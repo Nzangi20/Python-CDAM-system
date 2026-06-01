@@ -1343,27 +1343,6 @@ def admin_integrity():
     return render_template("admin_integrity.html", logs=logs, users_map=users_map, exams_map=exams_map)
 
 
-@app.post("/oauth/demo")
-def demo_oauth_login():
-    demo_email = "demo.student@cdam.local"
-    user = User.query.filter_by(email=demo_email).first()
-    if not user:
-        user = User(
-            name="Demo Student",
-            email=demo_email,
-            password_hash=generate_password_hash("demo-oauth-secret"),
-            auth_provider="demo_oauth",
-            avatar=CDAM_LOGO,
-            is_admin=False,
-            study_level="Beginner",
-        )
-        db.session.add(user)
-        db.session.commit()
-    login_user(user)
-    log_activity("auth.demo_oauth")
-    flash("Logged in via Demo OAuth.", "success")
-    return redirect(url_for("student_dashboard"))
-
 
 def migrate_schema() -> None:
 

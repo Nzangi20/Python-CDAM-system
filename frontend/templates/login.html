@@ -21,13 +21,7 @@
     <button class="btn primary" type="submit" style="width: 100%; font-weight: 700; margin-top: 0.5rem; padding: 0.85rem;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
   </form>
 
-  <div class="auth-divider" style="margin: 1.5rem 0; text-align: center; position: relative;">
-    <span style="background: var(--bg-soft); padding: 0 0.75rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Or connect with</span>
-  </div>
 
-  <form method="post" action="{{ url_for('demo_oauth_login') }}" style="margin-top: 0;">
-    <button class="btn oauth" type="submit" style="width: 100%; font-weight: 600; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: #ffffff;"><i class="fa-solid fa-shield-halved" style="color: var(--red-400);"></i> Continue with Demo OAuth</button>
-  </form>
 
   <p class="muted center" style="margin-top: 2rem; font-size: 0.9rem;">
     New to CDAM? <a href="{{ url_for('register') }}" style="color: var(--red-400); font-weight: 600; text-decoration: none;">Create an account</a>
