@@ -1,5 +1,7 @@
 # 🎓 CDAM - Python for Data Science LMS Masterclass Platform
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-red?style=for-the-badge&logo=render&logoColor=white)](https://python-cdam-system.onrender.com)
+
 An enterprise-grade, high-fidelity Learning Management System (LMS) inspired by the **Center for Data Analytics & Modelling (CDAM)** at **Chuka University**. Built with a modern, premium dark-red aesthetics design system, advanced automated anti-cheating proctoring, dynamic question builders, interactive code simulators, and full-featured role-based administrative dashboards.
 
 ---
