@@ -1417,6 +1417,8 @@ def initialize():
             db.session.commit()
 
 
+# Automatically initialize and seed the database on server startup/import
+initialize()
+
 if __name__ == "__main__":
-    initialize()
     app.run(debug=False)
