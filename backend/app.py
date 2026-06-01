@@ -46,7 +46,7 @@ app = Flask(
     static_folder=str(FRONTEND_DIR / "static"),
 )
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "change-this-in-production")
-db_url = os.environ.get("DATABASE_URL", "mysql+pymysql://root:@localhost:3306/cdam_lms")
+db_url = os.environ.get("DATABASE_URL", "mysql+pymysql://root:@localhost:3306/cdam_lms").strip()
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
