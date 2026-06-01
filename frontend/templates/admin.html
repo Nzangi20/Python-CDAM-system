@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard-header fade-in">
+  <div>
+    <h1 style="font-weight: 800; font-size: 2rem; letter-spacing: -0.02em;">Admin Control Center</h1>
+    <p class="muted" style="margin-top: 0.25rem;">Manage curriculum, review student progress, and monitor assessment integrity.</p>
+  </div>
+  <div class="hero-actions">
+    <a class="btn primary" href="{{ url_for('admin_session_new') }}"><i class="fa-solid fa-plus"></i> Add Session</a>
+    <a class="btn" href="{{ url_for('admin_export_csv') }}"><i class="fa-solid fa-file-csv"></i> Export CSV Report</a>
+  </div>
+</div>
+
+<!-- Stats Dashboard -->
+<section class="stats fade-in delay" style="margin-bottom: 2.5rem;">
+  <div class="stat-card">
+    <h3>Total Enrolled</h3>
+    <p>{{ users_count }}</p>
+    <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-user-graduate"></i> Active Students</span>
+  </div>
+  <div class="stat-card">
+    <h3>Active Today</h3>
+    <p>{{ active_users }}</p>
+    <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-circle-nodes"></i> Unique Visitors</span>
+  </div>
+  <div class="stat-card">
+    <h3>Curriculum Sessions</h3>
+    <p>{{ published_count }}</p>
+    <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-book-open"></i> Published Units</span>
+  </div>
+  <div class="stat-card">
+    <h3>Certificates Issued</h3>
+    <p>{{ completion_count }}</p>
+    <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-award"></i> Course Completions</span>
+  </div>
+  <div class="stat-card">
+    <h3>Average Performance</h3>
+    <p>{{ "%.1f"|format(avg_quiz_score) }}%</p>
+    <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-chart-line"></i> Quiz/Practice scores</span>
+  </div>
+</section>
+
+<!-- Main Admin Tabs -->
+<div class="tabs" role="tablist" style="margin-bottom: 2rem;">
+  <button class="tab active" data-tab="sessions"><i class="fa-solid fa-chalkboard-user"></i> Sessions Management</button>
+  <button class="tab" data-tab="students"><i class="fa-solid fa-users"></i> Student Roster</button>
+  <button class="tab" data-tab="discussions"><i class="fa-solid fa-comments"></i> Discussions Moderation</button>
+  <button class="tab" data-tab="comms"><i class="fa-solid fa-envelope-open-text"></i> System Notifications</button>
+</div>
+
+<!-- Sessions Panel -->
+<section class="tab-panel active" id="sessions">
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: flex-start;">
+    <!-- Course Sessions Grid -->
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      <h3 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 0.5rem;">Interactive Session List</h3>
+      <div style="display: grid; gap: 1rem; grid-template-columns: 1fr;">
+        {% for session in sessions %}
+          <div class="card" style="padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <span class="badge" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">Order {{ session.display_order }}</span>
+                <span class="badge {% if session.published %}success{% endif %}" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">
+                  {{ "Published" if session.published else "Draft" }}
+                </span>
+              </div>
+              <h4 style="font-weight: 800; font-size: 1.15rem; margin-top: 0.4rem;">{{ session.title }}</h4>
+              <p class="muted" style="font-size: 0.85rem; margin-top: 0.15rem;">{{ session.duration }} | {{ session.difficulty }}</p>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <a class="btn ghost" href="{{ url_for('admin_session_edit', session_id=session.id) }}" style="padding: 0.45rem 0.85rem; font-size: 0.85rem;"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+              <form method="post" action="{{ url_for('admin_toggle_publish', session_id=session.id) }}" style="margin:0;">
+                <button class="btn" type="submit" style="padding: 0.45rem 0.85rem; font-size: 0.85rem;">
+                  {{ "Unpublish" if session.published else "Publish" }}
+                </button>
+              </form>
+              <form method="post" action="{{ url_for('admin_session_delete', session_id=session.id) }}" onsubmit="return confirm('Are you sure you want to delete this session? All associated progress and comments will be permanently removed.')" style="margin:0;">
+                <button class="btn" type="submit" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; border-color: rgba(239, 68, 68, 0.4); color: var(--red-400); background: rgba(239, 68, 68, 0.05);"><i class="fa-regular fa-trash-can"></i> Delete</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Quick Ordering Form -->
+    <div class="card" style="padding: 1.5rem;">
+      <h3 style="font-weight: 800; font-size: 1.15rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-sort" style="color: var(--red-500);"></i> Quick Reorder</h3>
+      <p class="muted" style="font-size: 0.85rem; margin-bottom: 1rem;">Set the numerical order positions to rearrange lessons in the student dashboard.</p>
+      <form method="post" action="{{ url_for('admin_reorder_sessions') }}">
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          {% for session in sessions %}
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="number" name="session_id" value="{{ session.id }}" hidden />
+              <input type="number" name="order_{{ session.id }}" value="{{ session.display_order }}" style="width: 60px; padding: 0.4rem; text-align: center;" />
+              <span style="font-size: 0.9rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ session.title }}</span>
+            </div>
+          {% endfor %}
+        </div>
+        <button class="btn primary" type="submit" style="width: 100%; margin-top: 1.5rem;"><i class="fa-solid fa-save"></i> Save Display Order</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Student Roster Panel -->
+<section class="tab-panel card" id="students">
+  <h3 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1rem;"><i class="fa-solid fa-users-gear" style="color: var(--red-500);"></i> Student Accounts & Performance</h3>
+  <div style="overflow-x: auto;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email Address</th>
+          <th>Auth Mode</th>
+          <th>Account Level</th>
+          <th>Status</th>
+          <th style="text-align: right;">Roster Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+          <tr>
+            <td style="font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+              <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--bg-soft); border: 1px solid var(--border); display: grid; place-items: center; font-size: 0.75rem;">
+                {{ user.name[0] | upper if user.name else 'U' }}
+              </div>
+              {{ user.name }}
+            </td>
+            <td>{{ user.email }}</td>
+            <td style="text-transform: capitalize; font-size: 0.9rem;"><i class="fa-solid fa-key" style="font-size: 0.75rem; color: var(--text-muted);"></i> {{ user.auth_provider }}</td>
+            <td>
+              <span class="badge" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">{{ user.study_level }}</span>
+            </td>
+            <td>
+              {% if user.is_suspended %}
+                <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: var(--red-500); border-color: rgba(239, 68, 68, 0.2);"><i class="fa-solid fa-user-slash"></i> Suspended</span>
+              {% else %}
+                <span class="badge success" style="padding: 0.15rem 0.5rem;"><i class="fa-solid fa-circle-check"></i> Active</span>
+              {% endif %}
+            </td>
+            <td style="text-align: right;">
+              {% if not user.is_admin %}
+                <form method="post" action="{{ url_for('admin_toggle_suspend', user_id=user.id) }}" style="display:inline; margin: 0;">
+                  <button class="btn ghost" type="submit" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: var(--border);">
+                    {{ "Unsuspend" if user.is_suspended else "Suspend" }}
+                  </button>
+                </form>
+                <form method="post" action="{{ url_for('admin_reset_progress', user_id=user.id) }}" onsubmit="return confirm('Reset all module achievements and bookmarks for this student?')" style="display:inline; margin: 0;">
+                  <button class="btn ghost" type="submit" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: var(--border);">
+                    Reset Progress
+                  </button>
+                </form>
+              {% else %}
+                <span class="badge success" style="background: rgba(185, 28, 28, 0.1); color: var(--red-400); border-color: rgba(185,28,28,0.2);"><i class="fa-solid fa-user-shield"></i> Course Admin</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Discussions Panel -->
+<section class="tab-panel card" id="discussions">
+  <h3 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1rem;"><i class="fa-solid fa-comments" style="color: var(--red-500);"></i> Comment Moderation Queue</h3>
+  <div style="overflow-x: auto;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Session</th>
+          <th>Comment Snippet</th>
+          <th>Author</th>
+          <th>Status</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for comment in comments %}
+          <tr>
+            <td style="font-weight: 700;">{{ comment.session.title if comment.session else comment.session_id }}</td>
+            <td style="font-style: italic; color: var(--text-muted); font-size: 0.95rem;">"{{ comment.content[:75] }}{% if comment.content|length > 75 %}...{% endif %}"</td>
+            <td>{{ comment.user.name if comment.user else 'Student' }}</td>
+            <td>
+              {% if comment.approved %}
+                <span class="badge success" style="padding: 0.15rem 0.5rem;"><i class="fa-solid fa-eye"></i> Approved</span>
+              {% else %}
+                <span class="badge" style="background: rgba(0,0,0,0.2); color: var(--text-muted); border-color: var(--border);"><i class="fa-solid fa-eye-slash"></i> Hidden</span>
+              {% endif %}
+            </td>
+            <td style="text-align: right;">
+              <form method="post" action="{{ url_for('admin_toggle_comment', comment_id=comment.id) }}" style="margin: 0;">
+                <button class="btn ghost" type="submit" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                  {{ "Hide Comment" if comment.approved else "Approve" }}
+                </button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="muted" style="text-align: center; padding: 2rem 0;">No comments in database.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Comms Notification Panel -->
+<section class="tab-panel" id="comms">
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: flex-start;">
+    <div class="card" style="padding: 1.5rem;">
+      <h3 style="font-weight: 800; font-size: 1.15rem; margin-bottom: 1rem;"><i class="fa-solid fa-paper-plane" style="color: var(--red-500);"></i> Broadcast Notification</h3>
+      <form method="post" action="{{ url_for('admin_send_notification') }}">
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Alert Title</label>
+          <input type="text" name="title" placeholder="e.g. Server Maintenance or New Assessment Uploaded" required />
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Alert Message Description</label>
+          <textarea name="message" rows="4" placeholder="Type notification instructions here..." required></textarea>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Recipient Group</label>
+          <select name="target">
+            <option value="all">Broadcast to All Students</option>
+            {% for user in users if not user.is_admin %}
+              <option value="{{ user.id }}">{{ user.name }} ({{ user.email }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button class="btn primary" type="submit" style="margin-top: 1rem;"><i class="fa-solid fa-bell"></i> Broadcast Notification</button>
+      </form>
+    </div>
+
+    <!-- Activity and Stats logs -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div class="card" style="padding: 1.5rem;">
+        <h3 style="font-weight: 800; font-size: 1.15rem; margin-bottom: 1rem;"><i class="fa-solid fa-list-check" style="color: var(--red-500);"></i> Audit Activity Logs</h3>
+        <div style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.85rem;">
+          {% for item in recent_activities %}
+            <div style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+              <span class="muted">{{ item.created_at.strftime('%m-%d %H:%M') }}</span> | 
+              <strong style="color: var(--red-400);">{{ item.role }}</strong> | 
+              <span>{{ item.action }}</span>
+            </div>
+          {% else %}
+            <p class="muted">No activity logs recorded.</p>
+          {% endfor %}
+        </div>
+      </div>
+      
+      <div class="card" style="padding: 1.5rem;">
+        <h3 style="font-weight: 800; font-size: 1.15rem; margin-bottom: 1rem;"><i class="fa-regular fa-eye" style="color: var(--red-500);"></i> Popular Lessons</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.9rem;">
+          {% for row in most_viewed %}
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+              <span style="font-weight: 600;">{{ row[0] }}</span>
+              <span class="badge success" style="font-size: 0.75rem; padding: 0.15rem 0.5rem;">{{ row[1] }} views</span>
+            </div>
+          {% else %}
+            <p class="muted">No session views recorded yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

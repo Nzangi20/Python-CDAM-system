@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard-header fade-in" style="
+  position: relative;
+  background-image: linear-gradient(135deg, rgba(73, 3, 3, 0.8) 0%, rgba(10, 5, 20, 0.92) 100%), url('{{ url_for('static', filename='assets/cdam/home-page-1476x1476-1.jpg') }}');
+  background-size: cover;
+  background-position: center;
+  border-radius: 16px;
+  padding: 3rem 2.5rem;
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+">
+  <!-- Subtle radial light reflection overlay -->
+  <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 60%); pointer-events: none;"></div>
+
+  <div style="position: relative; z-index: 2; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+    <div style="
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--red-500) 0%, #e11d48 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(225, 29, 72, 0.45);
+      border: 3px solid rgba(255, 255, 255, 0.25);
+    ">
+      {{ current_user.name[0] | upper }}
+    </div>
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <h1 style="font-weight: 800; font-size: 2.25rem; letter-spacing: -0.02em; color: #ffffff; margin: 0;">Welcome back, {{ current_user.name }}!</h1>
+        <span class="badge" style="background: rgba(225, 29, 72, 0.25); color: #ffffff; border-color: rgba(225, 29, 72, 0.4); font-weight: 700; font-size: 0.8rem; padding: 0.25rem 0.75rem; border-radius: 30px;">
+          <i class="fa-solid fa-graduation-cap"></i> {{ current_user.study_level }} Level
+        </span>
+      </div>
+      <p style="margin-top: 0.5rem; font-size: 1.05rem; opacity: 0.95; color: rgba(255, 255, 255, 0.85); font-weight: 400; max-width: 600px; margin-bottom: 0;">
+        <i class="fa-solid fa-id-card" style="margin-right: 0.35rem; opacity: 0.7;"></i> Registration Number: <strong>{{ current_user.reg_number or 'ADMIN' }}</strong>
+      </p>
+    </div>
+  </div>
+
+  <div style="position: relative; z-index: 2; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+    {% if progress_pct == 100 %}
+      <a class="btn primary" href="{{ url_for('view_certificate', user_id=current_user.id) }}" style="background: #ffffff; color: var(--red-700); font-weight: 700; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 0.65rem 1.25rem; border-radius: 8px;">
+        <i class="fa-solid fa-award"></i> View Certificate
+      </a>
+    {% endif %}
+    <a class="btn ghost" href="{{ url_for('resources') }}" style="background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.25); color: #ffffff; padding: 0.65rem 1.25rem; border-radius: 8px; backdrop-filter: blur(8px);">
+      <i class="fa-solid fa-folder-open"></i> Resources Catalog
+    </a>
+  </div>
+</div>
+
+<section class="stats fade-in delay">
+  <div class="stat-card" style="display: flex; flex-direction: row; align-items: center; gap: 1.5rem; justify-content: space-between;">
+    <div>
+      <h3>Mastery Progress</h3>
+      <p>{{ completed_count }}/{{ total_sessions }} Sessions</p>
+      <span class="muted" style="font-size: 0.85rem;">{{ progress_pct }}% Completed</span>
+    </div>
+    <div class="progress-ring" style="--pct: {{ progress_pct }};">
+      <span>{{ progress_pct }}%</span>
+    </div>
+  </div>
+
+  <div class="stat-card" style="display: flex; flex-direction: row; align-items: center; gap: 1.5rem; justify-content: space-between;">
+    <div>
+      <h3>Learning Streak</h3>
+      <p>{{ streak }} Days</p>
+      <span class="muted" style="font-size: 0.85rem;">Keep coding daily!</span>
+    </div>
+    <div style="font-size: 2.5rem; color: #f59e0b;"><i class="fa-solid fa-fire"></i></div>
+  </div>
+
+  <div class="stat-card" style="display: flex; flex-direction: row; align-items: center; gap: 1.5rem; justify-content: space-between;">
+    <div>
+      <h3>Exam Average</h3>
+      <p>{{ "%.1f"|format(exam_avg) }}%</p>
+      <span class="muted" style="font-size: 0.85rem;">Passing criteria: 50%</span>
+    </div>
+    <div style="font-size: 2.5rem; color: var(--red-500);"><i class="fa-solid fa-graduation-cap"></i></div>
+  </div>
+</section>
+
+<div class="dashboard-grid fade-in">
+  <!-- Left Side Column -->
+  <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <!-- Continue Learning Section -->
+    <div class="card" style="
+      padding: 2rem 1.75rem; 
+      position: relative;
+      background-image: linear-gradient(135deg, rgba(12, 6, 24, 0.9) 0%, rgba(139, 0, 0, 0.78) 100%), url('{{ url_for('static', filename='assets/cdam/IMG_9428.jpg') }}');
+      background-size: cover;
+      background-position: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      color: #fff;
+    ">
+      <div style="position: relative; z-index: 2;">
+        <h2 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 1.25rem; color: #ffffff; display: flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-play" style="color: #f43f5e;"></i> Resume Your Learning Path</h2>
+        {% if recent_sessions %}
+          {% set latest = recent_sessions[0] %}
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
+            <div>
+              <h4 style="font-weight: 700; font-size: 1.15rem; margin-bottom: 0.25rem; color: #fff;">{{ latest.display_order }}. {{ latest.title }}</h4>
+              <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.8); margin: 0;">Resume masterclass session</p>
+            </div>
+            <a class="btn primary" href="{{ url_for('session_detail', slug=latest.slug) }}" style="background: var(--red-500); border: none; box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);"><i class="fa-solid fa-arrow-right"></i> Resume Session</a>
+          </div>
+        {% else %}
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
+            <div>
+              <h4 style="font-weight: 700; font-size: 1.15rem; margin-bottom: 0.25rem; color: #fff;">Begin the Curriculum</h4>
+              <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.8); margin: 0;">Start with Session 1: Introduction to Python</p>
+            </div>
+            <a class="btn primary" href="{{ url_for('index') }}#curriculum" style="background: var(--red-500); border: none; box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);"><i class="fa-solid fa-arrow-right"></i> Browse Sessions</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Quiz & Exam Performance Chart -->
+    <div class="card">
+      <h2 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-chart-simple" style="color: var(--red-500);"></i> Quiz Scores Overview</h2>
+      {% if chart_values and chart_labels %}
+        <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+          {% for label in chart_labels %}
+            {% set score = chart_values[loop.index0] %}
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.25rem;">
+                <span style="font-weight: 600;">{{ label }}</span>
+                <span style="font-weight: 700; color: var(--red-400);">{{ score }}%</span>
+              </div>
+              <div class="mini-progress">
+                <span style="width: {{ score }}%;"></span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="muted" style="text-align: center; padding: 2rem 0;">No quiz scores recorded yet. Complete session quizzes to see analytics.</p>
+      {% endif %}
+    </div>
+
+    <!-- Bookmarks and Achievements -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+      <div class="card">
+        <h2 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1rem;"><i class="fa-regular fa-bookmark" style="color: var(--red-500);"></i> Bookmarks</h2>
+        {% if bookmarked %}
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            {% for session in bookmarked %}
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <a href="{{ url_for('session_detail', slug=session.slug) }}" style="color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.95rem;">{{ session.title }}</a>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="muted" style="font-size: 0.9rem;">You haven't bookmarked any sessions yet.</p>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <h2 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1rem;"><i class="fa-solid fa-trophy" style="color: var(--red-500);"></i> Achievements</h2>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
+          <span class="badge success" style="opacity: {% if streak >= 1 %}1{% else %}0.3{% endif %};"><i class="fa-solid fa-fire"></i> First Spark</span>
+          <span class="badge success" style="opacity: {% if completed_count >= 1 %}1{% else %}0.3{% endif %};"><i class="fa-solid fa-check"></i> Session 1 Done</span>
+          <span class="badge success" style="opacity: {% if completed_count >= 5 %}1{% else %}0.3{% endif %};"><i class="fa-solid fa-star"></i> Halfway Star</span>
+          <span class="badge success" style="opacity: {% if completed_count == total_sessions and total_sessions > 0 %}1{% else %}0.3{% endif %};"><i class="fa-solid fa-award"></i> Graduate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side Column -->
+  <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <!-- Recent Notifications -->
+    <div class="card">
+      <h2 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1rem;"><i class="fa-regular fa-bell" style="color: var(--red-500);"></i> Notifications</h2>
+      {% if notifications %}
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          {% for n in notifications %}
+            <div style="border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; last-child: {border:none};">
+              <p style="font-size: 0.925rem; font-weight: 600; color: var(--text);">{{ n.message }}</p>
+              <span class="muted" style="font-size: 0.775rem;">{{ n.created_at.strftime('%b %d, %H:%M') }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="muted" style="font-size: 0.9rem;">No recent notifications.</p>
+      {% endif %}
+    </div>
+
+    <!-- Exam History Records -->
+    <div class="card">
+      <h2 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1rem;"><i class="fa-solid fa-file-signature" style="color: var(--red-500);"></i> Exam Attempts</h2>
+      {% if exam_attempts %}
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          {% for att in exam_attempts %}
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;">
+              <div>
+                <h4 style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.15rem;">{{ att.exam.title }}</h4>
+                <span class="muted" style="font-size: 0.8rem;">Attempt #{{ att.attempt_number }}</span>
+              </div>
+              <div style="text-align: right;">
+                <span class="badge {% if att.score >= att.exam.passing_score %}success{% else %}error{% endif %}">
+                  {{ att.score }}%
+                </span>
+                <p class="muted" style="font-size: 0.75rem; margin-top: 0.2rem;">{{ att.completed_at.strftime('%b %d') if att.completed_at else 'Active' }}</p>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="muted" style="font-size: 0.9rem;">No exam attempts recorded yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

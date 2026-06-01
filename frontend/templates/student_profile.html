@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard-header fade-in">
+  <div>
+    <h1 style="font-weight: 800; font-size: 2rem; letter-spacing: -0.02em;">Student Profile</h1>
+    <p class="muted" style="margin-top: 0.25rem;">Manage your credentials, select your default study level, and adjust account settings.</p>
+  </div>
+</div>
+
+<div class="dashboard-grid fade-in">
+  <!-- Left Side: Profile Edit Form -->
+  <div class="card" style="padding: 2.5rem;">
+    <h3 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-user-gear" style="color: var(--red-500);"></i> Edit Profile Details</h3>
+    
+    <form method="post">
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label>Full Name</label>
+        <input type="text" name="name" value="{{ current_user.name }}" required />
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label>Avatar URL (Link to your picture)</label>
+        <input type="url" name="avatar" value="{{ current_user.avatar or '' }}" placeholder="https://domain.com/avatar.jpg" />
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label>Academic Experience Level</label>
+        <select name="study_level" required style="padding: 0.8rem 1rem;">
+          <option value="Beginner" {% if current_user.study_level == "Beginner" %}selected{% endif %}>Beginner (Introductory Concepts)</option>
+          <option value="Intermediate" {% if current_user.study_level == "Intermediate" %}selected{% endif %}>Intermediate (Standard Analytics)</option>
+          <option value="Professional" {% if current_user.study_level == "Professional" %}selected{% endif %}>Professional (ML / Advanced Coding)</option>
+        </select>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem; margin-top: 1rem;">
+        <h4 style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--red-400);">Security Credential Refresh</h4>
+        <label>New Password (Leave blank to keep current)</label>
+        <input type="password" name="new_password" placeholder="••••••••" />
+      </div>
+
+      <button class="btn primary" type="submit" style="width: 100%; margin-top: 1.5rem; padding: 0.85rem; font-weight: 700;"><i class="fa-solid fa-save"></i> Save Changes</button>
+    </form>
+  </div>
+
+  <!-- Right Side: Account Summary Card -->
+  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <div class="card" style="text-align: center; padding: 2.5rem 1.5rem;">
+      <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--red-700); color: white; display: grid; place-items: center; font-size: 2rem; font-weight: 800; margin: 0 auto 1.5rem; border: 2px solid var(--border); box-shadow: var(--shadow);">
+        {% if current_user.avatar %}
+          <img src="{{ current_user.avatar }}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+        {% endif %}
+        <span>{{ current_user.name[0] | upper if current_user.name else 'S' }}</span>
+      </div>
+
+      <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 0.25rem;">{{ current_user.name }}</h3>
+      <p class="muted" style="font-size: 0.9rem; margin-bottom: 1.5rem;">{{ current_user.email }}</p>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+          <span class="muted">Account Role:</span>
+          <span class="badge success" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;"><i class="fa-solid fa-user-graduate"></i> Student</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+          <span class="muted">OAuth Provider:</span>
+          <span class="badge" style="font-size: 0.75rem; padding: 0.2rem 0.6rem; text-transform: uppercase;">{{ current_user.auth_provider }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+          <span class="muted">Study Track:</span>
+          <span class="badge" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">{{ current_user.study_level }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

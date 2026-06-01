@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero fade-in">
+  <div class="hero-copy">
+    <span class="badge pulse"><i class="fa-solid fa-fire"></i> CDAM Intake Ongoing!</span>
+    <h1>Master Python for Data Science</h1>
+    <p>
+      Unlock your potential with CDAM's professional masterclass in Python, analytics,
+      machine learning, and AI — inspired by the Center for Data Analytics & Modelling at Chuka University.
+    </p>
+    <div class="hero-actions">
+      <a class="btn primary" href="{{ url_for('register') }}"><i class="fa-solid fa-rocket"></i> Start Learning</a>
+      <a class="btn ghost" href="#curriculum"><i class="fa-solid fa-compass"></i> Explore Sessions</a>
+    </div>
+    <div class="hero-badges">
+      <span class="badge"><i class="fa-brands fa-python"></i> Python 3+</span>
+      <span class="badge"><i class="fa-solid fa-database"></i> SQL & R Ready</span>
+      <span class="badge"><i class="fa-solid fa-brain"></i> Machine Learning</span>
+      <span class="badge"><i class="fa-solid fa-chart-pie"></i> AI Analytics</span>
+    </div>
+  </div>
+  <div class="glass-card">
+    <img src="{{ cdam_logo }}" alt="CDAM" class="hero-logo" style="width: 64px; height: 64px; object-fit: contain; background: white; padding: 4px; border-radius: 12px; margin-bottom: 0.5rem;" />
+    <h3 style="font-weight: 800; font-size: 1.25rem;">Python Masterclass</h3>
+    <p style="font-size: 0.9rem; color: var(--text-muted);">Premium bootcamp-style learning with progress tracking, separate exams & quizzes, and automated integrity protection.</p>
+    <ul class="feature-list">
+      <li>10 practical sessions</li>
+      <li>Hands-on code simulations</li>
+      <li>Dedicated exams & quizzes</li>
+      <li>Industry-recognized certificate</li>
+    </ul>
+  </div>
+</section>
+
+<section class="about-cdam card fade-in delay" style="margin-bottom: 3rem;">
+  <h2 style="font-weight: 800; font-size: 1.75rem; margin-bottom: 1rem;"><i class="fa-solid fa-university" style="color: var(--red-500);"></i> About CDAM</h2>
+  <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 1.05rem;">
+    The Center for Data Analytics & Modelling (CDAM) at Chuka University is dedicated to cutting-edge training, consulting, and research in Data Science, Machine Learning, and Artificial Intelligence using Python, R, SQL, and advanced visualization tools.
+  </p>
+  <div class="vision-mission" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+    <div class="card" style="padding: 1.5rem; background: rgba(255, 255, 255, 0.02);">
+      <h4 style="font-weight: 700; font-size: 1.1rem; color: var(--red-400); margin-bottom: 0.5rem;"><i class="fa-solid fa-eye"></i> Our Vision</h4>
+      <p style="font-size: 0.95rem; color: var(--text-muted);">To be a leading regional center of excellence in data science, predictive modeling, and analytics-driven development.</p>
+    </div>
+    <div class="card" style="padding: 1.5rem; background: rgba(255, 255, 255, 0.02);">
+      <h4 style="font-weight: 700; font-size: 1.1rem; color: var(--red-400); margin-bottom: 0.5rem;"><i class="fa-solid fa-bullseye"></i> Our Mission</h4>
+      <p style="font-size: 0.95rem; color: var(--text-muted);">To generate actionable data-driven insights through advanced analytics, empowering researchers, professionals, and students to innovate.</p>
+    </div>
+  </div>
+</section>
+
+<section id="curriculum" class="curriculum fade-in" style="margin-bottom: 3rem;">
+  <div class="section-head" style="margin-bottom: 2rem;">
+    <h2 style="font-weight: 800; font-size: 2rem;"><i class="fa-solid fa-graduation-cap" style="color: var(--red-500);"></i> Learning Curriculum</h2>
+    <form class="filter-form" method="get" style="display: flex; gap: 0.75rem; align-items: center;">
+      <input type="search" name="q" value="{{ query }}" placeholder="Search sessions..." style="padding: 0.6rem 1rem;" />
+      <select name="difficulty" style="padding: 0.6rem 1rem;">
+        <option value="">All levels</option>
+        {% for level in difficulties %}
+          <option value="{{ level }}" {% if difficulty == level %}selected{% endif %}>{{ level }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn primary" type="submit" style="padding: 0.6rem 1.25rem;"><i class="fa-solid fa-filter"></i> Filter</button>
+    </form>
+  </div>
+
+  <div class="grid">
+    {% for session in sessions %}
+      {% set has_access = not current_user.is_authenticated or check_session_access(current_user, session.display_order) %}
+      <article class="card hover-scale" style="{% if current_user.is_authenticated and not has_access %}border-color: rgba(245, 158, 11, 0.2);{% endif %}">
+        <div class="card-top">
+          <span class="badge">{{ session.difficulty }}</span>
+          {% if current_user.is_authenticated and not has_access %}
+            <span class="badge warning" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);"><i class="fa-solid fa-lock"></i> Locked</span>
+          {% endif %}
+          <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;"><i class="fa-regular fa-clock"></i> {{ session.duration }}</span>
+        </div>
+        <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 0.75rem;">{{ session.display_order }}. {{ session.title }}</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; height: 4.5rem;">{{ session.description }}</p>
+        {% if current_user.is_authenticated %}
+          {% if has_access %}
+            <a class="btn primary" href="{{ url_for('session_detail', slug=session.slug) }}" style="width: 100%;"><i class="fa-solid fa-book-open-reader"></i> Learn Session</a>
+          {% else %}
+            <button class="btn ghost" disabled style="width: 100%; cursor: not-allowed; opacity: 0.65; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+              <i class="fa-solid fa-lock" style="color: #fbbf24;"></i> Locked ({{ session.difficulty }} Level)
+            </button>
+          {% endif %}
+        {% else %}
+          <a class="btn" href="{{ url_for('register') }}" style="width: 100%;"><i class="fa-solid fa-user-plus"></i> Enroll to Access</a>
+        {% endif %}
+      </article>
+    {% else %}
+      <p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted); padding: 3rem 0;">No sessions found matching your criteria.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="partners card fade-in" style="text-align: center; padding: 2.5rem 1rem;">
+  <h2 style="font-weight: 800; font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--text-muted);">Affiliated Partners</h2>
+  <div style="display: flex; justify-content: center; align-items: center; gap: 2rem;">
+    <img src="{{ chuka_logo }}" alt="Chuka University Logo" class="partner-logo" style="height: 80px; object-fit: contain; background: white; padding: 8px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);" />
+  </div>
+</section>
+{% endblock %}

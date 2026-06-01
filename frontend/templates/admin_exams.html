@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard-header fade-in">
+  <div>
+    <h1 style="font-weight: 800; font-size: 2rem; letter-spacing: -0.02em;">Manage Assessments & Exams</h1>
+    <p class="muted" style="margin-top: 0.25rem;">Create online tests, schedule start/end windows, configure anti-cheat policies, and construct question cards.</p>
+  </div>
+</div>
+
+<div class="dashboard-grid fade-in">
+  <!-- Create Exam Panel -->
+  <div class="card" style="padding: 2rem;">
+    <h2 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 1.25rem;"><i class="fa-solid fa-file-signature" style="color: var(--red-500);"></i> Create New Assessment</h2>
+    
+    <form method="post" id="examCreationForm">
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label>Exam Title</label>
+        <input type="text" name="title" placeholder="e.g. Session 1 Comprehensive Exam" required />
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label>Description</label>
+        <textarea name="description" rows="3" placeholder="Describe the topics, syllabus covered..." required></textarea>
+      </div>
+
+      <div class="form-row">
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Duration (Minutes)</label>
+          <input type="number" name="duration" value="30" min="5" max="300" required />
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Passing Score (%)</label>
+          <input type="number" name="passing_score" value="50" min="10" max="100" required />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Exam Mode</label>
+          <select name="exam_type">
+            <option value="multiple_choice">Multiple Choice (MCQ)</option>
+            <option value="essay">Written Essay / Coding</option>
+            <option value="mixed">Mixed Assessment</option>
+          </select>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Target Study Level</label>
+          <select name="study_level" required>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Professional">Professional</option>
+          </select>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Max Attempts Allowed</label>
+          <input type="number" name="attempt_limit" value="1" min="1" max="10" required />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Start Window (Optional)</label>
+          <input type="datetime-local" name="start_time" />
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>End Window (Optional)</label>
+          <input type="datetime-local" name="end_time" />
+        </div>
+      </div>
+
+      <!-- Proctoring Policies -->
+      <div style="margin: 1rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: rgba(0,0,0,0.15);">
+        <h4 style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.75rem; color: var(--red-400);"><i class="fa-solid fa-shield-halved"></i> Anti-Cheat Integrity Policies</h4>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <label class="checkbox-row">
+            <input type="checkbox" name="proctoring_enabled" checked />
+            Enforce Fullscreen / Focus lock monitoring
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" name="one_device_only" />
+            Lock attempt to a single session/device
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" name="randomize_questions" />
+            Randomize question display order for students
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" name="randomize_options" />
+            Randomize MCQ answer options layout
+          </label>
+        </div>
+      </div>
+
+      <!-- Question Builder Container -->
+      <div style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+        <h3 style="font-weight: 800; font-size: 1.15rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+          <span>Questions Set</span>
+          <button type="button" class="btn primary" id="addQuestionBtn" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;"><i class="fa-solid fa-plus"></i> Add Question</button>
+        </h3>
+        
+        <div id="questionsBuilderContainer" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+          <!-- Questions will be dynamically built here -->
+        </div>
+
+        <input type="hidden" name="questions_json" id="questionsJsonInput" value="[]" />
+      </div>
+
+      <button class="btn primary" type="submit" style="width: 100%; margin-top: 2rem; padding: 0.85rem; font-weight: 700;"><i class="fa-solid fa-save"></i> Save & Publish Assessment</button>
+    </form>
+  </div>
+
+  <!-- Active Assessments List -->
+  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <h2 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 0.25rem;"><i class="fa-solid fa-list-check" style="color: var(--red-500);"></i> Existing Assessments</h2>
+    
+    {% for exam in exams %}
+      <div class="card" style="padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
+          <div>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <span class="badge">{{ exam.exam_type }}</span>
+              <span class="badge" style="background: rgba(86, 0, 126, 0.12); color: var(--purple-brand); border-color: rgba(86, 0, 126, 0.25);"><i class="fa-solid fa-graduation-cap"></i> {{ exam.study_level }}</span>
+              <span class="badge {% if exam.published %}success{% endif %}">{{ "Active" if exam.published else "Draft" }}</span>
+            </div>
+            <h3 style="font-weight: 800; font-size: 1.2rem; margin-top: 0.5rem; margin-bottom: 0.25rem;">{{ exam.title }}</h3>
+            <p class="muted" style="font-size: 0.85rem;">{{ exam.duration }} Min | Passing score: {{ exam.passing_score }}%</p>
+          </div>
+        </div>
+
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin: 1rem 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">{{ exam.description }}</p>
+
+        <div style="display: flex; gap: 0.5rem; align-items: center; border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem;">
+          <a class="btn ghost" href="{{ url_for('admin_exam_edit', exam_id=exam.id) }}" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+          <form method="post" action="{{ url_for('admin_exam_toggle', exam_id=exam.id) }}" style="margin: 0;">
+            <button class="btn" type="submit" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+              {{ "Unpublish" if exam.published else "Publish" }}
+            </button>
+          </form>
+          <form method="post" action="{{ url_for('admin_exam_delete', exam_id=exam.id) }}" onsubmit="return confirm('Are you sure you want to delete this exam? This will erase all score logs and attempt sheets!')" style="margin: 0;">
+            <button class="btn" type="submit" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-color: rgba(239, 68, 68, 0.4); color: var(--red-400); background: rgba(239, 68, 68, 0.05);"><i class="fa-regular fa-trash-can"></i> Delete</button>
+          </form>
+        </div>
+      </div>
+    {% else %}
+      <p class="muted" style="text-align: center; padding: 3rem 0;">No exams configured yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (() => {
+    const addBtn = document.getElementById("addQuestionBtn");
+    const container = document.getElementById("questionsBuilderContainer");
+    const form = document.getElementById("examCreationForm");
+    const jsonInput = document.getElementById("questionsJsonInput");
+    let qCounter = 0;
+
+    addBtn.addEventListener("click", () => {
+      createQuestionBlock();
+    });
+
+    function createQuestionBlock(data = null) {
+      const qId = qCounter++;
+      const block = document.createElement("div");
+      block.className = "card question-builder-block";
+      block.style.padding = "1.25rem";
+      block.style.background = "rgba(255, 255, 255, 0.01)";
+      block.style.border = "1px solid var(--border)";
+      block.style.position = "relative";
+      
+      const type = data ? data.questionType : "mcq";
+      const qText = data ? data.questionText : "";
+      const marks = data ? data.marks : 1;
+      const options = data ? data.options : ["", "", "", ""];
+      const correct = data ? data.correctAnswer : "0";
+
+      block.innerHTML = `
+        <button type="button" class="remove-q-btn" style="position: absolute; top: 12px; right: 12px; background: none; border: none; color: var(--red-400); cursor: pointer; font-size: 1rem;"><i class="fa-solid fa-trash-can"></i></button>
+        <div style="display: flex; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 0.35rem;">
+            <label style="font-size: 0.8rem;">Question Type</label>
+            <select class="q-type" style="padding: 0.5rem 0.75rem; font-size: 0.85rem;">
+              <option value="mcq" ${type === "mcq" ? "selected" : ""}>Multiple Choice (MCQ)</option>
+              <option value="true_false" ${type === "true_false" ? "selected" : ""}>True / False</option>
+              <option value="essay" ${type === "essay" ? "selected" : ""}>Written Essay / Coding</option>
+            </select>
+          </div>
+          <div style="width: 100px; display: flex; flex-direction: column; gap: 0.35rem;">
+            <label style="font-size: 0.8rem;">Marks</label>
+            <input type="number" class="q-marks" value="${marks}" min="1" max="10" style="padding: 0.5rem 0.75rem; font-size: 0.85rem; text-align: center;" />
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.75rem;">
+          <label style="font-size: 0.8rem;">Question Text</label>
+          <input type="text" class="q-text" value="${qText.replace(/"/g, '&quot;')}" placeholder="e.g. What is the correct syntax for a list comprehension in Python?" required style="padding: 0.5rem 0.75rem; font-size: 0.85rem;" />
+        </div>
+
+        <div class="options-container" style="display: ${type === "mcq" ? "flex" : "none"}; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <label style="font-size: 0.8rem;">MCQ Options</label>
+          ${options.map((opt, i) => `
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="radio" name="correct_${qId}" class="q-correct-mcq" value="${i}" ${correct == i ? "checked" : ""} style="width: 16px; height: 16px;" />
+              <input type="text" class="q-opt" value="${opt.replace(/"/g, '&quot;')}" placeholder="Option ${i + 1}" style="padding: 0.4rem 0.75rem; font-size: 0.85rem;" />
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="tf-container" style="display: ${type === "true_false" ? "flex" : "none"}; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <label style="font-size: 0.8rem;">Correct True/False Answer</label>
+          <div style="display: flex; gap: 1.5rem; align-items: center; padding: 0.4rem 0;">
+            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.9rem; color: var(--text);">
+              <input type="radio" name="tf_val_${qId}" class="q-correct-tf" value="True" ${correct === "True" ? "checked" : ""} style="width: 16px; height: 16px;" /> True
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.9rem; color: var(--text);">
+              <input type="radio" name="tf_val_${qId}" class="q-correct-tf" value="False" ${correct === "False" ? "checked" : ""} style="width: 16px; height: 16px;" /> False
+            </label>
+          </div>
+        </div>
+      `;
+
+      // Event listener for type change
+      const typeSelect = block.querySelector(".q-type");
+      const optContainer = block.querySelector(".options-container");
+      const tfContainer = block.querySelector(".tf-container");
+
+      typeSelect.addEventListener("change", (e) => {
+        if (e.target.value === "mcq") {
+          optContainer.style.display = "flex";
+          tfContainer.style.display = "none";
+        } else if (e.target.value === "true_false") {
+          optContainer.style.display = "none";
+          tfContainer.style.display = "flex";
+        } else {
+          optContainer.style.display = "none";
+          tfContainer.style.display = "none";
+        }
+      });
+
+      // Remove button listener
+      block.querySelector(".remove-q-btn").addEventListener("click", () => {
+        block.remove();
+      });
+
+      container.appendChild(block);
+    }
+
+    form.addEventListener("submit", (e) => {
+      const qBlocks = container.querySelectorAll(".question-builder-block");
+      const questionsList = [];
+
+      qBlocks.forEach((qb) => {
+        const type = qb.querySelector(".q-type").value;
+        const marks = parseInt(qb.querySelector(".q-marks").value) || 1;
+        const text = qb.querySelector(".q-text").value.trim();
+
+        let options = [];
+        let correct = "";
+
+        if (type === "mcq") {
+          const optInputs = qb.querySelectorAll(".q-opt");
+          optInputs.forEach((inp) => {
+            options.push(inp.value.trim());
+          });
+          const correctRadio = qb.querySelector(".q-correct-mcq:checked");
+          correct = correctRadio ? correctRadio.value : "0";
+        } else if (type === "true_false") {
+          options = ["True", "False"];
+          const correctRadio = qb.querySelector(".q-correct-tf:checked");
+          correct = correctRadio ? correctRadio.value : "True";
+        } else {
+          options = [];
+          correct = "";
+        }
+
+        questionsList.push({
+          questionText: text,
+          questionType: type,
+          options: options,
+          correctAnswer: correct,
+          marks: marks
+        });
+      });
+
+      jsonInput.value = JSON.stringify(questionsList);
+    });
+
+    // Seed default first question to begin editing easily
+    createQuestionBlock();
+  })();
+</script>
+{% endblock %}

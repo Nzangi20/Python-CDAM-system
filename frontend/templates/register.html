@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="auth-card card fade-in" style="max-width: 500px; margin: 3rem auto; padding: 2.5rem;">
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <img src="{{ cdam_logo }}" alt="CDAM Logo" style="width: 56px; height: 56px; object-fit: contain; background: white; padding: 4px; border-radius: 10px; margin-bottom: 1rem;" />
+    <h1 style="font-weight: 800; font-size: 1.75rem; letter-spacing: -0.02em;">Create Account</h1>
+    <p class="muted" style="font-size: 0.9rem; margin-top: 0.25rem;">Start your professional certificate program today</p>
+  </div>
+
+  <form method="post">
+    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <label><i class="fa-regular fa-user"></i> Full Name</label>
+      <input type="text" name="name" placeholder="John Doe" required style="padding-left: 1rem;" />
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <label><i class="fa-solid fa-id-card"></i> Student Registration Number</label>
+      <input type="text" name="reg_number" placeholder="e.g. EB3/12345/24" required style="padding-left: 1rem;" />
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <label><i class="fa-solid fa-graduation-cap"></i> Current Python Experience Level</label>
+      <select name="study_level" required style="padding: 0.8rem 1rem;">
+        <option value="Beginner">Beginner (No coding experience)</option>
+        <option value="Intermediate">Intermediate (Basic syntax / data science intro)</option>
+        <option value="Professional">Professional (Advanced libraries / ML practitioner)</option>
+      </select>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <label><i class="fa-solid fa-lock"></i> Password</label>
+      <input type="password" name="password" placeholder="••••••••" required style="padding-left: 1rem;" />
+    </div>
+
+    <button class="btn primary" type="submit" style="width: 100%; font-weight: 700; margin-top: 0.5rem; padding: 0.85rem;"><i class="fa-solid fa-user-plus"></i> Create Account</button>
+  </form>
+
+  <p class="muted center" style="margin-top: 2rem; font-size: 0.9rem;">
+    Already registered? <a href="{{ url_for('login') }}" style="color: var(--red-400); font-weight: 600; text-decoration: none;">Sign In</a>
+  </p>
+</section>
+{% endblock %}

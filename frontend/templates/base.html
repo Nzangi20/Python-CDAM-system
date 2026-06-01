@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}CDAM | Python for Data Science LMS{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+  <!-- CDAM Corporate Brand Banner -->
+  <div class="cdam-brand-banner">
+    <div class="container banner-inner">
+      <div class="left-brand">
+        <img src="{{ chuka_logo }}" alt="Chuka University" class="chuka-banner-logo" />
+      </div>
+      <div class="divider-line"></div>
+      <div class="middle-brand">
+        <h1>Center For Data Analytics and Modeling</h1>
+      </div>
+      <div class="right-brand">
+        <img src="{{ cdam_logo }}" alt="CDAM" class="cdam-banner-logo" />
+      </div>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="container nav-wrap">
+      <a href="{{ url_for('index') }}" class="logo">
+        <img src="{{ cdam_logo }}" alt="CDAM Logo" class="logo-img" />
+        <span>CDAM LMS</span>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="{{ url_for('index') }}"><i class="fa-solid fa-house"></i> Home</a>
+        
+        <div class="dropdown">
+          <button class="dropbtn"><i class="fa-solid fa-book-open"></i> Sessions <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></button>
+          <div class="dropdown-content">
+            {% for s in nav_sessions %}
+              {% set has_access = not current_user.is_authenticated or check_session_access(current_user, s.display_order) %}
+              <a href="{{ url_for('session_detail', slug=s.slug) if current_user.is_authenticated else url_for('login') }}" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                <span>{{ s.display_order }}. {{ s.title }}</span>
+                {% if current_user.is_authenticated and not has_access %}
+                  <i class="fa-solid fa-lock" style="color: #fbbf24; font-size: 0.75rem;"></i>
+                {% endif %}
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+        
+        {% if current_user.is_authenticated %}
+          {% if not current_user.is_admin %}
+            <a href="{{ url_for('exams_dashboard') }}"><i class="fa-solid fa-graduation-cap"></i> Exams & Quizzes</a>
+          {% endif %}
+          <a href="{{ url_for('resources') }}"><i class="fa-solid fa-folder-open"></i> Resources</a>
+          <a href="{{ url_for('dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+          {% if current_user.is_admin %}
+            <a href="{{ url_for('admin_panel') }}"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
+            <a href="{{ url_for('admin_exams') }}"><i class="fa-solid fa-file-signature"></i> Manage Exams</a>
+            <a href="{{ url_for('admin_integrity') }}"><i class="fa-solid fa-shield-halved"></i> Integrity Logs</a>
+          {% else %}
+            <a href="{{ url_for('student_profile') }}"><i class="fa-solid fa-user"></i> Profile</a>
+          {% endif %}
+          <a href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        {% else %}
+          <a href="{{ url_for('login') }}"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+          <a class="nav-cta" href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <i class="fa-solid fa-circle-half-stroke"></i>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content">
+    <div id="toastContainer" class="toast-container"></div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="flash {{ category }}" data-toast>{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <img src="{{ chuka_logo }}" alt="Chuka University" class="partner-logo" style="height: 60px; object-fit: contain; background: white; padding: 5px; border-radius: 8px; margin-bottom: 1rem;" />
+        <p style="font-weight: 700;">Center for Data Analytics & Modelling (CDAM)</p>
+        <p class="muted" style="font-size: 0.875rem;">Inspiring Environmental Sustainability for Better Life</p>
+      </div>
+      <div class="footer-about">
+        <p style="font-weight: 700; color: var(--red-500); margin-bottom: 0.5rem;">CDAM Intake Ongoing</p>
+        <p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem;">Professional Certificate in Data Science & AI</p>
+        <p class="muted" style="font-size: 0.875rem;">CDAM empowers researchers, professionals, and students with practical analytics, machine learning, and AI skills for decision-making and innovation.</p>
+      </div>
+    </div>
+    <p class="copyright" style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);">© Chuka University. All rights reserved.</p>
+  </footer>
+
+  {% if current_user.is_authenticated %}
+  <button class="chatbot-toggle" id="chatbotToggle" aria-label="Open assistant">
+    <i class="fa-solid fa-comment-dots"></i>
+  </button>
+  <aside class="chatbot-panel" id="chatbotPanel">
+    <header>
+      <strong style="display: flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-robot"></i> CDAM Assistant</strong>
+      <button id="chatbotClose"><i class="fa-solid fa-xmark" style="font-size: 1.1rem;"></i></button>
+    </header>
+    <div class="chatbot-messages" id="chatbotMessages">
+      <div class="bot-msg">Hi! I am your CDAM Learning Assistant. Ask me about Python, datasets, or exams!</div>
+    </div>
+    <form id="chatbotForm" class="chatbot-form">
+      <input type="text" id="chatbotInput" placeholder="Ask a question..." />
+      <button type="submit" class="btn primary" style="padding: 0.5rem 1rem;"><i class="fa-solid fa-paper-plane"></i></button>
+    </form>
+  </aside>
+  {% endif %}
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

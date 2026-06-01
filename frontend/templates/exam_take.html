@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="startExamCard" class="card fade-in" style="max-width: 600px; margin: 3rem auto; text-align: center; padding: 3rem 2rem;">
+  <div style="font-size: 3rem; color: var(--red-500); margin-bottom: 1.5rem;"><i class="fa-solid fa-shield-halved"></i></div>
+  <h1 style="font-weight: 800; font-size: 1.75rem; margin-bottom: 1rem;">Mandatory Integrity Environment Check</h1>
+  <p class="muted" style="font-size: 0.95rem; margin-bottom: 2rem;">
+    To start <strong>{{ exam.title }}</strong>, you must enter secure fullscreen mode. 
+    Tab switches, copy/paste operations, keyboard shortcuts (Ctrl+C, Ctrl+V, F12), 
+    and exiting fullscreen are strictly monitored and will cause automatic submission.
+  </p>
+  <button class="btn primary" id="enterFullscreenBtn" style="padding: 0.85rem 2rem; font-weight: 700; width: 100%;"><i class="fa-solid fa-expand"></i> I Agree, Enter Fullscreen & Start</button>
+</div>
+
+<section id="examPlayground" class="card fade-in" hidden style="max-width: 850px; margin: 0 auto; padding: 2.5rem; position: relative;">
+  <!-- Exam Header HUD -->
+  <div style="position: sticky; top: 70px; z-index: 100; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow);">
+    <div>
+      <h2 style="font-weight: 800; font-size: 1.15rem; margin: 0;">{{ exam.title }}</h2>
+      <span class="muted" style="font-size: 0.8rem;">Pass criteria: {{ pass_mark }}% | Limit: {{ time_limit }}m</span>
+    </div>
+    <div id="examTimer" class="badge pulse" style="background: var(--red-700); color: white; padding: 0.5rem 1rem; font-weight: 800; font-size: 0.9rem;">
+      <i class="fa-regular fa-clock"></i> Remaining: --:--
+    </div>
+  </div>
+
+  <form method="post" id="examForm" style="gap: 2rem;">
+    <input type="hidden" name="tab_switches" id="tabSwitches" value="0" />
+    <input type="hidden" name="fullscreen_exits" id="fullscreenExits" value="0" />
+    <input type="hidden" name="copy_events" id="copyEvents" value="0" />
+    <input type="hidden" name="forced_termination" id="forcedTermination" value="" />
+
+    {% for question in exam_questions %}
+      <fieldset class="quiz-item" style="border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; background: rgba(0,0,0,0.1); margin: 0;">
+        <legend style="font-weight: 700; font-size: 1.05rem; padding: 0 0.5rem; color: var(--text); float: left; width: 100%; margin-bottom: 1rem;">
+          <span style="color: var(--red-500); margin-right: 0.5rem;">Q{{ loop.index }}.</span> {{ question.question }}
+        </legend>
+        
+        <div style="clear: both; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; width: 100%;">
+          {% if question.type == "essay" %}
+            <textarea name="q{{ loop.index0 }}" rows="5" placeholder="Type your detailed answer here..." required style="resize: vertical; width: 100%;"></textarea>
+          {% else %}
+            {% for option in question.options %}
+              <label class="quiz-option" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: var(--transition);">
+                <input type="radio" name="q{{ loop.index0 }}" value="{{ loop.index0 }}" required style="width: 18px; height: 18px; accent-color: var(--red-600);" />
+                <span style="font-size: 0.95rem;">{{ option }}</span>
+              </label>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </fieldset>
+    {% endfor %}
+    
+    <div style="border-top: 1px solid var(--border); padding-top: 1.5rem; display: flex; justify-content: flex-end;">
+      <button class="btn primary" type="submit" style="padding: 0.85rem 2rem; font-weight: 700;"><i class="fa-solid fa-paper-plane"></i> Submit Exam & Finalize</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (() => {
+    const startedAt = new Date("{{ attempt.created_at.isoformat() }}").getTime();
+    const limitMs = {{ time_limit }} * 60 * 1000;
+    const timerEl = document.getElementById("examTimer");
+    const form = document.getElementById("examForm");
+    const enterFullscreenBtn = document.getElementById("enterFullscreenBtn");
+    const startExamCard = document.getElementById("startExamCard");
+    const examPlayground = document.getElementById("examPlayground");
+
+    const tabSwitches = document.getElementById("tabSwitches");
+    const fullscreenExits = document.getElementById("fullscreenExits");
+    const copyEvents = document.getElementById("copyEvents");
+    const forcedTermination = document.getElementById("forcedTermination");
+    let submitted = false;
+    let examStarted = false;
+
+    enterFullscreenBtn.addEventListener("click", async () => {
+      try {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+          await document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
+          await document.documentElement.msRequestFullscreen();
+        }
+        
+        // Success
+        startExamCard.style.display = "none";
+        examPlayground.hidden = false;
+        examStarted = true;
+        
+        // Start checking listeners
+        setupIntegrityListeners();
+      } catch (err) {
+        alert("Fullscreen is mandatory. Please grant permissions and click again.");
+      }
+    });
+
+    async function reportViolation(type) {
+      try {
+        const body = new URLSearchParams();
+        body.set("type", type);
+        const res = await fetch("/exams/attempt/{{ attempt.id }}/violation", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: body.toString(),
+        });
+        const data = await res.json();
+        if (data.terminate) {
+          forcedTermination.value = type;
+          safeSubmit("Integrity threshold exceeded due to: " + type);
+        }
+      } catch {}
+    }
+
+    function safeSubmit(reason) {
+      if (submitted) return;
+      submitted = true;
+      if (reason) alert(reason + " Exam will be submitted automatically.");
+      
+      // Attempt to exit fullscreen on submit
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+      form.submit();
+    }
+
+    function updateTimer() {
+      if (!examStarted) return;
+      const now = Date.now();
+      const remaining = Math.max(0, limitMs - (now - startedAt));
+      const mins = Math.floor(remaining / 60000);
+      const secs = Math.floor((remaining % 60000) / 1000);
+      timerEl.innerHTML = `<i class="fa-regular fa-clock"></i> Remaining: ${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+      if (remaining <= 0) {
+        safeSubmit("Time limit expired.");
+      }
+    }
+
+    function setupIntegrityListeners() {
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden && examStarted) {
+          tabSwitches.value = String(Number(tabSwitches.value) + 1);
+          reportViolation("tab_switch");
+          forcedTermination.value = "tab_switch_detected";
+          safeSubmit("Tab/window switching is not allowed.");
+        }
+      });
+      
+      window.addEventListener("blur", () => {
+        if (examStarted) {
+          tabSwitches.value = String(Number(tabSwitches.value) + 1);
+          reportViolation("window_blur");
+          forcedTermination.value = "window_blur_detected";
+          safeSubmit("Focus loss detected.");
+        }
+      });
+      
+      document.addEventListener("fullscreenchange", () => {
+        if (!document.fullscreenElement && examStarted && !submitted) {
+          fullscreenExits.value = String(Number(fullscreenExits.value) + 1);
+          reportViolation("fullscreen_exit");
+          forcedTermination.value = "fullscreen_exit_detected";
+          safeSubmit("Exiting fullscreen is not allowed.");
+        }
+      });
+
+      document.addEventListener("copy", () => {
+        copyEvents.value = String(Number(copyEvents.value) + 1);
+      });
+      
+      document.addEventListener("paste", (e) => {
+        e.preventDefault();
+        copyEvents.value = String(Number(copyEvents.value) + 1);
+        reportViolation("paste_event");
+        forcedTermination.value = "paste_event_detected";
+        safeSubmit("Copy/paste is not allowed.");
+      });
+      
+      document.addEventListener("contextmenu", (e) => e.preventDefault());
+      
+      document.addEventListener("keydown", (e) => {
+        if (!examStarted) return;
+        const blocked =
+          e.key === "PrintScreen" ||
+          (e.ctrlKey && ["c", "v", "x", "p", "u", "s"].includes(e.key.toLowerCase())) ||
+          e.key === "F12";
+        if (blocked) {
+          e.preventDefault();
+          copyEvents.value = String(Number(copyEvents.value) + 1);
+          reportViolation("restricted_key");
+          forcedTermination.value = "restricted_key_detected";
+          safeSubmit("Restricted keyboard shortcut detected.");
+        }
+      });
+    }
+
+    setInterval(updateTimer, 1000);
+    
+    window.addEventListener("beforeunload", (e) => {
+      if (examStarted && !submitted) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    });
+  })();
+</script>
+{% endblock %}

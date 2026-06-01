@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="auth-card card fade-in" style="max-width: 440px; margin: 3rem auto; padding: 2.5rem;">
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <img src="{{ cdam_logo }}" alt="CDAM Logo" style="width: 56px; height: 56px; object-fit: contain; background: white; padding: 4px; border-radius: 10px; margin-bottom: 1rem;" />
+    <h1 style="font-weight: 800; font-size: 1.75rem; letter-spacing: -0.02em;">Welcome Back</h1>
+    <p class="muted" style="font-size: 0.9rem; margin-top: 0.25rem;">Sign in to continue your data science journey</p>
+  </div>
+
+  <form method="post">
+    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <label><i class="fa-solid fa-id-card"></i> Registration Number / Email</label>
+      <input type="text" name="identifier" placeholder="e.g. EB3/12345/24 or admin@cdam.local" required style="padding-left: 1rem;" />
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <label><i class="fa-solid fa-lock"></i> Password</label>
+      <input type="password" name="password" placeholder="••••••••" required style="padding-left: 1rem;" />
+    </div>
+
+    <button class="btn primary" type="submit" style="width: 100%; font-weight: 700; margin-top: 0.5rem; padding: 0.85rem;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+  </form>
+
+  <div class="auth-divider" style="margin: 1.5rem 0; text-align: center; position: relative;">
+    <span style="background: var(--bg-soft); padding: 0 0.75rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Or connect with</span>
+  </div>
+
+  <form method="post" action="{{ url_for('demo_oauth_login') }}" style="margin-top: 0;">
+    <button class="btn oauth" type="submit" style="width: 100%; font-weight: 600; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: #ffffff;"><i class="fa-solid fa-shield-halved" style="color: var(--red-400);"></i> Continue with Demo OAuth</button>
+  </form>
+
+  <p class="muted center" style="margin-top: 2rem; font-size: 0.9rem;">
+    New to CDAM? <a href="{{ url_for('register') }}" style="color: var(--red-400); font-weight: 600; text-decoration: none;">Create an account</a>
+  </p>
+</section>
+{% endblock %}

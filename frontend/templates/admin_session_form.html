@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Admin Session Form | CDAM{% endblock %}
+{% block content %}
+<div class="dashboard-header fade-in">
+  <div>
+    <h1 style="font-weight: 800; font-size: 2rem; letter-spacing: -0.02em;">
+      {{ "Edit Session" if session_obj else "Create Course Session" }}
+    </h1>
+    <p class="muted" style="margin-top: 0.25rem;">Configure title, markdown body, objectives, Jupyter simulations, and attach files.</p>
+  </div>
+  <a class="btn" href="{{ url_for('admin_panel') }}"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+</div>
+
+<div class="fade-in" style="max-width: 850px; margin: 0 auto;">
+  <div class="card" style="padding: 2.5rem;">
+    <form method="post" enctype="multipart/form-data">
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label>Session Title</label>
+        <input type="text" name="title" value="{{ session_obj.title if session_obj else '' }}" placeholder="e.g. Introduction to Pandas" required />
+      </div>
+
+      <div class="form-row">
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Slug URL Parameter (Optional)</label>
+          <input type="text" name="slug" value="{{ session_obj.slug if session_obj else '' }}" placeholder="e.g. intro-to-pandas" />
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Display Order Position</label>
+          <input type="number" name="display_order" value="{{ session_obj.display_order if session_obj else 1 }}" min="1" required />
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label>Brief Description</label>
+        <textarea name="description" rows="3" placeholder="Explain what students will learn in this session..." required>{{ session_obj.description if session_obj else '' }}</textarea>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label>Full Lesson Material Content (Markdown format)</label>
+        <textarea name="content" rows="12" placeholder="Write full session tutorial in Markdown..." required style="font-family: monospace;">{{ session_obj.content if session_obj else '' }}</textarea>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label>Session Learning Objectives (Markdown bullet points)</label>
+        <textarea name="objectives" rows="4" placeholder="* Learn series creation&#10;* Learn DataFrame filtering" required style="font-family: monospace;">{{ session_obj.objectives if session_obj else '' }}</textarea>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label>Python Code Examples (Runs inside student code emulator)</label>
+        <textarea name="code_examples" rows="6" placeholder="import pandas as pd&#10;df = pd.DataFrame({'A': [1, 2]})&#10;print(df)" required style="font-family: monospace;">{{ session_obj.code_examples if session_obj else '' }}</textarea>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label>Resources & External References (Markdown)</label>
+        <textarea name="resources" rows="4" placeholder="[Pandas Documentation](https://pandas.pydata.org/)" required style="font-family: monospace;">{{ session_obj.resources if session_obj else '' }}</textarea>
+      </div>
+
+      <!-- File Attachment Upload -->
+      <div style="padding: 1.25rem; border: 1px solid var(--border); border-radius: 10px; background: rgba(0,0,0,0.15);">
+        <h4 style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-paperclip"></i> Course Notes & Material Files Upload</h4>
+        <p class="muted" style="font-size: 0.8rem; margin-bottom: 1rem;">Supports PDF, Doc, Code Files, ZIP Archives, Jupyter Notebooks (.ipynb), Slides (.pptx), Images, and Excel Sheets.</p>
+        <input type="file" name="notes_file" accept=".pdf,.doc,.docx,.txt,.md,.csv,.zip,.ipynb,.pptx,.ppt,.png,.jpg,.jpeg,.gif,.svg,.mp4,.webm,.xlsx,.xls" />
+        
+        {% if session_obj and session_obj.notes_file_path %}
+          <p class="muted" style="font-size: 0.85rem; margin-top: 0.75rem;">
+            <i class="fa-solid fa-file"></i> Active Note: 
+            <a href="{{ url_for('static', filename=session_obj.notes_file_path) }}" target="_blank" style="color: var(--red-400); font-weight: 600; text-decoration: none;">Download current attachment</a>
+          </p>
+        {% endif %}
+      </div>
+
+      <div class="form-row">
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Embed Video URL (YouTube, Vimeo, etc.)</label>
+          <input type="url" name="video_url" value="{{ session_obj.video_url if session_obj else '' }}" placeholder="https://www.youtube.com/embed/..." />
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Estimated Duration text</label>
+          <input type="text" name="duration" value="{{ session_obj.duration if session_obj else '60 min' }}" placeholder="e.g. 60 min" />
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Session Difficulty</label>
+          <select name="difficulty">
+            {% for level in ['Beginner', 'Intermediate', 'Advanced'] %}
+              <option value="{{ level }}" {% if session_obj and session_obj.difficulty == level %}selected{% endif %}>{{ level }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">
+        <label class="checkbox-row">
+          <input type="checkbox" name="published" {% if not session_obj or session_obj.published %}checked{% endif %} />
+          Make this session visible to students (Publish immediately)
+        </label>
+      </div>
+
+      <button class="btn primary" type="submit" style="width: 100%; margin-top: 1.5rem; padding: 0.85rem; font-weight: 700;"><i class="fa-solid fa-save"></i> Save Course Session</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

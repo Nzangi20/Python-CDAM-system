@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard-header fade-in">
+  <div>
+    <h1 style="font-weight: 800; font-size: 2rem; letter-spacing: -0.02em;">Proctoring Integrity Logs</h1>
+    <p class="muted" style="margin-top: 0.25rem;">Real-time anti-cheat alerts: fullscreen exits, tab switches, and keyboard shortcuts violation reports.</p>
+  </div>
+</div>
+
+<div class="card fade-in">
+  <h2 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 1rem;"><i class="fa-solid fa-triangle-exclamation" style="color: var(--red-500);"></i> Flags & Violations Record</h2>
+  
+  {% if logs %}
+    <div style="overflow-x: auto;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Student Account</th>
+            <th>Target Assessment</th>
+            <th>Flagged Event</th>
+            <th>Severity Rating</th>
+            <th>Incident Detail</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+            {% set user = users_map.get(log.user_id) %}
+            {% set exam = exams_map.get(log.exam_id) %}
+            <tr>
+              <td class="muted">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+              <td style="font-weight: 700;">
+                {% if user %}
+                  {{ user.name }} <br/>
+                  <span class="muted" style="font-weight: 400; font-size: 0.8rem;">{{ user.email }}</span>
+                {% else %}
+                  Student ID: {{ log.user_id }}
+                {% endif %}
+              </td>
+              <td>
+                {% if exam %}
+                  {{ exam.title }}
+                {% else %}
+                  Exam ID: {{ log.exam_id }}
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245,158,11,0.25);">
+                  {{ log.violation_type | replace('_', ' ') | title }}
+                </span>
+              </td>
+              <td>
+                {% if log.violation_type in ['fullscreen_exit', 'tab_switch', 'window_blur'] %}
+                  <span class="badge" style="background: rgba(220, 38, 38, 0.1); color: var(--red-400); border-color: rgba(220,38,38,0.2); font-weight: 700;">HIGH</span>
+                {% else %}
+                  <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #fbbf24; border-color: rgba(245,158,11,0.2); font-weight: 700;">MEDIUM</span>
+                {% endif %}
+              </td>
+              <td style="font-size: 0.9rem; color: var(--text-muted);">
+                {% if log.violation_type == 'tab_switch' %}
+                  Student switched browser tabs or minimized window.
+                {% elif log.violation_type == 'window_blur' %}
+                  Student clicked outside exam window / lost window focus.
+                {% elif log.violation_type == 'fullscreen_exit' %}
+                  Fullscreen mode was cancelled before submission.
+                {% elif log.violation_type == 'paste_event' %}
+                  Student attempted to paste clipboard text.
+                {% elif log.violation_type == 'restricted_key' %}
+                  Blocked key shortcut (PrintScreen, Ctrl+C/V, F12) was pressed.
+                {% else %}
+                  Proctoring system log: {{ log.details or 'No additional details.' }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted" style="text-align: center; padding: 3rem 0; font-size: 0.95rem;">No integrity violations have been recorded yet. The system is currently clean.</p>
+  {% endif %}
+</div>
+{% endblock %}

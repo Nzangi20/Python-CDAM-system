@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard-header fade-in">
+  <div>
+    <h1 style="font-weight: 800; font-size: 2rem; letter-spacing: -0.02em;">Exams & Quizzes</h1>
+    <p class="muted" style="margin-top: 0.25rem;">Assess your data science understanding with protected exam environments.</p>
+  </div>
+</div>
+
+<!-- Available Exams Section -->
+<section style="margin-bottom: 3rem;" class="fade-in delay">
+  <h2 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-file-invoice" style="color: var(--red-500);"></i> Available Assessments</h2>
+  <div class="grid">
+    {% for exam in available %}
+      <article class="card hover-scale" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div class="card-top">
+            <span class="badge"><i class="fa-solid fa-tag"></i> {{ exam.exam_type }}</span>
+            <span class="muted" style="font-size: 0.85rem; font-weight: 600;"><i class="fa-regular fa-clock"></i> {{ exam.duration }} Min</span>
+          </div>
+          <h3 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 0.5rem; margin-top: 0.5rem;">{{ exam.title }}</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">{{ exam.description }}</p>
+          
+          <ul class="feature-list" style="margin-bottom: 1.5rem;">
+            <li>Passing Score: <strong>{{ exam.passing_score }}%</strong></li>
+            <li>Max Attempts Allowed: <strong>{{ exam.attempt_limit }}</strong></li>
+            {% if exam.proctoring_enabled %}
+              <li style="color: var(--red-400);"><i class="fa-solid fa-shield-halved"></i> Automated Integrity Proctoring Enabled</li>
+            {% endif %}
+            {% if exam.one_device_only %}
+              <li><i class="fa-solid fa-mobile-screen"></i> Single-Device Lock active</li>
+            {% endif %}
+          </ul>
+        </div>
+        <a class="btn primary" href="{{ url_for('exam_take', exam_id=exam.id) }}" style="width: 100%;"><i class="fa-solid fa-circle-play"></i> Start Assessment</a>
+      </article>
+    {% else %}
+      <p class="muted" style="grid-column: 1 / -1; text-align: center; padding: 3rem 0;">No assessments are currently active.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Upcoming Exams Section -->
+{% if upcoming %}
+<section style="margin-bottom: 3rem;" class="fade-in">
+  <h2 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 1.5rem;"><i class="fa-regular fa-calendar-days" style="color: var(--red-500);"></i> Upcoming Scheduled Assessments</h2>
+  <div class="grid">
+    {% for exam in upcoming %}
+      <article class="card" style="opacity: 0.75;">
+        <div class="card-top">
+          <span class="badge"><i class="fa-solid fa-clock"></i> Scheduled</span>
+          <span class="muted" style="font-size: 0.85rem; font-weight: 600;">{{ exam.duration }} Min</span>
+        </div>
+        <h3 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 0.5rem;">{{ exam.title }}</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">{{ exam.description }}</p>
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--red-400);">Starts: {{ exam.start_time.strftime('%b %d, %Y at %H:%M UTC') }}</p>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Exam History/Attempts Section -->
+<section class="card fade-in">
+  <h2 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 1rem;"><i class="fa-solid fa-history" style="color: var(--red-500);"></i> Assessment History & Credentials</h2>
+  {% if attempts %}
+    <div style="overflow-x: auto;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Assessment Name</th>
+            <th>Attempt #</th>
+            <th>Final Score</th>
+            <th>Status</th>
+            <th>Violations Flagged</th>
+            <th>Completed Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for att in attempts %}
+            <tr>
+              <td style="font-weight: 700;">{{ att.exam.title }}</td>
+              <td>{{ att.attempt_number }}</td>
+              <td style="font-weight: 800; font-size: 1.05rem; color: var(--red-400);">{{ att.score }}%</td>
+              <td>
+                {% if att.score >= att.exam.passing_score %}
+                  <span class="badge success"><i class="fa-solid fa-circle-check"></i> Passed</span>
+                {% else %}
+                  <span class="badge" style="background: rgba(220, 38, 38, 0.1); color: var(--red-400); border-color: rgba(220,38,38,0.2);"><i class="fa-solid fa-circle-xmark"></i> Failed</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if att.violation_count > 0 %}
+                  <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #fbbf24; border-color: rgba(245,158,11,0.2);">
+                    <i class="fa-solid fa-triangle-exclamation"></i> {{ att.violation_count }} flags
+                  </span>
+                {% else %}
+                  <span class="badge success" style="padding: 0.2rem 0.5rem;"><i class="fa-solid fa-shield"></i> Clean</span>
+                {% endif %}
+              </td>
+              <td class="muted">{{ att.completed_at.strftime('%Y-%m-%d %H:%M') if att.completed_at else 'In Progress' }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted" style="text-align: center; padding: 2rem 0;">You have not taken any assessments yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

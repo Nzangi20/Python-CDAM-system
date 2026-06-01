@@ -1,0 +1,38 @@
+# -----------------------------------------------------------------------------
+# Online Examination System - Git Exclusion Directives
+# -----------------------------------------------------------------------------
+
+# 1. Environment Secrets & Settings (CRITICAL: Do not upload credentials!)
+.env
+.env.local
+.env.*.local
+
+# 2. Python Caches & Compiled Bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 3. Local SQLite Databases & Assets
+*.db
+*.sqlite3
+backend/cdam.db
+frontend/static/uploads/notes/*
+
+# 4. Virtual Environments & Local Packages
+venv/
+.venv/
+env/
+ENV/
+
+# 5. IDE Configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
