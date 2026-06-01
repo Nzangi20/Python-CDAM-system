@@ -51,20 +51,7 @@ python backend/app.py
 ```
 After executing, navigate to: `http://127.0.0.1:5000`
 
----
 
-## 🔐 Credentials & Authentication
-
-### 1. Default Administrator Account
-Log in to access the Admin Control Center:
-- **Email**: `admin@cdam.local`
-- **Password**: `admin123`
-
-### 2. Student Demo Sign-In (OAuth Bypass)
-Navigate to or post request to:
-- **Endpoint**: `/oauth/demo` (automatically generates and authenticates a student session without using registration forms).
-
----
 
 ## 🧪 Run Automated Verification Tests
 We maintain full coverage across backend CRUD endpoints, integrity violations, session progress, and auth rules.
