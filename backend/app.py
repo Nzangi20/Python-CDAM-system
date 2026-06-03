@@ -96,9 +96,9 @@ class Session(db.Model):
     description = db.Column(db.Text, nullable=False)
     content = db.Column(db.Text, nullable=False)
     objectives = db.Column(db.Text, nullable=False)
-    expected_outcomes = db.Column(db.Text, nullable=False, default="")
-    learning_notes = db.Column(db.Text, nullable=False, default="")
-    instructions = db.Column(db.Text, nullable=False, default="")
+    expected_outcomes = db.Column(db.Text, nullable=True)
+    learning_notes = db.Column(db.Text, nullable=True)
+    instructions = db.Column(db.Text, nullable=True)
     code_examples = db.Column(db.Text, nullable=False)
     resources = db.Column(db.Text, nullable=False)
     notes_file_path = db.Column(db.String(500), nullable=True)
@@ -1389,13 +1389,13 @@ def migrate_schema() -> None:
                 conn.execute(text("ALTER TABLE sessions ADD COLUMN video_url VARCHAR(500)"))
         if "expected_outcomes" not in columns:
             with db.engine.begin() as conn:
-                conn.execute(text("ALTER TABLE sessions ADD COLUMN expected_outcomes TEXT DEFAULT ''"))
+                conn.execute(text("ALTER TABLE sessions ADD COLUMN expected_outcomes TEXT"))
         if "learning_notes" not in columns:
             with db.engine.begin() as conn:
-                conn.execute(text("ALTER TABLE sessions ADD COLUMN learning_notes TEXT DEFAULT ''"))
+                conn.execute(text("ALTER TABLE sessions ADD COLUMN learning_notes TEXT"))
         if "instructions" not in columns:
             with db.engine.begin() as conn:
-                conn.execute(text("ALTER TABLE sessions ADD COLUMN instructions TEXT DEFAULT ''"))
+                conn.execute(text("ALTER TABLE sessions ADD COLUMN instructions TEXT"))
     if "users" in inspector.get_table_names():
         columns = {col["name"] for col in inspector.get_columns("users")}
         if "study_level" not in columns:
