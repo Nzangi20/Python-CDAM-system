@@ -774,7 +774,7 @@ def generate_ai_response(action: str, query: str, code: str, error: str, session
         if "SyntaxError" in error:
             msg += f"It looks like there is a **Syntax Error** in your code.\n\n"
             msg += f"**What this means:** Python couldn't parse your code because of a typo or formatting mistake. Check for:\n"
-            msg += f"- Missing closing parentheses `()`, brackets `[]`, or braces `{}`.\n"
+            msg += f"- Missing closing parentheses `()`, brackets `[]`, or braces `{{}}`.\n"
             msg += f"- Missing colon `:` at the end of `if`, `for`, `def`, or `else` lines.\n"
             msg += f"- Unmatched or unclosed quotes (`'` or `\"`).\n\n"
         elif "NameError" in error:
