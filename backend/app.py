@@ -744,7 +744,7 @@ def session_detail(slug: str):
     if not check_session_access(current_user, session.display_order):
         required_level = "Intermediate" if session.display_order <= 10 else "Professional"
         flash(f"Session '{session.title}' notes and materials are restricted to {required_level} level students. Please upgrade your profile level to access.", "error")
-        return redirect(url_for("resources"))
+        return redirect(url_for("student_dashboard"))
         
     progress = UserProgress.query.filter_by(user_id=current_user.id, session_id=session.id).first()
     completed = bool(progress and progress.completed)
@@ -758,11 +758,18 @@ def session_detail(slug: str):
     log_activity("student.session.view", session.slug)
     
     notes_exist = False
+    is_viewable = False
+    notes_filename = ""
     if session.notes_file_path and session.notes_file_path.strip() and session.notes_file_path != 'None' and session.notes_file_path != 'null':
         filename = session.notes_file_path.split("/")[-1]
         filepath = UPLOADS_DIR / filename
         if filepath.exists() and filepath.is_file():
             notes_exist = True
+            notes_filename = filename.split("-", 2)[-1] if len(filename.split("-", 2)) > 2 else filename
+            import os
+            ext = os.path.splitext(filename)[1].lower()
+            if ext in {".pdf", ".txt", ".md", ".png", ".jpg", ".jpeg", ".gif", ".svg"}:
+                is_viewable = True
             
     return render_template(
         "session_detail.html",
@@ -776,6 +783,8 @@ def session_detail(slug: str):
         show_quiz=False,
         show_exam=False,
         notes_exist=notes_exist,
+        is_viewable=is_viewable,
+        notes_filename=notes_filename,
     )
 
 
@@ -786,10 +795,10 @@ def download_notes(session_id: int):
     session = db.session.get(Session, session_id)
     if not session or not session.notes_file_path:
         flash("Notes file not found.", "error")
-        return redirect(request.referrer or url_for("resources"))
+        return redirect(request.referrer or url_for("student_dashboard"))
     if not check_session_access(current_user, session.display_order):
         flash("Access to this note/revision material is restricted for your experience level.", "error")
-        return redirect(request.referrer or url_for("resources"))
+        return redirect(request.referrer or url_for("student_dashboard"))
     
     filename = session.notes_file_path.split("/")[-1]
     return send_from_directory(UPLOADS_DIR, filename, as_attachment=False)
@@ -801,10 +810,10 @@ def view_notes(session_id: int):
     session = db.session.get(Session, session_id)
     if not session or not session.notes_file_path:
         flash("Notes file not found.", "error")
-        return redirect(request.referrer or url_for("resources"))
+        return redirect(request.referrer or url_for("student_dashboard"))
     if not check_session_access(current_user, session.display_order):
         flash("Access to this note/revision material is restricted for your experience level.", "error")
-        return redirect(request.referrer or url_for("resources"))
+        return redirect(request.referrer or url_for("student_dashboard"))
     return render_template("view_notes.html", session=session)
 
 

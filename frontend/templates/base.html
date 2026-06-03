@@ -61,7 +61,6 @@
         {% if current_user.is_authenticated %}
           {% if not current_user.is_admin %}
             <a href="{{ url_for('exams_dashboard') }}"><i class="fa-solid fa-graduation-cap"></i> Exams & Quizzes</a>
-            <a href="{{ url_for('resources') }}"><i class="fa-solid fa-folder-open"></i> Resources</a>
             <a href="{{ url_for('dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
           {% endif %}
           {% if current_user.is_admin %}

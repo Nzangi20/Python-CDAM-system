@@ -66,8 +66,8 @@
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-        <label>Resources & External References (Markdown)</label>
-        <textarea name="resources" rows="4" placeholder="[Pandas Documentation](https://pandas.pydata.org/)" required style="font-family: monospace;">{{ session_obj.resources if session_obj else '' }}</textarea>
+        <label>Resources & External References (Optional Markdown)</label>
+        <textarea name="resources" rows="4" placeholder="[Pandas Documentation](https://pandas.pydata.org/)" style="font-family: monospace;">{{ session_obj.resources if session_obj else '' }}</textarea>
       </div>
 
       <!-- File Attachment Upload -->
