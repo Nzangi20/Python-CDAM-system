@@ -217,14 +217,23 @@ def test_study_level_access_control(client):
     
     with app.app_context():
         s1 = Session.query.filter_by(display_order=1).first()
+        s1_id = s1.id
         s1_slug = s1.slug
         s6 = Session.query.filter_by(display_order=6).first()
         s6_slug = s6.slug if s6 else None
         
-        # Create a display_order 11 session to test restrictions
         s11 = Session(
             title="Advanced ML",
             slug="advanced-ml",
+            description="Learn advanced machine learning models.",
+            content="Session content here.",
+            objectives="Understand neural networks.",
+            expected_outcomes="Able to build models.",
+            learning_notes="Learning notes here.",
+            instructions="Follow the instructions.",
+            code_examples="print('Advanced ML')",
+            resources="None",
+            duration=45,
             display_order=11,
             published=True,
             difficulty="Professional"
@@ -247,7 +256,7 @@ def test_study_level_access_control(client):
     assert resp_s11.status_code == 302
         
     # Try to download Session 1 notes -> Allowed
-    resp_dl1 = client.get(f"/session/{s1.id}/download")
+    resp_dl1 = client.get(f"/session/{s1_id}/download")
     assert resp_dl1.status_code != 302 or b"restricted" not in resp_dl1.data
     
     # Try to download Session 11 notes -> Blocked and redirected (302)
