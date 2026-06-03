@@ -93,7 +93,7 @@
       </div>
     </section>
 
-    <section class="tab-panel" id="code" style="padding: 0; background: transparent; border: none; box-shadow: none;">
+    <section class="tab-panel" id="code" data-session-id="{{ session.id }}" style="padding: 0; background: transparent; border: none; box-shadow: none;">
       <div class="simulator-layout">
         <!-- Left Column: Learning Notes & Guided Instructions -->
         <div class="info-column" style="display: flex; flex-direction: column; gap: 1.5rem;">
@@ -143,6 +143,34 @@
             </h4>
             <pre id="runOutputText" style="margin: 0; background: transparent !important; padding: 0; white-space: pre-wrap; font-family: 'Fira Code', 'Courier New', monospace; font-size: 0.9rem; color: var(--text);"></pre>
           </div>
+        </div>
+
+        <!-- Right Column: AI Learning Assistant -->
+        <div class="card ai-column" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; border-top: 4px solid var(--purple-brand);">
+          <h3 style="font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; color: var(--text);">
+            <i class="fa-solid fa-brain" style="color: var(--purple-brand);"></i> 3. AI Learning Coach
+          </h3>
+          
+          <!-- AI Action Pills -->
+          <div class="ai-pills-container" style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.25rem;">
+            <button type="button" class="btn btn-xs ai-action-pill" data-action="explain" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; border-color: rgba(139, 92, 246, 0.4);"><i class="fa-solid fa-wand-magic-sparkles"></i> Explain Code</button>
+            <button type="button" class="btn btn-xs ai-action-pill" data-action="review" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; border-color: rgba(139, 92, 246, 0.4);"><i class="fa-solid fa-code-compare"></i> Review Code</button>
+            <button type="button" class="btn btn-xs ai-action-pill" data-action="challenge" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; border-color: rgba(139, 92, 246, 0.4);"><i class="fa-solid fa-puzzle-piece"></i> Challenge</button>
+            <button type="button" class="btn btn-xs ai-action-pill" data-action="career" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; border-color: rgba(139, 92, 246, 0.4);"><i class="fa-solid fa-compass"></i> Career Mentor</button>
+          </div>
+
+          <!-- Chat Window -->
+          <div class="ai-chat-messages" id="aiChatMessages" style="flex: 1; min-height: 240px; max-height: 380px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; background: var(--bg-soft);">
+            <div class="bot-msg" style="padding: 0.65rem 0.85rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px 8px 8px 0; font-size: 0.875rem; align-self: flex-start; max-width: 90%;">
+              <strong>🤖 AI Tutor:</strong> Hello! I am your interactive AI Coach. You can ask me questions about this lesson, click the action pills above, or run your code. If you encounter errors, I will help you debug them!
+            </div>
+          </div>
+
+          <!-- Chat Input -->
+          <form id="aiChatForm" style="display: flex; gap: 0.5rem; margin-top: 0.25rem;">
+            <input type="text" id="aiChatInput" placeholder="Ask the tutor..." style="flex: 1; padding: 0.55rem 0.75rem; font-size: 0.875rem; border-radius: 6px; border: 1px solid var(--border); outline: none; background: var(--card-bg); color: var(--text);" required />
+            <button type="submit" class="btn primary" style="padding: 0.55rem 1rem;"><i class="fa-solid fa-paper-plane"></i></button>
+          </form>
         </div>
       </div>
       <div class="tab-navigation">

@@ -330,12 +330,10 @@ def check_session_access(user, display_order):
     if user.is_admin:
         return True
     level = getattr(user, "study_level", "Beginner")
-    if display_order <= 5:
+    if display_order <= 10:
         return True
-    elif display_order <= 10:
-        return level in ("Intermediate", "Professional")
     else:
-        return level == "Professional"
+        return level in ("Intermediate", "Professional")
 
 
 
@@ -386,8 +384,6 @@ def dashboard_context(user_id: int):
     user = db.session.get(User, user_id)
     study_level = getattr(user, "study_level", "Beginner")
     if study_level == "Beginner":
-        total_sessions = 5
-    elif study_level == "Intermediate":
         total_sessions = 10
     else:
         total_sessions = 20
@@ -747,6 +743,180 @@ def run_code():
             "output": "",
             "error": f"Internal execution error: {str(e)}"
         })
+
+
+def generate_ai_response(action: str, query: str, code: str, error: str, session: Session) -> str:
+    import random
+    import re
+    title = session.title
+    objectives = session.objectives
+    outcomes = session.expected_outcomes or ""
+    learning_notes = session.learning_notes or ""
+    
+    if action == "debug":
+        if not error:
+            return "Your code executed successfully without errors! Great job."
+        msg = f"### 🔍 AI Error Debugger\n"
+        if "SyntaxError" in error:
+            msg += f"It looks like there is a **Syntax Error** in your code.\n\n"
+            msg += f"**What this means:** Python couldn't parse your code because of a typo or formatting mistake. Check for:\n"
+            msg += f"- Missing closing parentheses `()`, brackets `[]`, or braces `{}`.\n"
+            msg += f"- Missing colon `:` at the end of `if`, `for`, `def`, or `else` lines.\n"
+            msg += f"- Unmatched or unclosed quotes (`'` or `\"`).\n\n"
+        elif "NameError" in error:
+            match = re.search(r"name '(\w+)' is not defined", error)
+            name = f"`{match.group(1)}`" if match else "a variable or function"
+            msg += f"It looks like there is a **Name Error** in your code.\n\n"
+            msg += f"**What this means:** You are trying to use {name} before defining or importing it. Check if you misspelled it or forgot to assign it a value.\n\n"
+        elif "TypeError" in error:
+            msg += f"It looks like there is a **Type Error** in your code.\n\n"
+            msg += f"**What this means:** You tried to perform an operation on incompatible types (for example, adding a string to an integer, or calling something that isn't a function).\n\n"
+        elif "IndexError" in error:
+            msg += f"It looks like there is an **Index Error** in your code.\n\n"
+            msg += f"**What this means:** You are trying to access an element of a list or array at an index that doesn't exist (e.g. accessing index 5 in a list of size 3).\n\n"
+        else:
+            msg += f"Python reported the following error:\n`{error}`\n\n"
+        
+        msg += f"**How to Fix:** Review the instructions and notes under the **Learning Notes** tab to compare your syntax, or ask me *'How do I fix my code?'* in the chat."
+        return msg
+
+    elif action == "explain":
+        if not code.strip():
+            return "Your code editor is currently empty! Write some Python code or select a template to explain."
+        
+        msg = f"### 💡 Code Explanation\n"
+        msg += f"Here is a breakdown of what your code does in the context of **{title}**:\n\n"
+        
+        lines = code.split("\n")
+        msg += f"- It runs a script with {len(lines)} lines of Python code.\n"
+        
+        if "import pandas" in code or "pd." in code:
+            msg += f"- **Data Analysis**: It imports/uses **Pandas** to work with structured datasets (DataFrames).\n"
+        if "import numpy" in code or "np." in code:
+            msg += f"- **Numerical Operations**: It utilizes **NumPy** arrays for fast vectorized operations.\n"
+        if "import matplotlib" in code or "plt." in code or "sns." in code:
+            msg += f"- **Visualization**: It utilizes plotting libraries to generate charts/graphs.\n"
+        if "for " in code or "while " in code:
+            msg += f"- **Looping**: It iterates over a sequence or condition using a loop.\n"
+        if "def " in code:
+            msg += f"- **Functions**: It defines a custom function to encapsulate reusable logic.\n"
+        
+        msg += f"\n**Line-by-Line Highlight:**\n"
+        for line in lines[:5]:
+            if line.strip() and not line.strip().startswith("#"):
+                msg += f"- `{line.strip()}`: Executed to initialize, process, or render data.\n"
+        if len(lines) > 5:
+            msg += f"- *(and {len(lines)-5} more lines)*\n"
+            
+        msg += f"\n**Reference Concept:**\n"
+        msg += f"This aligns with our learning objectives:\n"
+        msg += "\n".join(objectives.split("\n")[:3])
+        return msg
+
+    elif action == "review":
+        if not code.strip():
+            return "Write some code first, and I will review it for quality, pep-8 compatibility, and performance!"
+        
+        suggestions = []
+        if len(code) > 10 and "def " not in code and ("for " in code or "import " in code):
+            suggestions.append("Consider encapsulating your main code block inside a reusable function (e.g., `def run_analysis():`).")
+        if any(len(line) > 79 for line in code.split("\n")):
+            suggestions.append("Some lines of code exceed 79 characters. Consider splitting them to comply with PEP 8 readability standards.")
+        if "=" in code and not re.search(r"\s=\s", code):
+            suggestions.append("Add spacing around operators (e.g., `x = 10` instead of `x=10`) to enhance visual hierarchy.")
+        if "import " in code and not code.startswith("import"):
+            suggestions.append("Place all your library imports (like `pandas` or `numpy`) at the very top of the script.")
+            
+        msg = f"### 🛠️ Code Review & Optimization\n"
+        if suggestions:
+            msg += "I've reviewed your workspace. Here are some suggestions for improvement:\n\n"
+            for s in suggestions:
+                msg += f"- {s}\n"
+        else:
+            msg += "Excellent work! Your code is highly readable, PEP 8 compliant, and uses optimal structures for this exercise.\n"
+            
+        msg += f"\n**Performance Tip:** Keep in mind that for Data Science, vectorized operations (e.g., `df['col'] * 2` in Pandas) are significantly faster than looping through rows with `for` loops."
+        return msg
+
+    elif action == "challenge":
+        challenges = {
+            "introduction-to-python": "Write a Python script that calculates the area of a circle. Define a variable `radius = 7`, compute the area using the formula `area = 3.14159 * (radius ** 2)`, and print the result.",
+            "python-data-structures": "Create a list named `temperatures` with values `[22, 25, 19, 31, 28]`. Add a new temperature `24` to the end of the list, compute the average temperature, and print it.",
+            "control-flow-and-functions": "Write a function named `is_even(n)` that returns `True` if a number is even, and `False` otherwise. Test the function on the numbers `4` and `7`.",
+            "numpy-fundamentals": "Use NumPy to create a 1D array of 20 numbers from 1 to 20. Reshape it into a 4x5 2D matrix, and print the mean of each column.",
+            "pandas-dataframes": "Create a Pandas DataFrame from a dictionary containing names and scores. Select only the rows where the score is greater than 80.",
+            "data-cleaning-prep": "Write a snippet using Pandas to fill missing values in a DataFrame column named `Salary` with the column's median value, then drop any rows that have missing values in the `Email` column.",
+            "matplotlib-seaborn": "Write a Matplotlib script to plot a simple line chart where the X-axis represents years `[2020, 2021, 2022, 2023]` and the Y-axis represents revenue `[500, 750, 1000, 1400]`. Set the title to 'Annual Growth'.",
+            "statistical-analysis": "Use scipy or numpy to compute the Pearson correlation coefficient between two lists: `x = [1, 2, 3, 4, 5]` and `y = [2, 4, 5, 4, 5]`. Explain if the correlation is positive or negative.",
+            "introduction-to-machine-learning": "Define a Scikit-Learn `DecisionTreeClassifier` with `max_depth=3`. Fit it on your training features `X_train` and labels `y_train`, then predict labels on `X_test`.",
+            "model-evaluation": "Write a snippet using Scikit-Learn to compute and print the confusion matrix and classification report for a set of true labels `y_true` and predicted labels `y_pred`."
+        }
+        challenge = challenges.get(session.slug, "Write a function that accepts a list of numbers and returns a new list containing only the unique numbers.")
+        msg = f"### 🏋️ Practice Challenge\n"
+        msg += f"Ready to test your skills? Try this challenge for **{title}**:\n\n"
+        msg += f"> **Challenge:** {challenge}\n\n"
+        msg += "Write your solution in the **Code Simulator** editor in the center panel, then click **Run Code** to test it!"
+        return msg
+
+    elif action == "career":
+        careers = {
+            "introduction-to-python": "Python is the entry point for almost all Data roles. Data Analysts and Engineers use it daily. Highlight your understanding of fundamental syntax and environment management in your resume.",
+            "python-data-structures": "Efficient data handling is vital. Interviewers frequently ask about lists vs. tuples vs. dictionaries. Learn when to use which structure to optimize performance.",
+            "control-flow-and-functions": "Writing clean, functional code is a key software engineering skill for Data Scientists. Break down complex scripts into modular functions to make them testable.",
+            "numpy-fundamentals": "NumPy is the backbone of scientific computing. Machine Learning engineers use it to manipulate matrices (tensors). Make sure you understand array reshaping and slicing.",
+            "pandas-dataframes": "Pandas is the absolute #1 library for Data Analysts. 80% of your time on the job will be spent manipulating tables with Pandas. Build portfolio projects showing data exploration with Pandas.",
+            "data-cleaning-prep": "Data cleaning is where data professionals spend most of their time. Showing that you can handle missing data, duplicates, and type mismatches makes you stand out in technical interviews.",
+            "matplotlib-seaborn": "Visual storytelling is critical for communicating insights to business managers. Data Analysts who can build clear, uncluttered visualizations are highly sought after.",
+            "statistical-analysis": "A strong foundation in statistics separates amateur builders from professional data scientists. Focus on understanding hypothesis testing, p-values, and statistical distributions.",
+            "introduction-to-machine-learning": "Machine learning is the gateway to Data Science and AI Engineering. Start by understanding standard models like Linear Regression and Decision Trees before moving to Deep Learning.",
+            "model-evaluation": "Any model is useless without proper evaluation. Understanding metrics like Precision, Recall, and ROC-AUC is crucial when explaining your model's performance to clients or stakeholders."
+        }
+        advice = careers.get(session.slug, "Building a strong personal GitHub portfolio is the best way to get noticed by recruiters. Focus on clean code, clear documentation, and solved problems.")
+        msg = f"### 💼 Career Mentorship\n"
+        msg += f"**How this session applies to your career:**\n\n"
+        msg += f"{advice}\n\n"
+        msg += "**Action Step:** Build a small script incorporating today's concepts and push it to your GitHub portfolio. It shows recruiters you are actively learning and writing clean code!"
+        return msg
+
+    else:
+        text = query.lower()
+        if "numpy" in text:
+            return "NumPy stands for Numerical Python. It provides high-performance multidimensional array objects and tools to work with them. Essential for scientific operations!"
+        elif "pandas" in text or "dataframe" in text:
+            return "Pandas is the standard data manipulation library. It introduces DataFrames, which are 2D tabular data structures with labeled axes (rows and columns) like an Excel sheet."
+        elif "matplotlib" in text or "seaborn" in text or "plot" in text or "chart" in text:
+            return "Visualization is key! Matplotlib provides low-level control, while Seaborn offers high-level, beautiful statistic visualizations. Remember to call `plt.show()` or return figures."
+        elif "machine learning" in text or "ml" in text:
+            return "Machine Learning allows systems to learn from data patterns instead of explicit programming. Today we are focusing on supervised models like decision trees or regressions."
+        elif "error" in text or "fail" in text or "debug" in text or "fix" in text:
+            if code:
+                return "Click the **Review Code** button above, and I will analyze your current code editor contents and help you fix any formatting or logical errors."
+            return "If you are getting a syntax error, check for missing colons, parenthesis, or quotes. Paste your code here and I will help you look at it."
+        elif "career" in text or "job" in text or "interview" in text:
+            return "To prepare for a career in Data Science: 1. Master Pandas/NumPy. 2. Build a project portfolio on GitHub. 3. Learn SQL. 4. Practice coding challenges. Ask me for *Career Mentor* advice using the action pill!"
+        elif "how do i" in text or "what is" in text or "explain" in text:
+            return f"In the context of **{title}**, this topic deals with key concepts like variables, loops, or arrays. Based on the **Learning Notes**, the main idea is: {learning_notes[:250]}..."
+        
+        return f"I am your AI Learning assistant for **{title}**. Ask me any question about Python, libraries, or concepts in this lesson! You can also click the quick action pills above for instant code review, explanations, or coding challenges."
+
+
+@app.route("/api/ai-assistant", methods=["POST"])
+@login_required
+@student_required
+def ai_assistant_api():
+    payload = request.get_json(silent=True) or {}
+    session_id = payload.get("session_id")
+    code = payload.get("code", "")
+    query = payload.get("query", "").strip()
+    action = payload.get("action", "chat")
+    error = payload.get("error", "")
+
+    session = db.session.get(Session, session_id) if session_id else None
+    if not session:
+        return jsonify({"reply": "I couldn't load the context for this session. Please refresh the page."})
+
+    reply = generate_ai_response(action, query, code, error, session)
+    return jsonify({"reply": reply})
 
 
 

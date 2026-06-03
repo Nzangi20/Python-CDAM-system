@@ -220,24 +220,39 @@ def test_study_level_access_control(client):
         s1_slug = s1.slug
         s6 = Session.query.filter_by(display_order=6).first()
         s6_slug = s6.slug if s6 else None
+        
+        # Create a display_order 11 session to test restrictions
+        s11 = Session(
+            title="Advanced ML",
+            slug="advanced-ml",
+            display_order=11,
+            published=True,
+            difficulty="Professional"
+        )
+        db.session.add(s11)
+        db.session.commit()
+        s11_id = s11.id
     
-    # Try to access Session 1 (Beginner level, order 1) -> Allowed (200)
+    # Try to access Session 1 (display_order 1) -> Allowed (200)
     resp_s1 = client.get(f"/session/{s1_slug}")
     assert resp_s1.status_code == 200
     
-    # Try to access Session 6 (Intermediate, order 6) -> Restricted, redirects to resources (302)
+    # Try to access Session 6 (display_order 6) -> Now Allowed (200)
     if s6_slug:
         resp_s6 = client.get(f"/session/{s6_slug}")
-        assert resp_s6.status_code == 302
+        assert resp_s6.status_code == 200
         
-    # Try to download Session 1 notes -> Allowed (not redirected to resources with unauthorized flash)
+    # Try to access Session 11 (display_order 11) -> Restricted, redirects (302)
+    resp_s11 = client.get(f"/session/advanced-ml")
+    assert resp_s11.status_code == 302
+        
+    # Try to download Session 1 notes -> Allowed
     resp_dl1 = client.get(f"/session/{s1.id}/download")
     assert resp_dl1.status_code != 302 or b"restricted" not in resp_dl1.data
     
-    # Try to download Session 6 notes -> Blocked and redirected (302)
-    if s6:
-        resp_dl6 = client.get(f"/session/{s6.id}/download")
-        assert resp_dl6.status_code == 302
+    # Try to download Session 11 notes -> Blocked and redirected (302)
+    resp_dl11 = client.get(f"/session/{s11_id}/download")
+    assert resp_dl11.status_code == 302
 
 
 def test_api_run_code(client):

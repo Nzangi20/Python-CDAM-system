@@ -42,70 +42,13 @@
 
 <!-- Main Admin Tabs -->
 <div class="tabs" role="tablist" style="margin-bottom: 2rem;">
-  <button class="tab active" data-tab="sessions"><i class="fa-solid fa-chalkboard-user"></i> Sessions Management</button>
-  <button class="tab" data-tab="students"><i class="fa-solid fa-users"></i> Student Roster</button>
+  <button class="tab active" data-tab="students"><i class="fa-solid fa-users"></i> Student Roster</button>
   <button class="tab" data-tab="discussions"><i class="fa-solid fa-comments"></i> Discussions Moderation</button>
   <button class="tab" data-tab="comms"><i class="fa-solid fa-envelope-open-text"></i> System Notifications</button>
 </div>
 
-<!-- Sessions Panel -->
-<section class="tab-panel active" id="sessions">
-  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: flex-start;">
-    <!-- Course Sessions Grid -->
-    <div style="display: flex; flex-direction: column; gap: 1rem;">
-      <h3 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 0.5rem;">Interactive Session List</h3>
-      <div style="display: grid; gap: 1rem; grid-template-columns: 1fr;">
-        {% for session in sessions %}
-          <div class="card" style="padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-            <div>
-              <div style="display: flex; gap: 0.5rem; align-items: center;">
-                <span class="badge" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">Order {{ session.display_order }}</span>
-                <span class="badge {% if session.published %}success{% endif %}" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">
-                  {{ "Published" if session.published else "Draft" }}
-                </span>
-              </div>
-              <h4 style="font-weight: 800; font-size: 1.15rem; margin-top: 0.4rem;">{{ session.title }}</h4>
-              <p class="muted" style="font-size: 0.85rem; margin-top: 0.15rem;">{{ session.duration }} | {{ session.difficulty }}</p>
-            </div>
-            
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <a class="btn ghost" href="{{ url_for('admin_session_edit', session_id=session.id) }}" style="padding: 0.45rem 0.85rem; font-size: 0.85rem;"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
-              <form method="post" action="{{ url_for('admin_toggle_publish', session_id=session.id) }}" style="margin:0;">
-                <button class="btn" type="submit" style="padding: 0.45rem 0.85rem; font-size: 0.85rem;">
-                  {{ "Unpublish" if session.published else "Publish" }}
-                </button>
-              </form>
-              <form method="post" action="{{ url_for('admin_session_delete', session_id=session.id) }}" onsubmit="return confirm('Are you sure you want to delete this session? All associated progress and comments will be permanently removed.')" style="margin:0;">
-                <button class="btn" type="submit" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; border-color: rgba(239, 68, 68, 0.4); color: var(--red-400); background: rgba(239, 68, 68, 0.05);"><i class="fa-regular fa-trash-can"></i> Delete</button>
-              </form>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-
-    <!-- Quick Ordering Form -->
-    <div class="card" style="padding: 1.5rem;">
-      <h3 style="font-weight: 800; font-size: 1.15rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-sort" style="color: var(--red-500);"></i> Quick Reorder</h3>
-      <p class="muted" style="font-size: 0.85rem; margin-bottom: 1rem;">Set the numerical order positions to rearrange lessons in the student dashboard.</p>
-      <form method="post" action="{{ url_for('admin_reorder_sessions') }}">
-        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-          {% for session in sessions %}
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <input type="number" name="session_id" value="{{ session.id }}" hidden />
-              <input type="number" name="order_{{ session.id }}" value="{{ session.display_order }}" style="width: 60px; padding: 0.4rem; text-align: center;" />
-              <span style="font-size: 0.9rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ session.title }}</span>
-            </div>
-          {% endfor %}
-        </div>
-        <button class="btn primary" type="submit" style="width: 100%; margin-top: 1.5rem;"><i class="fa-solid fa-save"></i> Save Display Order</button>
-      </form>
-    </div>
-  </div>
-</section>
-
 <!-- Student Roster Panel -->
-<section class="tab-panel card" id="students">
+<section class="tab-panel card active" id="students">
   <h3 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1rem;"><i class="fa-solid fa-users-gear" style="color: var(--red-500);"></i> Student Accounts & Performance</h3>
   <div style="overflow-x: auto;">
     <table class="admin-table">

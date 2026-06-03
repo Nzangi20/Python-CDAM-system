@@ -110,7 +110,7 @@
     <p class="copyright" style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);">© Chuka University. All rights reserved.</p>
   </footer>
 
-  {% if current_user.is_authenticated %}
+  {% if current_user.is_authenticated and request.endpoint != 'exam_take' %}
   <button class="chatbot-toggle" id="chatbotToggle" aria-label="Open assistant">
     <i class="fa-solid fa-comment-dots"></i>
   </button>
