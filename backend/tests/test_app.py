@@ -496,5 +496,81 @@ def test_admin_attempt_action(client):
         assert updated_attempt.status == "terminated"
 
 
+def test_transcript_and_trials_limit(client):
+    # 1. Register and login
+    register_and_login(client, reg_number="EB3/99999/26", password="mytestpassword", study_level="Beginner")
+    
+    # 2. Check transcript requires 100% progress (which is currently 0%, so it should redirect)
+    resp_tr = client.get("/transcript")
+    assert resp_tr.status_code == 302
+    
+    # 3. Seed student progress to 100% to unlock transcript
+    with app.app_context():
+        student = User.query.filter_by(reg_number="EB3/99999/26").first()
+        student_id = student.id
+        
+        # Complete all 10 Beginner sessions
+        for i in range(1, 11):
+            s = Session.query.filter_by(display_order=i).first()
+            if s:
+                prog = UserProgress(user_id=student_id, session_id=s.id, completed=True)
+                db.session.add(prog)
+        db.session.commit()
+        
+    resp_tr_unlocked = client.get("/transcript")
+    assert resp_tr_unlocked.status_code == 200
+    assert b"Official Academic Transcript" in resp_tr_unlocked.data
+    assert b"EB3/99999/26" in resp_tr_unlocked.data
+    
+    # 4. Check trials limit logic (at most 3 attempts, blocked after passing)
+    with app.app_context():
+        exam = Exam(
+            title="Trial Limit Exam",
+            description="Testing max attempts rule",
+            duration=30,
+            passing_score=60,
+            study_level="Beginner",
+            published=True
+        )
+        db.session.add(exam)
+        db.session.commit()
+        exam_id = exam.id
+        
+    # Attempt 1: Failed
+    with app.app_context():
+        att1 = ExamAttemptRecord(user_id=student_id, exam_id=exam_id, score=45, status="submitted")
+        db.session.add(att1)
+        db.session.commit()
+        
+    # Attempt 2: Failed
+    with app.app_context():
+        att2 = ExamAttemptRecord(user_id=student_id, exam_id=exam_id, score=50, status="submitted")
+        db.session.add(att2)
+        db.session.commit()
+        
+    # Attempt 3: Failed
+    with app.app_context():
+        att3 = ExamAttemptRecord(user_id=student_id, exam_id=exam_id, score=55, status="submitted")
+        db.session.add(att3)
+        db.session.commit()
+        
+    # Attempt 4: Should be blocked by prior attempts >= 3 limit
+    resp_att4 = client.get(f"/exams/{exam_id}/take")
+    assert resp_att4.status_code == 302
+    
+    # Check that if they passed, they are also blocked from retaking
+    with app.app_context():
+        # Clean up database records for this exam
+        ExamAttemptRecord.query.filter_by(exam_id=exam_id).delete()
+        # Add a passed attempt
+        att_passed = ExamAttemptRecord(user_id=student_id, exam_id=exam_id, score=85, status="submitted")
+        db.session.add(att_passed)
+        db.session.commit()
+        
+    resp_att_passed = client.get(f"/exams/{exam_id}/take")
+    assert resp_att_passed.status_code == 302
+
+
+
 
 

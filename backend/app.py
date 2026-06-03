@@ -198,7 +198,7 @@ class Exam(db.Model):
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
     duration = db.Column(db.Integer, default=30)
-    passing_score = db.Column(db.Integer, default=50)
+    passing_score = db.Column(db.Integer, default=60)
     exam_type = db.Column(db.String(50), default="mixed")
     start_time = db.Column(db.DateTime, nullable=True)
     end_time = db.Column(db.DateTime, nullable=True)
@@ -707,6 +707,36 @@ def certificate():
     return render_template("certificate.html", user=current_user, completed_at=datetime.now(UTC))
 
 
+@app.route("/transcript")
+@login_required
+@student_required
+def transcript():
+    ctx = dashboard_context(current_user.id)
+    if not ctx["certificate_ready"]:
+        flash("Complete all sessions to unlock your academic transcript.", "error")
+        return redirect(url_for("student_dashboard"))
+        
+    sessions = ctx["sessions"]
+    progress_map = ctx["progress_map"]
+    
+    quiz_results = QuizResult.query.filter_by(user_id=current_user.id).all()
+    quiz_map = {q.session_id: q for q in quiz_results}
+    
+    exams = Exam.query.filter_by(published=True, study_level=current_user.study_level).all()
+    exam_attempts = ExamAttemptRecord.query.filter_by(user_id=current_user.id).all()
+    
+    return render_template(
+        "transcript.html",
+        user=current_user,
+        sessions=sessions,
+        progress_map=progress_map,
+        quiz_map=quiz_map,
+        exams=exams,
+        exam_attempts=exam_attempts,
+        completed_at=datetime.now(UTC)
+    )
+
+
 @app.route("/session/<slug>")
 @login_required
 def session_detail(slug: str):
@@ -1068,9 +1098,19 @@ def exam_take(exam_id: int):
         flash("Exam window has closed.", "error")
         return redirect(url_for("exams_dashboard"))
 
+    # Check if student has already passed this exam
+    passed_attempt = ExamAttemptRecord.query.filter_by(
+        user_id=current_user.id, 
+        exam_id=exam.id,
+        status="submitted"
+    ).filter(ExamAttemptRecord.score >= exam.passing_score).first()
+    if passed_attempt:
+        flash("You have already passed this exam.", "success")
+        return redirect(url_for("exams_dashboard"))
+
     prior_attempts = ExamAttemptRecord.query.filter_by(user_id=current_user.id, exam_id=exam.id).count()
-    if prior_attempts >= exam.attempt_limit:
-        flash("Attempt limit reached for this exam.", "error")
+    if prior_attempts >= 3:
+        flash("Attempt limit reached. You are only allowed 2 other trials after failing.", "error")
         return redirect(url_for("exams_dashboard"))
 
     question_rows = Question.query.filter_by(exam_id=exam.id).all()

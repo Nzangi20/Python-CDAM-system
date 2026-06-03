@@ -56,6 +56,9 @@
       <a class="btn primary" href="{{ url_for('certificate') }}" style="background: #ffffff; color: var(--red-700); font-weight: 700; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 0.65rem 1.25rem; border-radius: 8px;">
         <i class="fa-solid fa-award"></i> View Certificate
       </a>
+      <a class="btn primary" href="{{ url_for('transcript') }}" style="background: var(--purple-brand); color: #ffffff; font-weight: 700; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 0.65rem 1.25rem; border-radius: 8px;">
+        <i class="fa-solid fa-file-invoice"></i> View Transcript
+      </a>
     {% endif %}
     <a class="btn ghost" href="{{ url_for('resources') }}" style="background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.25); color: #ffffff; padding: 0.65rem 1.25rem; border-radius: 8px; backdrop-filter: blur(8px);">
       <i class="fa-solid fa-folder-open"></i> Resources Catalog
@@ -88,7 +91,7 @@
     <div>
       <h3>Exam Average</h3>
       <p>{{ "%.1f"|format(exam_avg) }}%</p>
-      <span class="muted" style="font-size: 0.85rem;">Passing criteria: 50%</span>
+      <span class="muted" style="font-size: 0.85rem;">Passing criteria: 60%</span>
     </div>
     <div style="font-size: 2.5rem; color: var(--red-500);"><i class="fa-solid fa-graduation-cap"></i></div>
   </div>
