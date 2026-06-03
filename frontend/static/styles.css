@@ -242,7 +242,7 @@ html[data-theme="dark"] .middle-brand h1 {
 .dropdown-content {
   display: none;
   position: absolute;
-  top: 125%;
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
   min-width: 250px;
