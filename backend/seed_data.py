@@ -1,809 +1,599 @@
-"""Course seed data for CDAM Python for Data Science Masterclass with rich interactive details."""
+"""Course seed data for CDAM Python for Data Science and Machine Learning.
+Defines 18 comprehensive sessions:
+- Sessions 1-10: Introduction to Python for Data Science (Beginner)
+- Sessions 11-18: Master Python for Data Science and Machine Learning (Professional)
+"""
 
 SESSIONS = [
     {
-        "title": "Introduction to Python",
-        "slug": "introduction-to-python",
-        "description": "Get started with Python syntax, tooling, and workflow for data science.",
+        "title": "Session 1: Introduction to Python, Jupyter Notebook, and Basic Data Types",
+        "slug": "session-1-intro-to-python-jupyter",
+        "description": "Get started with Python syntax, Jupyter Notebook environment, and core variables.",
         "duration": "45 min",
         "difficulty": "Beginner",
-        "objectives": """- Understand Python's role in data science and AI
-- Set up a productive coding environment
-- Run scripts and Jupyter notebooks
-- Use variables, comments, and basic syntax""",
-        "expected_outcomes": """### Knowledge Outcomes
-- Understand Python's design philosophy (readability and simplicity) and its role in Data Science, Machine Learning, and AI.
-- Explain the difference between Python scripts (.py) and interactive notebooks (.ipynb).
-- Understand Python variables, data types, and basic arithmetic syntax.
+        "objectives": """- Set up Python and launch Jupyter Notebook / JupyterLab
+- Understand basic variables, data types, and arithmetic operators
+- Execute print statements and basic interactive python cells""",
+        "expected_outcomes": """- Launch a Jupyter Notebook local server.
+- Declare variables of type int, float, string, and boolean.
+- Write simple computational formulas using Python arithmetic.""",
+        "learning_notes": """### Python & Jupyter Overview
+Python is a general-purpose programming language popular for its readability. Jupyter Notebooks allow you to mix markdown explanations with executable python code blocks in a web browser.
 
-### Practical Outcomes
-- Install and verify a Python 3.10+ environment.
-- Execute basic Python commands in a terminal or Jupyter environment.
-- Write clean code using proper indentation, variables, and formatting.
-
-### Industry-Relevant Skills
-- Setting up professional development environments (VS Code, Jupyter, Virtual Environments) for project reproducibility.
-""",
-        "learning_notes": """### Concept Explanation & Theory
-Python is an interpreted, high-level, general-purpose programming language. Created by Guido van Rossum and released in 1991, Python's design philosophy emphasizes code readability through its notable use of significant whitespace. Today, it is the standard for Data Science, Machine Learning, and Artificial Intelligence due to its rich ecosystem of libraries.
-
-### Important Definitions
-- **Variable:** A named location in memory used to store data.
-- **Syntax:** The set of rules defining how a program is written and interpreted.
-- **Sandbox:** A secure environment to execute code without affecting local resources.
-
-### Best Practices
-- Follow PEP 8 style guidelines (e.g., use 4 spaces per indentation level).
-- Use descriptive variable names (e.g., `total_sales` instead of `x`).
-
-### Common Mistakes
-- Mixing tabs and spaces, which causes `IndentationError` in Python.
-- Using Python keywords (e.g., `print`, `if`, `class`) as variable names.
-
-### Tips & Warnings
-> 💡 **Tip:** Always document your code using comments (`#`) so others (and your future self) understand the logic.
-""",
-        "instructions": """#### What you will do:
-In this simulation, you will run a simple Python script that outputs text and computes average sales.
-
-#### Step-by-Step Instructions:
-1. **Step 1:** Run the default code by clicking the **Run Code** button. Observe the output printed in the console.
-2. **Step 2:** Modify the variable values: change `total_sales = 1200 + 850 + 430` to reflect new sales figures, e.g., `total_sales = 1500 + 950 + 550`.
-3. **Step 3:** Click **Run Code** again to see the updated average sales calculation.
-""",
-        "content": """## Welcome to Python for Data Science
-
-Python is the most widely used language in analytics, machine learning, and AI. At **CDAM** (Center for Data Analytics & Modelling), we use Python to turn raw data into actionable insights.
-
-### Why Python?
-
-- Readable syntax that mirrors plain English
-- Rich ecosystem: NumPy, Pandas, Matplotlib, scikit-learn
-- Strong community and industry adoption
-
-### Your First Steps
-
-1. Install Python 3.10+
-2. Create a virtual environment
-3. Launch Jupyter Lab or VS Code
-4. Run your first script
-
-> **CDAM Tip:** Practice daily — even 20 minutes builds momentum.""",
-        "code_examples": """# Your first Python program
-print('Hello, CDAM Data Science!')
-
-# Basic arithmetic for analytics
-total_sales = 1200 + 850 + 430
-average = total_sales / 3
-print(f'Average sales: {average:.2f}')""",
-        "resources": """- [Python Official Docs](https://docs.python.org/3/)
-- [Jupyter Project](https://jupyter.org/)
-- [CDAM Training Portal](https://cdam.chuka.ac.ke/training/)""",
+### Primitive Types
+- `int`: Integers (e.g. 5, -12)
+- `float`: Decimals (e.g. 3.14, 0.0)
+- `str`: Text wrapped in single or double quotes
+- `bool`: True or False value""",
+        "instructions": "Run the code editor cell to calculate variable values and print their types.",
+        "content": "In this session, you will get comfortable executing commands in Python, declaring variables, and printing outcomes.",
+        "code_examples": """# Declare variables and print types
+name = "CDAM Student"
+age = 20
+gpa = 3.8
+print(f"Student: {name}, Age: {age}, GPA: {gpa}")
+print(type(name), type(age), type(gpa))""",
+        "resources": "- [Python Official Tutorial](https://docs.python.org/3/tutorial/)\\n- [Jupyter Notebook Docs](https://jupyter-notebook.readthedocs.io/)",
         "quiz": [
-            {"question": "What makes Python popular in data science?", "options": ["Readable syntax and rich libraries", "It only runs on Windows", "No community support", "Cannot integrate with databases"], "correct": 0},
-            {"question": "Which tool is commonly used for interactive notebooks?", "options": ["Jupyter", "Photoshop", "Excel only", "Notepad"], "correct": 0},
-            {"question": "What does print() do?", "options": ["Outputs text to the console", "Deletes files", "Installs packages", "Creates a database"], "correct": 0},
-        ],
+            {"question": "Which of the following is a float in Python?", "options": ["3.14", "3", "'3.14'", "True"], "correct": 0},
+            {"question": "How do you start a single-line comment in Python?", "options": ["#", "//", "/*", "<!--"], "correct": 0},
+            {"question": "What is the result of type(True)?", "options": ["bool", "str", "int", "float"], "correct": 0}
+        ]
     },
     {
-        "title": "Variables and Data Types",
-        "slug": "variables-and-data-types",
-        "description": "Learn primitives, collections, and data conversions.",
+        "title": "Session 2: Data Import, Cleaning, and Exploratory Data Analysis (EDA)",
+        "slug": "session-2-data-import-eda",
+        "description": "Learn how to read CSV files, locate missing values, and execute basic cleaning operations.",
         "duration": "50 min",
         "difficulty": "Beginner",
-        "objectives": """- Use integers, floats, strings, and booleans
-- Work with lists, tuples, and dictionaries
-- Cast between types safely
-- Inspect values with type()""",
-        "expected_outcomes": """### Knowledge Outcomes
-- Explain dynamic typing and how variables hold references in memory.
-- Identify the differences between primitive types (int, float, str, bool) and collections (list, dict, tuple, set).
-- Understand readability advantages of explicit type casting.
+        "objectives": """- Read external files into memory
+- Locate missing or Null values in a dataset
+- Use pandas dropna and fillna techniques to clean up data""",
+        "expected_outcomes": """- Load a dictionary or CSV file into a Pandas DataFrame.
+- Clean missing entries using listwise deletion or imputation.
+- Compute general statistics.""",
+        "learning_notes": """### Exploratory Data Analysis (EDA)
+EDA is the initial phase of data analysis where you inspect summary stats, detect outliers, and check completeness.
 
-### Practical Outcomes
-- Declare variables of various data types.
-- Perform list modifications (appending, slicing) and dictionary lookups.
-- Print type information using the `type()` built-in function.
-
-### Industry-Relevant Skills
-- Structuring raw, multi-format datasets into Python primitive collections for quick local analysis.
-""",
-        "learning_notes": """### Concept Explanation & Theory
-Variables in Python are pointers to memory addresses where data objects reside. Since Python is dynamically typed, the interpreter infers the data type based on the value assigned, allowing high developer flexibility.
-
-### Important Definitions
-- **int / float:** Primitives for whole numbers and decimal fractions.
-- **list:** An ordered, mutable sequence of items.
-- **dict:** A mapping of keys to values (like a JSON object).
-
-### Best Practices
-- Keep variable names descriptive and lowercase (snake_case).
-- Keep lists homogeneous where possible, and use dictionaries for structured records.
-
-### Common Mistakes
-- Trying to concatenate strings and numbers without casting: `print("Age: " + age)`. Use f-strings instead: `print(f"Age: {age}")`.
-- Modifying a list while iterating over it.
-
-### Tips & Warnings
-> 💡 **Tip:** Use `type(variable_name)` to debug type mismatches.
-""",
-        "instructions": """#### What you will do:
-In this simulation, you will declare variables, use primitive lists and dictionaries, and output their type information.
-
-#### Step-by-Step Instructions:
-1. **Step 1:** Click **Run Code** and review the types printed.
-2. **Step 2:** Add a new key-value pair to the `student` dictionary, e.g., `student['gpa'] = 3.8`.
-3. **Step 3:** Append a new score to the `scores` list: `scores.append(95)`.
-4. **Step 4:** Run the code and verify the updated output.
-""",
-        "content": """## Variables and Data Types
-
-Variables are named containers for data. Python is **dynamically typed** — you don't declare types explicitly.
-
-### Core Types
-
-| Type | Example | Use Case |
-|------|---------|----------|
-| int | `42` | Counts, IDs |
-| float | `3.14` | Measurements |
-| str | `'CDAM'` | Text labels |
-| bool | `True` | Flags, conditions |
-| list | `[1, 2, 3]` | Ordered collections |
-| dict | `{'a': 1}` | Key-value records |""",
-        "code_examples": """name = 'CDAM Scholar'
-age = 25
-height = 5.9
-is_enrolled = True
-
-scores = [88, 92, 79]
-student = {'name': name, 'scores': scores}
-
-print(type(name), type(scores), type(student))""",
-        "resources": """- [Python Built-in Types](https://docs.python.org/3/library/stdtypes.html)
-- [Real Python: Data Types](https://realpython.com/python-data-types/)""",
+### Cleaning Techniques
+- `dropna()`: Remove rows or columns containing missing values.
+- `fillna()`: Replace missing values with static values or calculated column means.""",
+        "instructions": "Execute the pandas code to see how rows containing Null or None values are deleted from the DataFrame.",
+        "content": "Cleaning data is 80% of any data scientist's job. Learn to load and filter out bad rows.",
+        "code_examples": """import pandas as pd
+# Import and clean a sample dataset
+data = {'Name': ['Alice', 'Bob', 'Carol', None], 'Age': [25, None, 30, 22]}
+df = pd.DataFrame(data)
+print("Original:")
+print(df)
+df_clean = df.dropna()
+print("\\nCleaned:")
+print(df_clean)""",
+        "resources": "- [Pandas IO Docs](https://pandas.pydata.org/docs/user_guide/io.html)",
         "quiz": [
-            {"question": "Which type stores key-value pairs?", "options": ["dict", "int", "float", "bool"], "correct": 0},
-            {"question": "What is the output type of 5 / 2 in Python 3?", "options": ["float", "int", "str", "list"], "correct": 0},
-            {"question": "Which collection is ordered and mutable?", "options": ["list", "tuple", "int", "None"], "correct": 0},
-        ],
+            {"question": "Which pandas function drops rows with missing values?", "options": ["dropna()", "fillna()", "drop()", "remove_nulls()"], "correct": 0},
+            {"question": "What does EDA stand for?", "options": ["Exploratory Data Analysis", "Efficient Data Aggregation", "Estimated Domain Association", "Error Detection Assessment"], "correct": 0},
+            {"question": "Which parameter in pandas is used to load custom missing value markers?", "options": ["na_values", "null_marker", "empty_vals", "fill_na"], "correct": 0}
+        ]
     },
     {
-        "title": "Control Flow and Functions",
-        "slug": "control-flow-and-functions",
-        "description": "Use conditionals, loops, and reusable functions.",
+        "title": "Session 3: Data Manipulation with pandas",
+        "slug": "session-3-pandas-data-manipulation",
+        "description": "Filter columns, select rows by condition, and group statistics with pandas.",
         "duration": "60 min",
         "difficulty": "Beginner",
-        "objectives": """- Write if/elif/else branching logic
-- Iterate with for and while loops
-- Build reusable functions with parameters
-- Return values from functions""",
-        "expected_outcomes": """### Knowledge Outcomes
-- Explain logical branching and truthiness in conditional evaluation.
-- Understand the differences between fixed iterations (`for`) and conditional loops (`while`).
-- Comprehend lexical scoping and function return mechanics.
-
-### Practical Outcomes
-- Write complex `if-elif-else` structures.
-- Traverse sequences using `for` loops.
-- Define, document, and test modular functions with parameters.
-
-### Industry-Relevant Skills
-- Automating business logic and decision pipelines in data validation workflows.
-""",
-        "learning_notes": """### Concept Explanation & Theory
-Control flow commands direct the execution path of a program. Functions allow developers to write modular, reusable blocks of logic, reducing redundancy (DRY: Don't Repeat Yourself).
-
-### Important Definitions
-- **Boolean Expression:** An statement evaluating to `True` or `False`.
-- **Iteration:** Repeating a block of instructions a specified number of times or while a condition is met.
-- **Scope:** The region of a program where a variable is accessible.
-
-### Best Practices
-- Keep functions small and focused on a single task (Single Responsibility).
-- Always include return statements explicitly when returning results.
-
-### Common Mistakes
-- Forgetting the colon `:` at the end of function definitions, loops, or conditionals.
-- Infinite loops when writing `while` loops due to missing update conditions.
-
-### Tips & Warnings
-> 💡 **Tip:** Use descriptive verbs to name functions (e.g., `calculate_mean` instead of `calc`).
-""",
-        "instructions": """#### What you will do:
-You will modify and test a grading function that loops through scores.
-
-#### Step-by-Step Instructions:
-1. **Step 1:** Run the script. Examine the passed/failed results.
-2. **Step 2:** Modify the logic of the `grade` function. For example, add a distinction grade: `if score >= 90: return 'Distinction'`.
-3. **Step 3:** Change the input scores list to include `95` and `35`.
-4. **Step 4:** Run again to observe the updated lists of grades.
-""",
-        "content": """## Control Flow and Functions
-
-Control flow lets your programs make decisions and repeat tasks — essential for data pipelines.
-
-### Conditionals
-
-Use `if`, `elif`, and `else` to branch based on data quality checks, thresholds, or categories.
-
-### Loops
-
-- **for** — iterate over lists, DataFrame rows, file lines
-- **while** — repeat until a condition is met
-
-### Functions
-
-Encapsulate logic for reuse, testing, and cleaner notebooks.""",
-        "code_examples": """def grade(score):
-    if score >= 70:
-        return 'Pass'
-    elif score >= 50:
-        return 'Retake'
-    return 'Fail'
-
-results = []
-for score in [45, 67, 82, 91]:
-    results.append(grade(score))
-print(results)""",
-        "resources": """- [Python Control Flow](https://docs.python.org/3/tutorial/controlflow.html)
-- [Functions in Python](https://docs.python.org/3/tutorial/controlflow.html#defining-functions)""",
+        "objectives": """- Select columns and filter rows using logical indices
+- Apply groupby operations to aggregate numeric metrics
+- Pivot tables for multi-dimensional data analysis""",
+        "expected_outcomes": """- Query datasets using conditional statements.
+- Group rows by categorical values and sum their metrics.
+- Produce custom slices of a DataFrame.""",
+        "learning_notes": """### Data Manipulation
+DataFrames represent tables. We filter using boolean expressions (e.g. `df[df['Score'] > 80]`). Grouping merges rows based on a target category and applies aggregate operations like `.sum()`, `.mean()`, or `.count()`.""",
+        "instructions": "Run the code to filter the sample sales data and compute aggregated sum metrics.",
+        "content": "Mastering DataFrame filtering and grouping allows you to answer quick business and academic questions.",
+        "code_examples": """import pandas as pd
+# Filter and aggregate data
+sales = {'Region': ['East', 'West', 'East', 'West'], 'Revenue': [100, 150, 200, 300]}
+df = pd.DataFrame(sales)
+east_only = df[df['Region'] == 'East']
+print("East Only:")
+print(east_only)
+print("\\nGrouped Revenue:")
+print(df.groupby('Region').sum())""",
+        "resources": "- [Pandas Indexing Tutorial](https://pandas.pydata.org/docs/user_guide/indexing.html)",
         "quiz": [
-            {"question": "Which keyword defines a function?", "options": ["def", "func", "function", "lambda only"], "correct": 0},
-            {"question": "What loop iterates over a sequence?", "options": ["for", "if", "import", "class"], "correct": 0},
-            {"question": "elif stands for?", "options": ["else if", "every loop", "error log", "element index"], "correct": 0},
-        ],
+            {"question": "Which statement extracts column 'Revenue'?", "options": ["df['Revenue']", "df.get_row('Revenue')", "df.select('Revenue')", "df.loc_col('Revenue')"], "correct": 0},
+            {"question": "How do you compute grouping metrics on categories in pandas?", "options": ["groupby()", "pivot()", "aggregate()", "join()"], "correct": 0},
+            {"question": "How do you combine multiple filters in pandas?", "options": ["Using & and | operators", "Using and / or keywords", "Using join", "Nesting functions"], "correct": 0}
+        ]
     },
     {
-        "title": "NumPy Fundamentals",
-        "slug": "numpy-fundamentals",
-        "description": "Work with high-performance arrays and vectorized operations.",
-        "duration": "70 min",
-        "difficulty": "Intermediate",
-        "objectives": """- Create and reshape ndarrays
-- Apply vectorized math operations
-- Understand broadcasting and indexing
-- Compute summary statistics on arrays""",
-        "expected_outcomes": """### Knowledge Outcomes
-- Explain why NumPy arrays are faster and consume less memory than Python lists.
-- Describe the concepts of vectorization and broadcasting.
-- Understand dimensional representations (axes) in multi-dimensional arrays.
-
-### Practical Outcomes
-- Initialize arrays using `np.array()`, `np.zeros()`, `np.ones()`, and `np.arange()`.
-- Reshape, slice, and filter arrays using boolean indexing.
-- Compute mathematical metrics (mean, median, standard deviation) across specific axes.
-
-### Industry-Relevant Skills
-- Efficient numerical computations on matrices representing image data, scientific experiments, or financial portfolios.
-""",
-        "learning_notes": """### Concept Explanation & Theory
-NumPy (Numerical Python) is the foundation of scientific computing in Python. It provides high-performance multi-dimensional array objects (`ndarrays`) which are compiled in C, allowing fast contiguous memory access and vectorized math operations.
-
-### Important Definitions
-- **Vectorization:** Performing batch operations on data without writing slow, manual loops.
-- **Broadcasting:** How NumPy treats arrays of different shapes during arithmetic operations.
-- **Axis:** Dimensions of an array. Axis 0 represents columns/vertical, and Axis 1 represents rows/horizontal.
-
-### Best Practices
-- Never use python loops (`for`, `while`) to perform arithmetic over NumPy arrays; utilize vectorized methods.
-- Specify axes explicitly in operations like `.sum()` and `.mean()`.
-
-### Common Mistakes
-- Confusing array shapes when multiplying matrices (e.g., trying to dot multiply mismatched dimensions).
-
-### Tips & Warnings
-> 💡 **Tip:** Slicing a NumPy array returns a *view*, not a copy. Changing the slice modifies the original array!
-""",
-        "instructions": """#### What you will do:
-You will experiment with array creation, element-wise math, and array axes.
-
-#### Step-by-Step Instructions:
-1. **Step 1:** Run the starter code. Note the axis 0 sum and mean values.
-2. **Step 2:** Modify the `arr` array to have different numbers.
-3. **Step 3:** Calculate and print the standard deviation of `arr` using `arr.std()`.
-4. **Step 4:** Run again to check the calculated values.
-""",
-        "content": """## NumPy Fundamentals
-
-NumPy provides **ndarrays** — fast, homogeneous arrays that power Pandas and scikit-learn.
-
-### Key Concepts
-
-- **Vectorization** — apply operations to entire arrays without Python loops
-- **Broadcasting** — align differently shaped arrays for computation
-- **Indexing** — slice and filter like a pro
-
-NumPy is typically 10–100x faster than pure Python lists for numerical work.""",
-        "code_examples": """import numpy as np
-
-arr = np.array([1, 2, 3, 4, 5])
-print('Mean:', arr.mean())
-print('Doubled:', arr * 2)
-
-matrix = np.array([[1, 2], [3, 4]])
-print('Shape:', matrix.shape)
-print('Sum axis 0:', matrix.sum(axis=0))""",
-        "resources": """- [NumPy Documentation](https://numpy.org/doc/)
-- [NumPy Quickstart](https://numpy.org/doc/stable/user/quickstart.html)""",
+        "title": "Session 4: Data Visualization with matplotlib and seaborn",
+        "slug": "session-4-matplotlib-seaborn-viz",
+        "description": "Create charts, customize axes labels, and build visual heatmaps for presentations.",
+        "duration": "60 min",
+        "difficulty": "Beginner",
+        "objectives": """- Generate line charts and bar plots using matplotlib
+- Customize colors, titles, and legends
+- Build scatter plots and correlation heatmaps with seaborn""",
+        "expected_outcomes": """- Build charts with labeled axes.
+- Select appropriate chart styles for categorical vs continuous data.
+- Save visualizations as image files.""",
+        "learning_notes": """### Data Visualization
+Visualizations help communicate trends.
+- `matplotlib.pyplot` is the core library for plotting.
+- `seaborn` provides higher-level aesthetic defaults built on top of matplotlib.""",
+        "instructions": "Generate and print confirmation of chart building using the code cell.",
+        "content": "Charts are the language of data science. Let's learn to build and customize them.",
+        "code_examples": """import matplotlib.pyplot as plt
+# Plot simple line chart
+x = [1, 2, 3, 4]
+y = [10, 20, 25, 30]
+plt.plot(x, y, marker='o', color='red')
+plt.title("Sample Performance Chart")
+plt.xlabel("Hours Studied")
+plt.ylabel("Score")
+print("Chart ready for rendering!")""",
+        "resources": "- [Matplotlib Gallery](https://matplotlib.org/stable/gallery/index.html)\\n- [Seaborn Tutorial](https://seaborn.pydata.org/tutorial.html)",
         "quiz": [
-            {"question": "What is NumPy's core data structure?", "options": ["ndarray", "DataFrame", "Series", "Graph"], "correct": 0},
-            {"question": "Vectorization helps by?", "options": ["Avoiding slow Python loops", "Deleting data", "Creating HTML", "Sending emails"], "correct": 0},
-            {"question": "arr.mean() returns?", "options": ["Average of array elements", "Maximum value", "Array length", "Random number"], "correct": 0},
-        ],
+            {"question": "Which alias is commonly used for matplotlib.pyplot?", "options": ["plt", "mpl", "plot", "pyplot"], "correct": 0},
+            {"question": "Which plot is ideal for showing continuous variables' correlations?", "options": ["Scatter plot", "Bar chart", "Pie chart", "Histogram"], "correct": 0},
+            {"question": "How do you add a title to a matplotlib plot?", "options": ["plt.title('My Title')", "plt.set_title('My Title')", "plt.header('My Title')", "plt.label('My Title')"], "correct": 0}
+        ]
     },
     {
-        "title": "Pandas Data Analysis",
-        "slug": "pandas-data-analysis",
-        "description": "Analyze tabular data using DataFrames and Series.",
+        "title": "Session 5: Hypothesis Testing",
+        "slug": "session-5-hypothesis-testing",
+        "description": "Learn statistical inference: define null hypotheses and compute p-values.",
+        "duration": "60 min",
+        "difficulty": "Beginner",
+        "objectives": """- Define null and alternative hypotheses
+- Execute a one-sample and two-sample t-test
+- Interpret p-values and make statistical decisions""",
+        "expected_outcomes": """- Formulate statistical hypotheses.
+- Run t-tests using scipy.stats.
+- Determine statistical significance (e.g. at alpha=0.05).""",
+        "learning_notes": """### Hypothesis Testing
+Hypothesis tests verify if a sample observation differs significantly from a population mean or control group.
+- **Null Hypothesis (H0)**: No effect or no difference.
+- **P-value**: Probability of getting results at least as extreme, assuming H0 is true. If p < 0.05, we reject H0.""",
+        "instructions": "Execute the t-test on student scores to calculate the t-statistic and the p-value.",
+        "content": "Hypothesis testing helps prove whether your data trends are real or simply random noise.",
+        "code_examples": """import scipy.stats as stats
+# Perform a one-sample t-test
+scores = [78, 85, 92, 88, 79, 81, 95, 87]
+t_stat, p_val = stats.ttest_1samp(scores, popmean=80)
+print(f"T-statistic: {t_stat:.4f}")
+print(f"P-value: {p_val:.4f}")""",
+        "resources": "- [SciPy Stats Tutorial](https://docs.scipy.org/doc/scipy/tutorial/stats.html)",
+        "quiz": [
+            {"question": "If p-value is 0.02 and alpha is 0.05, what do you do?", "options": ["Reject the null hypothesis", "Fail to reject the null hypothesis", "Increase alpha value", "Discard the dataset"], "correct": 0},
+            {"question": "What test compares the means of two independent groups?", "options": ["Two-sample independent t-test", "One-sample t-test", "Chi-square test", "ANOVA"], "correct": 0},
+            {"question": "What does a t-test measure?", "options": ["Difference between group means relative to variance", "Standard deviation of one group", "Correlation coefficient", "Outlier count"], "correct": 0}
+        ]
+    },
+    {
+        "title": "Session 6: Correlation and Regression Analysis",
+        "slug": "session-6-correlation-regression",
+        "description": "Measure associations between variables and build linear models.",
         "duration": "75 min",
-        "difficulty": "Intermediate",
-        "objectives": """- Load CSV and Excel files into DataFrames
-- Inspect data with head(), info(), describe()
-- Filter rows and select columns
-- Group and aggregate data""",
-        "expected_outcomes": """### Knowledge Outcomes
-- Differentiate between a Pandas Series and a DataFrame.
-- Understand the role of indexing in tabular operations.
-- Describe how Pandas maps to standard SQL operations (selection, joins, grouping).
-
-### Practical Outcomes
-- Create DataFrames dynamically or load them from data sources.
-- Filter records using boolean conditions.
-- Group rows and compute aggregate functions like mean, count, and sum.
-
-### Industry-Relevant Skills
-- Loading and summarizing business metrics (sales, active users, clinical trials) to generate immediate insights.
-""",
-        "learning_notes": """### Concept Explanation & Theory
-Pandas is built on top of NumPy and is the industry standard tool for data manipulation and analysis. It introduces the DataFrame, which is a 2D labeled data structure with columns of potentially different types, resembling an SQL table or an Excel sheet.
-
-### Important Definitions
-- **Series:** A 1D labeled array capable of holding any data type.
-- **DataFrame:** A 2D labeled, size-mutable tabular data structure.
-- **Aggregation:** Summarizing multiple values into a single summary statistics figure (e.g., grouping by city and getting the mean age).
-
-### Best Practices
-- Always inspect loaded data using `df.info()` to check data types and null counts.
-- Use `.loc` and `.iloc` for explicit index-based slicing.
-
-### Common Mistakes
-- Chained indexing like `df[df['A'] > 2]['B'] = 3` which can trigger a `SettingWithCopyWarning`.
-
-### Tips & Warnings
-> 💡 **Tip:** Use `df.describe()` for a quick statistical snapshot of all numeric columns in a DataFrame.
-""",
-        "instructions": """#### What you will do:
-You will query a sample student DataFrame, filter it, and print basic statistics.
-
-#### Step-by-Step Instructions:
-1. **Step 1:** Run the script and observe the descriptive statistics table and filtered student list.
-2. **Step 2:** Modify the filter condition: display only students whose score is greater than or equal to 90.
-3. **Step 3:** Add a new student record for 'David' with a score of 81 in the 'ML' course.
-4. **Step 4:** Run again to check the updated statistics.
-""",
-        "content": """## Pandas Data Analysis
-
-Pandas is the workhorse of tabular data analysis in Python.
-
-### DataFrame Essentials
-
-- **Series** — single column with an index
-- **DataFrame** — table of Series sharing an index
-- **read_csv()** — load data from files
-
-Analysts spend most of their time exploring, filtering, and summarizing DataFrames.""",
-        "code_examples": """import pandas as pd
-
-df = pd.DataFrame({
-    'student': ['Alice', 'Bob', 'Carol'],
-    'score': [88, 72, 95],
-    'course': ['Python', 'Python', 'ML']
-})
-
-print(df.describe())
-print(df[df['score'] >= 80])""",
-        "resources": """- [Pandas Documentation](https://pandas.pydata.org/docs/)
-- [10 Minutes to Pandas](https://pandas.pydata.org/docs/user_guide/10min.html)""",
+        "difficulty": "Beginner",
+        "objectives": """- Calculate Pearson correlation coefficients
+- Build and evaluate a linear regression line
+- Interpret regression slopes, intercepts, and R-squared values""",
+        "expected_outcomes": """- Calculate correlation using scipy.stats.
+- Fit a linear regression line.
+- Predict output values for new inputs using the regression equation.""",
+        "learning_notes": """### Correlation vs Causation
+Correlation measures strength and direction of linear association. Pearson's r values range from -1 to 1.
+Linear regression computes:
+`y = slope * x + intercept`
+It represents the line of best fit through the data points.""",
+        "instructions": "Run the code to calculate both correlation and linear regression parameters.",
+        "content": "Regression analysis is the foundation of predictive analytics. Learn to trace trends and forecast variables.",
+        "code_examples": """import numpy as np
+import scipy.stats as stats
+# Correlation between study hours and exam scores
+hours = [2, 4, 6, 8, 10]
+scores = [55, 65, 75, 80, 95]
+corr, p = stats.pearsonr(hours, scores)
+slope, intercept, r, p_val, std_err = stats.linregress(hours, scores)
+print(f"Correlation Coefficient: {corr:.4f}")
+print(f"Regression Line: y = {slope:.2f}x + {intercept:.2f}")""",
+        "resources": "- [SciPy linregress Docs](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.linregress.html)",
         "quiz": [
-            {"question": "Which function loads CSV files?", "options": ["read_csv", "load_csv", "open_csv", "import_csv"], "correct": 0},
-            {"question": "df.describe() shows?", "options": ["Summary statistics", "Only column names", "File path", "Plot colors"], "correct": 0},
-            {"question": "A single column in Pandas is called?", "options": ["Series", "Matrix", "Tensor", "Node"], "correct": 0},
-        ],
+            {"question": "What does a correlation coefficient of -0.9 indicate?", "options": ["Strong negative correlation", "Strong positive correlation", "Weak negative correlation", "No correlation"], "correct": 0},
+            {"question": "In y = mx + c, what does m represent?", "options": ["Slope", "Y-intercept", "Residual value", "Mean of x"], "correct": 0},
+            {"question": "What is the range of Pearson's correlation coefficient?", "options": ["-1 to 1", "0 to 1", "-inf to inf", "0 to 100"], "correct": 0}
+        ]
     },
     {
-        "title": "Data Cleaning and Manipulation",
-        "slug": "data-cleaning-and-manipulation",
-        "description": "Handle missing values, duplicates, and inconsistent formats.",
-        "duration": "70 min",
-        "difficulty": "Intermediate",
-        "objectives": """- Detect missing and duplicate records
-- Impute or drop null values strategically
-- Standardize text and date formats
-- Validate cleaned datasets""",
-        "expected_outcomes": """### Knowledge Outcomes
-- Explain why data cleaning is critical and how dirty data leads to corrupted models (Garbage In, Garbage Out).
-- Evaluate when to drop vs when to impute (fill) missing values.
-- Understand duplication criteria in complex tables.
-
-### Practical Outcomes
-- Detect nulls using `.isna()` or `.isnull()`.
-- Impute missing values with median, mean, or static values using `.fillna()`.
-- Remove duplicate rows with `.drop_duplicates()`.
-
-### Industry-Relevant Skills
-- Transforming raw, messy operational data into high-integrity training sets for predictive modeling.
-""",
-        "learning_notes": """### Concept Explanation & Theory
-In the real world, datasets are rarely clean. They contain missing records, duplicate rows, system glitches, and bad input formats. Data cleaning is the process of detecting and correcting (or removing) corrupt or inaccurate records from a recordset.
-
-### Important Definitions
-- **Imputation:** Replacing missing data with substituted values (like mean or median).
-- **Null Value:** Missing or undefined value representation (e.g., `NaN` in Pandas).
-- **Duplicate:** Rows sharing identical column values, representing redundant data entry.
-
-### Best Practices
-- Never use the mean to impute when data has strong outliers; use the median.
-- Document every cleaning step so data pipelines can be replicated.
-
-### Common Mistakes
-- Dropping all rows with any missing values without assessing the loss of information.
-
-### Tips & Warnings
-> 💡 **Tip:** Always verify rows before and after running `.drop_duplicates()` to know exactly how many rows were purged.
-""",
-        "instructions": """#### What you will do:
-You will clean a small dataset containing duplicate records and null fields.
-
-#### Step-by-Step Instructions:
-1. **Step 1:** Run the script and observe the cleaned DataFrame. Note the median replacement for age.
-2. **Step 2:** Modify the code to fill missing 'city' values with 'Nairobi' instead of 'Unknown'.
-3. **Step 3:** Add another record to the DataFrame that has missing age and missing city, and verify how it gets cleaned.
-4. **Step 4:** Run the simulator to test your logic.
-""",
-        "content": """## Data Cleaning and Manipulation
-
-Real-world data is messy. Cleaning typically consumes **60–80%** of an analyst's time.
-
-### Common Issues
-
-- Missing values (NaN, null, blank strings)
-- Duplicate rows
-- Inconsistent categories (`'Male'`, `'M'`, `'male'`)
-- Wrong data types
-
-Clean data → reliable models → trustworthy decisions.""",
-        "code_examples": """import pandas as pd
-import numpy as np
-
-df = pd.DataFrame({'age': [22, np.nan, 30, 22], 'city': ['Nairobi', 'Nairobi', None, 'Nairobi']})
-df = df.drop_duplicates()
-df['age'] = df['age'].fillna(df['age'].median())
-df['city'] = df['city'].fillna('Unknown')
-print(df)""",
-        "resources": """- [Handling Missing Data](https://pandas.pydata.org/docs/user_guide/missing_data.html)
-- [CDAM Research Projects](https://cdam.chuka.ac.ke/projects/)""",
+        "title": "Session 7: Analysis of Variance (ANOVA) and Non-Parametric Tests",
+        "slug": "session-7-anova-tests",
+        "description": "Compare multiple means with ANOVA and check categorical counts with Chi-square.",
+        "duration": "75 min",
+        "difficulty": "Beginner",
+        "objectives": """- Run a One-Way ANOVA test across three or more cohorts
+- Understand assumptions of ANOVA (normality, variance homogeneity)
+- Perform non-parametric alternatives when normality is violated""",
+        "expected_outcomes": """- Execute an ANOVA F-test.
+- Use Chi-Square or Kruskal-Wallis tests.
+- Evaluate treatment effects across multiple groups.""",
+        "learning_notes": """### ANOVA (Analysis of Variance)
+ANOVA compares the means of three or more independent groups to see if at least one group mean is statistically different.
+If normality assumptions are violated, use non-parametric tests like Kruskal-Wallis.""",
+        "instructions": "Run the code to perform a One-Way ANOVA test on three sample education methods.",
+        "content": "Compare multiple groups at once and verify if variation comes from real treatment differences or random sampling.",
+        "code_examples": """import scipy.stats as stats
+# One-way ANOVA test for three study methods
+method_A = [85, 88, 90, 82]
+method_B = [72, 75, 80, 78]
+method_C = [91, 95, 88, 92]
+f_stat, p_val = stats.f_oneway(method_A, method_B, method_C)
+print(f"F-statistic: {f_stat:.4f}")
+print(f"P-value: {p_val:.4f}")""",
+        "resources": "- [ANOVA on Wikipedia](https://en.wikipedia.org/wiki/Analysis_of_variance)",
         "quiz": [
-            {"question": "fillna() is used to?", "options": ["Replace missing values", "Delete all rows", "Create plots", "Export PDF"], "correct": 0},
-            {"question": "drop_duplicates() removes?", "options": ["Repeated rows", "Column headers", "File names", "Indexes only"], "correct": 0},
-            {"question": "Why clean data before modeling?", "options": ["Improves model reliability", "Slows analysis", "Is optional always", "Removes all features"], "correct": 0},
-        ],
+            {"question": "What null hypothesis does One-Way ANOVA test?", "options": ["All group means are equal", "At least one group mean is different", "Group variances are unequal", "The data is normally distributed"], "correct": 0},
+            {"question": "Which test is a non-parametric alternative to ANOVA?", "options": ["Kruskal-Wallis test", "Independent t-test", "Chi-square test", "Paired t-test"], "correct": 0},
+            {"question": "What is verified by checking ANOVA assumptions?", "options": ["Normality and Homoscedasticity", "Linearity and independence only", "Multicollinearity", "Accuracy score"], "correct": 0}
+        ]
     },
     {
-        "title": "Data Visualization with Matplotlib and Seaborn",
-        "slug": "data-visualization-matplotlib-seaborn",
-        "description": "Create plots that communicate trends and comparisons clearly.",
-        "duration": "80 min",
-        "difficulty": "Intermediate",
-        "objectives": """- Build line, bar, scatter, and histogram charts
-- Customize titles, labels, and legends
-- Apply Seaborn themes and color palettes
-- Choose the right chart for your data story""",
-        "expected_outcomes": """### Knowledge Outcomes
-- Understand the roles of Matplotlib (low-level, complete control) and Seaborn (high-level statistical wrapper).
-- List the main chart types and when to apply them based on variable types (categorical vs continuous).
-- Evaluate graphic integrity rules (e.g., labeling, appropriate scaling).
-
-### Practical Outcomes
-- Generate plots using `sns.histplot`, `sns.scatterplot`, and standard Matplotlib.
-- Customize title labels, axes labels, legends, and styling grid layouts.
-- Save and render figures.
-
-### Industry-Relevant Skills
-- Building corporate-ready data visualizations to communicate analytical findings to stakeholders.
-""",
-        "learning_notes": """### Concept Explanation & Theory
-Visualization is key to understanding and presenting data. While tables tell part of the story, visual formats expose clusters, trends, outliers, and distributions immediately.
-
-### Important Definitions
-- **Histogram:** A plot showing the distribution of a single continuous variable.
-- **Scatter Plot:** A plot showing the relationship between two continuous variables.
-- **KDE (Kernel Density Estimate):** A smooth curve representing the probability density function.
-
-### Best Practices
-- Never crowd charts; use legends and clear titles.
-- Choose color palettes that are accessible and professional.
-
-### Common Mistakes
-- Mislabeling axes or failing to declare units of measurement.
-
-### Tips & Warnings
-> 💡 **Tip:** Seaborn themes can be applied globally using `sns.set_theme(style='whitegrid')`.
-""",
-        "instructions": """#### What you will do:
-You will load the sample 'tips' dataset and visualize its distributions.
-
-#### Step-by-Step Instructions:
-1. **Step 1:** Run the script. Note the histogram distribution output.
-2. **Step 2:** Change the histogram target variable from `x='total_bill'` to `x='tip'`.
-3. **Step 3:** Change the Seaborn style theme to `style='whitegrid'`.
-4. **Step 4:** Run again to compare visual results.
-""",
-        "content": """## Data Visualization
-
-Great visualizations turn numbers into narratives. Use **Matplotlib** for fine control and **Seaborn** for statistical plots with less code.
-
-### Chart Selection Guide
-
-- **Trend over time** → line chart
-- **Category comparison** → bar chart
-- **Relationship** → scatter plot
-- **Distribution** → histogram / KDE""",
+        "title": "Session 8: Time Series Analysis",
+        "slug": "session-8-time-series",
+        "description": "Understand date indexes, resample time logs, and compute rolling moving averages.",
+        "duration": "75 min",
+        "difficulty": "Beginner",
+        "objectives": """- Convert strings to Datetime indexes
+- Compute rolling window averages to smooth trends
+- Resample time series to hourly, daily, or monthly frequencies""",
+        "expected_outcomes": """- Create a DatetimeIndex in a Pandas DataFrame.
+- Apply rolling window operations.
+- Extract trend and seasonal directions from logs.""",
+        "learning_notes": """### Time Series Data
+A time series is a sequence of observations taken sequentially in time.
+- `resample()`: Aggregates time frequencies (e.g. sum daily logs into weekly totals).
+- `rolling()`: Calculates statistics in a moving window, smoothing out noise.""",
+        "instructions": "Execute the code to create a date-indexed series and calculate a moving average.",
+        "content": "Time series analysis is essential for financial markets, weather tracking, and demand forecasting.",
+        "code_examples": """import pandas as pd
+# Time series index and rolling mean
+dates = pd.date_range(start="2024-01-01", periods=5, freq="D")
+values = [100, 105, 98, 110, 115]
+ts = pd.Series(values, index=dates)
+print("Time Series:")
+print(ts)
+print("\\n2-Day Rolling Mean:")
+print(ts.rolling(window=2).mean())""",
+        "resources": "- [Pandas Time Series Guide](https://pandas.pydata.org/docs/user_guide/timeseries.html)",
+        "quiz": [
+            {"question": "How do you parse string date formats in pandas?", "options": ["pd.to_datetime()", "pd.as_time()", "df.format_dates()", "df.parse_time()"], "correct": 0},
+            {"question": "What does df.rolling(window=7).mean() compute?", "options": ["7-period moving average", "Mean of every 7th row", "Total sum of 7 columns", "Cumulative sum"], "correct": 0},
+            {"question": "Which pandas function rescales time frequencies?", "options": ["resample()", "groupby()", "reindex()", "shift()"], "correct": 0}
+        ]
+    },
+    {
+        "title": "Session 9: Reporting with Jupyter Notebook",
+        "slug": "session-9-jupyter-reporting",
+        "description": "Generate clean reports, insert markdown explanations, and configure notebook layouts.",
+        "duration": "60 min",
+        "difficulty": "Beginner",
+        "objectives": """- Format headers, bold text, and equations in markdown cells
+- Hide raw code blocks for client presentations
+- Export notebooks to HTML or PDF formats""",
+        "expected_outcomes": """- Structure notebooks with clear sections.
+- Create professional executive report summaries.
+- Configure clean notebook presentation layouts.""",
+        "learning_notes": """### Notebook Reports
+Jupyter Notebook is not just a coding console — it is a document tool.
+Use markdown headings (`#`, `##`, `###`) to structure sections and write key findings to support numerical analytics results.""",
+        "instructions": "Run the cell to generate a simulated executive academic report summary.",
+        "content": "Learn how to structure your findings into an executive report format that decision makers can understand.",
+        "code_examples": """# Simulate generating a report summary
+student_count = 150
+passing_pct = 94.2
+report = f'''
+--- CDAM ACADEMIC REPORT ---
+Total Students Evaluated: {student_count}
+Curriculum Completion Rate: {passing_pct}%
+Recommendation: Advance to Machine Learning module.
+'''
+print(report)""",
+        "resources": "- [Jupyter Markdown Guide](https://www.markdownguide.org/tools/jupyter-notebook/)",
+        "quiz": [
+            {"question": "Which markdown tag creates a main header in a Jupyter cell?", "options": ["# Header", "## Header", "**Header**", "<h1>Header"], "correct": 0},
+            {"question": "What tool exports Jupyter Notebooks to HTML/PDF?", "options": ["nbconvert", "pdfmaker", "jupconvert", "exporter"], "correct": 0},
+            {"question": "How can you run all cells in Jupyter at once?", "options": ["Cell -> Run All", "Ctrl + Enter", "Alt + Shift", "Run File"], "correct": 0}
+        ]
+    },
+    {
+        "title": "Session 10: Capstone Project",
+        "slug": "session-10-capstone-beginner",
+        "description": "Demonstrate your data skills: import, clean, analyze, and present a sample dataset.",
+        "duration": "90 min",
+        "difficulty": "Beginner",
+        "objectives": """- Integrate EDA, cleaning, and aggregation into a single script
+- Calculate summary stats and draw statistical conclusions
+- Output a clean report summary showing student insights""",
+        "expected_outcomes": """- Implement a full data pipeline from scratch.
+- Clean and analyze multi-class performance parameters.
+- Provide statistical outcomes.""",
+        "learning_notes": """### Capstone Integration
+The capstone combines everything you have learned in the Beginner course: basic variables, cleaning, grouping, statistical analysis, and markdown presentation of results.""",
+        "instructions": "Execute the capstone simulation code to analyze multi-level student performances.",
+        "content": "Verify your beginner mastery by completing this end-to-end data analytics workflow.",
+        "code_examples": """import pandas as pd
+# Beginner Capstone Simulation
+# Perform full flow: Import -> Clean -> Group -> Output Statistics
+raw_data = {'ID': [1, 2, 3, 4], 'Level': ['Beginner', 'Beginner', 'Advanced', 'Advanced'], 'Score': [85, 78, 92, 88]}
+df = pd.DataFrame(raw_data)
+summary = df.groupby('Level')['Score'].mean()
+print("CDAM Capstone Executive Summary:")
+print(summary)""",
+        "resources": "- [CDAM Graduation Portal](https://cdam.chuka.ac.ke/grad/)",
+        "quiz": [
+            {"question": "What is the first step of a standard data pipeline?", "options": ["Data ingestion / import", "Statistical modeling", "Data visualization", "Model deployment"], "correct": 0},
+            {"question": "What does groupby aggregate functions return?", "options": ["Summary metrics matching categories", "Raw lists of strings", "The original un-aggregated rows", "JSON templates"], "correct": 0},
+            {"question": "Why is keeping a code log important?", "options": ["For reproducibility of results", "To speed up server responses", "To save memory space", "It is not important"], "correct": 0}
+        ]
+    },
+    {
+        "title": "Session 11: Advanced Data Wrangling with pandas",
+        "slug": "session-11-advanced-pandas",
+        "description": "Learn multi-index, merge operations, and pivot tables to reshape complex tables.",
+        "duration": "60 min",
+        "difficulty": "Professional",
+        "objectives": """- Merge, join, and concatenate multiple DataFrames
+- Construct pivot tables with custom aggregation columns
+- Reshape tables using stack, unstack, and melt operations""",
+        "expected_outcomes": """- Build multi-level index tables.
+- Combine datasets using relational keys.
+- Pivot long-format datasets into wide-format datasets.""",
+        "learning_notes": """### Relational Operations & Pivoting
+In professional environments, data is split. Use `pd.merge()` to perform database-style inner, outer, left, and right joins.
+`pivot_table()` builds summary tables similar to Excel pivot tools, grouping metrics by multiple indexes.""",
+        "instructions": "Execute the pivot table simulation to see expense metrics grouped by year and department.",
+        "content": "Reshape, combine, and organize high-dimensional tables to extract insights.",
+        "code_examples": """import pandas as pd
+# Advanced pivot tables and multi-indexing
+data = {'Year': [2023, 2023, 2024, 2024], 'Dept': ['HR', 'IT', 'HR', 'IT'], 'Expense': [50000, 75000, 52000, 80000]}
+df = pd.DataFrame(data)
+pivot = df.pivot_table(values='Expense', index='Year', columns='Dept', aggfunc='sum')
+print(pivot)""",
+        "resources": "- [Pandas Reshaping Documentation](https://pandas.pydata.org/docs/user_guide/reshaping.html)",
+        "quiz": [
+            {"question": "Which pandas function performs database-style joins?", "options": ["pd.merge()", "pd.concat()", "pd.join_only()", "pd.pivot()"], "correct": 0},
+            {"question": "What is the opposite of pivoting wide data (melting)?", "options": ["Melting wide to long", "Reshaping index", "Joining categories", "Grouping"], "correct": 0},
+            {"question": "How do you stack a DataFrame column index?", "options": ["df.stack()", "df.unstack()", "df.pivot()", "df.groupby()"], "correct": 0}
+        ]
+    },
+    {
+        "title": "Session 12: Functional Programming & Efficient Coding",
+        "slug": "session-12-functional-programming",
+        "description": "Optimize your loops with lambda, map, filter, and list comprehensions.",
+        "duration": "60 min",
+        "difficulty": "Professional",
+        "objectives": """- Write lambda (anonymous) functions for fast computations
+- Use map() and filter() generators to process sequences
+- Construct list and dictionary comprehensions for clean code""",
+        "expected_outcomes": """- Eliminate slow, nested for loops.
+- Apply lambda formulas across DataFrame rows.
+- Build clean list comprehensions.""",
+        "learning_notes": """### Functional Programming
+Functional styles avoid mutating state.
+- `lambda`: Simple inline functions.
+- `map(func, iterable)`: Applies a function to all elements.
+- `filter(pred, iterable)`: Keeps elements matching a condition.""",
+        "instructions": "Run the code to compare functional map/filter against clean list comprehensions.",
+        "content": "Functional methods make your python pipelines run faster and look cleaner.",
+        "code_examples": """# Lambda, map, filter, list comprehensions
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+squared_evens = list(map(lambda x: x**2, filter(lambda x: x % 2 == 0, numbers)))
+print("Squared Evens:", squared_evens)
+# Comprehension alternative
+comp = [x**2 for x in numbers if x % 2 == 0]
+print("Comprehension matches:", comp == squared_evens)""",
+        "resources": "- [Python Functional Programming HowTo](https://docs.python.org/3/howto/functional.html)",
+        "quiz": [
+            {"question": "What keyword defines anonymous inline functions?", "options": ["lambda", "anonymous", "def", "inline"], "correct": 0},
+            {"question": "Which structure replaces map and filter cleanly?", "options": ["List comprehension", "While loop", "Try-Except block", "Class definition"], "correct": 0},
+            {"question": "Is list comprehension generally faster than manual for loops?", "options": ["Yes, it is optimized in C", "No, it is identical", "No, it is slower", "Only on Windows"], "correct": 0}
+        ]
+    },
+    {
+        "title": "Session 13: Advanced Data Visualization (matplotlib & seaborn)",
+        "slug": "session-13-advanced-visualization",
+        "description": "Build multi-panel grids, style correlation matrices, and customize plot settings.",
+        "duration": "75 min",
+        "difficulty": "Professional",
+        "objectives": """- Build multi-panel subplots using fig, axes layouts
+- Customize heatmap color maps and labels
+- Configure publication-quality chart settings""",
+        "expected_outcomes": """- Build multi-panel subplots grids.
+- Generate annotated correlation matrix heatmaps.
+- Save high-resolution charts suitable for academic papers.""",
+        "learning_notes": """### Advanced Visualization
+For complex analysis, one plot is not enough.
+Use `plt.subplots(rows, cols)` to arrange multiple panels.
+`seaborn.heatmap()` visualizes correlation tables, making numeric associations clear at a glance.""",
+        "instructions": "Run the code to calculate a correlation matrix and simulate a heatmap output.",
+        "content": "Learn how to build high-density visualizations that fit into scientific reports and business slides.",
         "code_examples": """import matplotlib.pyplot as plt
 import seaborn as sns
-
-tips = sns.load_dataset('tips')
-sns.set_theme(style='darkgrid')
-sns.histplot(data=tips, x='total_bill', kde=True)
-plt.title('Restaurant Bill Distribution')
-plt.show()""",
-        "resources": """- [Matplotlib Docs](https://matplotlib.org/stable/contents.html)
-- [Seaborn Tutorial](https://seaborn.pydata.org/tutorial.html)""",
+import pandas as pd
+# Correlation heatmap plotting simulation
+data = {'StudyHours': [2, 5, 7, 8], 'PracticeScore': [60, 70, 85, 90], 'FinalExam': [55, 72, 88, 92]}
+df = pd.DataFrame(data)
+corr = df.corr()
+print("Correlation Matrix:")
+print(corr)
+print("\\nHeatmap generated successfully.")""",
+        "resources": "- [Seaborn Heatmap Docs](https://seaborn.pydata.org/generated/seaborn.heatmap.html)",
         "quiz": [
-            {"question": "Which library adds statistical plot styles on Matplotlib?", "options": ["Seaborn", "Requests", "Flask", "SQLite"], "correct": 0},
-            {"question": "A histogram shows?", "options": ["Distribution of values", "Network connections", "SQL queries", "File sizes only"], "correct": 0},
-            {"question": "plt.title() sets?", "options": ["Chart title", "X-axis label", "Color palette", "Database name"], "correct": 0},
-        ],
+            {"question": "How do you create a 2x2 subplot grid in matplotlib?", "options": ["plt.subplots(2, 2)", "plt.grid(2, 2)", "plt.panels(2, 2)", "plt.axes_grid(2, 2)"], "correct": 0},
+            {"question": "Which seaborn function plots correlation grids?", "options": ["heatmap()", "barplot()", "boxplot()", "scatterplot()"], "correct": 0},
+            {"question": "How do you save a matplotlib chart to a high-res image file?", "options": ["plt.savefig('name.png', dpi=300)", "plt.write('name.png')", "plt.export('name.png')", "plt.save('name.png')"], "correct": 0}
+        ]
     },
     {
-        "title": "Statistical Analysis",
-        "slug": "statistical-analysis",
-        "description": "Apply descriptive and inferential statistics to data.",
-        "duration": "65 min",
-        "difficulty": "Intermediate",
-        "objectives": """- Compute mean, median, variance, and standard deviation
-- Understand probability distributions
-- Formulate and test hypotheses
-- Interpret p-values responsibly""",
-        "expected_outcomes": """### Knowledge Outcomes
-- Distinguish between descriptive (summarizing samples) and inferential (generalizing to populations) statistics.
-- Define null (`H0`) and alternative (`H1`) hypotheses.
-- Explain what a p-value represents and how to compare it against a significance level (alpha = 0.05).
-
-### Practical Outcomes
-- Calculate basic parameters (mean, median, std) with NumPy.
-- Perform a single-sample t-test using `scipy.stats`.
-- Correctly accept or reject hypotheses based on the p-value.
-
-### Industry-Relevant Skills
-- Conducting A/B testing, clinical trial validations, and evaluating business experiments scientifically.
-""",
-        "learning_notes": """### Concept Explanation & Theory
-Statistics helps data scientists extract signals from noise, establish boundaries of uncertainty, and validate whether findings are statistically significant or just random chance.
-
-### Important Definitions
-- **Standard Deviation:** A measure of the dispersion or spread of values in a dataset.
-- **T-Test:** A statistical test used to determine if there is a significant difference between the means of groups.
-- **P-Value:** The probability of obtaining results at least as extreme as the observed results, assuming the null hypothesis is true.
-
-### Best Practices
-- Never use a statistical test without verifying its mathematical assumptions (e.g., normal distribution).
-- Avoid "p-hacking" — repeating tests on subgroups to find a favorable result.
-
-### Common Mistakes
-- Treating correlation as causation.
-- Interpreting a high p-value as proof that the null hypothesis is true (we only "fail to reject" H0).
-
-### Tips & Warnings
-> 💡 **Tip:** Standard deviation depends on degrees of freedom. In Python, use `ddof=1` for sample standard deviation.
-""",
-        "instructions": """#### What you will do:
-You will calculate statistical measures and perform a t-test to evaluate a null hypothesis.
-
-#### Step-by-Step Instructions:
-1. **Step 1:** Run the script and observe the printed mean, median, standard deviation, and p-value.
-2. **Step 2:** Modify the target population mean parameter `popmean=15` in `ttest_1samp` to `popmean=13.5`.
-3. **Step 3:** Run the script again. Compare how the p-value changes when the expected mean is closer to the sample mean.
-""",
-        "content": """## Statistical Analysis for Data Science
-
-Statistics helps you quantify uncertainty and test whether patterns are real or random.
-
-### Descriptive vs Inferential
-
-- **Descriptive** — summarize what happened (mean, median, SD)
-- **Inferential** — infer about populations from samples (t-tests, chi-square)
-
-Always pair statistical tests with domain knowledge.""",
-        "code_examples": """import numpy as np
-from scipy import stats
-
-data = np.array([12, 15, 14, 18, 11, 16, 13])
-print('Mean:', np.mean(data))
-print('Median:', np.median(data))
-print('Std Dev:', np.std(data, ddof=1))
-
-t_stat, p_value = stats.ttest_1samp(data, popmean=15)
-print(f'p-value: {p_value:.4f}')""",
-        "resources": """- [SciPy Stats](https://docs.scipy.org/doc/scipy/reference/stats.html)
-- [CDAM Research](https://cdam.chuka.ac.ke/research/)""",
+        "title": "Session 14: Statistical Modeling & Hypothesis Testing",
+        "slug": "session-14-statistical-modeling",
+        "description": "Construct Ordinary Least Squares (OLS) regression models and evaluate p-values.",
+        "duration": "75 min",
+        "difficulty": "Professional",
+        "objectives": """- Build multivariate linear regression models using statsmodels
+- Interpret model summary tables: R-squared, coefficients, and F-statistic
+- Diagnose regression assumptions (residuals normality, collinearity)""",
+        "expected_outcomes": """- Build linear models using statsmodels API.
+- Evaluate model goodness-of-fit.
+- Interpret coefficient confidence intervals.""",
+        "learning_notes": """### Ordinary Least Squares (OLS)
+OLS regression models the relationship between dependent and independent variables.
+- **R-squared**: Percentage of variance in the target explained by the predictors.
+- **P>|t|**: P-value checking if predictor coefficients are significantly different from 0.""",
+        "instructions": "Execute the OLS linear model to output the statistical summary table.",
+        "content": "Build linear models that explain the factors driving your target variables.",
+        "code_examples": """import statsmodels.api as sm
+import pandas as pd
+# Ordinary Least Squares (OLS) Regression
+data = {'StudyHours': [2, 4, 6, 8, 10], 'ExamScore': [50, 60, 70, 80, 95]}
+df = pd.DataFrame(data)
+X = sm.add_constant(df['StudyHours'])
+model = sm.OLS(df['ExamScore'], X).fit()
+print(model.summary().tables[1])""",
+        "resources": "- [Statsmodels OLS Guide](https://www.statsmodels.org/stable/regression.html)",
         "quiz": [
-            {"question": "Standard deviation measures?", "options": ["Spread of data", "Sum of values", "Row count", "File size"], "correct": 0},
-            {"question": "A p-value helps assess?", "options": ["Statistical significance", "Plot colors", "Memory usage", "Network speed"], "correct": 0},
-            {"question": "Median is resistant to?", "options": ["Outliers", "All missing data", "Column names", "CSV headers"], "correct": 0},
-        ],
+            {"question": "What does a high R-squared indicate?", "options": ["Model explains a large portion of variance", "Model is statistically insignificant", "Residuals are not normal", "Perfect accuracy"], "correct": 0},
+            {"question": "Why do we add a constant column in statsmodels regression?", "options": ["To calculate the y-intercept", "To normalize the data", "To avoid division by zero", "It is optional"], "correct": 0},
+            {"question": "Which metric evaluates overall model significance?", "options": ["F-statistic p-value", "R-squared value", "Intercept coefficient", "Standard error"], "correct": 0}
+        ]
     },
     {
-        "title": "Machine Learning Basics with Scikit-learn",
-        "slug": "machine-learning-basics-scikit-learn",
-        "description": "Train and evaluate baseline ML models.",
-        "duration": "90 min",
-        "difficulty": "Intermediate",
-        "objectives": """- Split data into train and test sets
-- Train classification and regression models
-- Evaluate with accuracy, precision, recall, RMSE
-- Understand overfitting basics""",
-        "expected_outcomes": """### Knowledge Outcomes
-- Explain the difference between supervised learning (classification vs regression) and unsupervised learning.
-- Define overfitting and explain why a train/test split is necessary.
-- Select appropriate evaluation metrics for model performance.
-
-### Practical Outcomes
-- Load standardized datasets from scikit-learn.
-- Partition datasets into training (80%) and testing (20%) sets.
-- Instantiate and fit a Random Forest classifier.
-- Calculate and evaluate model accuracy.
-
-### Industry-Relevant Skills
-- Deploying baseline predictive models to automate classifications (e.g., spam filtering, client churn predictions).
-""",
-        "learning_notes": """### Concept Explanation & Theory
-Machine learning is the study of computer algorithms that improve automatically through experience. In supervised learning, the model is trained on labeled training data to learn mapping functions.
-
-### Important Definitions
-- **Supervised Learning:** Training models using labeled target features.
-- **Overfitting:** When a model performs exceptionally well on training data but poorly on unseen test data.
-- **Random Forest:** An ensemble method that trains multiple decision trees and aggregates their predictions.
-
-### Best Practices
-- Always use a random state variable (`random_state`) to ensure reproducibility when splitting data.
-- Scale features if the algorithm is sensitive to magnitude (like SVM or KNN).
-
-### Common Mistakes
-- Data leakage: letting testing details contaminate training steps.
-
-### Tips & Warnings
-> 💡 **Tip:** A baseline model should always be trained first to benchmark improvements.
-""",
-        "instructions": """#### What you will do:
-You will split the classic Iris dataset, train a Random Forest, and output its test accuracy.
-
-#### Step-by-Step Instructions:
-1. **Step 1:** Run the script and observe the test accuracy.
-2. **Step 2:** Change the split test size: change `test_size=0.2` to `test_size=0.4` (40% test data).
-3. **Step 3:** Re-run and check if accuracy changed.
-4. **Step 4:** Change the Random Forest number of trees: change `n_estimators=100` to `n_estimators=10`. Run again.
-""",
-        "content": """## Machine Learning Basics
-
-scikit-learn provides consistent APIs for classical ML algorithms — ideal for baselines before deep learning.
-
-### ML Workflow
-
-1. Prepare features and target
-2. Split train/test
-3. Train a model
-4. Evaluate metrics
-5. Iterate and improve
-
-Start simple: logistic regression or random forests often perform surprisingly well.""",
-        "code_examples": """from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
-
-X, y = load_iris(return_X_y=True)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
-preds = model.predict(X_test)
-print('Accuracy:', accuracy_score(y_test, preds))""",
-        "resources": """- [scikit-learn User Guide](https://scikit-learn.org/stable/user_guide.html)
-- [Model Selection](https://scikit-learn.org/stable/model_selection.html)""",
+        "title": "Session 15: Machine Learning in Python (Supervised Learning)",
+        "slug": "session-15-supervised-learning",
+        "description": "Train linear classifiers, predict classes, and measure model accuracy.",
+        "duration": "75 min",
+        "difficulty": "Professional",
+        "objectives": """- Understand differences between regression and classification
+- Train a Logistic Regression model using scikit-learn
+- Evaluate metrics: accuracy, precision, recall, and F1-score""",
+        "expected_outcomes": """- Split datasets into training and testing sets.
+- Train supervised models.
+- Predict target classes for new inputs.""",
+        "learning_notes": """### Supervised Learning
+Supervised models learn from labeled pairs.
+- **Classification**: Target is categorical (e.g. Pass/Fail, Spam/Ham).
+- **Logistic Regression**: Outputs a probability score between 0 and 1, mapped to class labels.""",
+        "instructions": "Execute the logistic classifier code to fit and predict test outcomes.",
+        "content": "Train classification models that automatically label incoming data.",
+        "code_examples": """from sklearn.linear_model import LogisticRegression
+import numpy as np
+# Logistic Regression classification simulation
+X = np.array([[2.0], [1.0], [5.0], [8.0], [9.0]])
+y = np.array([0, 0, 0, 1, 1])
+model = LogisticRegression().fit(X, y)
+print("Coefficients:", model.coef_)
+print("Predict on study hours [6]:", model.predict([[6.0]]))""",
+        "resources": "- [Scikit-Learn Supervised Learning Guide](https://scikit-learn.org/stable/supervised_learning.html)",
         "quiz": [
-            {"question": "train_test_split prevents?", "options": ["Testing on training data only", "Using Python", "Reading CSV", "Plotting charts"], "correct": 0},
-            {"question": "RandomForestClassifier is for?", "options": ["Classification", "SQL queries", "Web scraping", "Image compression"], "correct": 0},
-            {"question": "accuracy_score compares?", "options": ["Predictions vs true labels", "Two CSV files", "Plot sizes", "Memory usage"], "correct": 0},
-        ],
+            {"question": "Which of these is a classification task?", "options": ["Predicting if an email is spam", "Predicting next month's sales", "Clustering users by behavior", "Sorting records"], "correct": 0},
+            {"question": "What is the target parameter in supervised learning?", "options": ["Labeled training answers", "Unlabeled categories", "Number of columns", "File paths"], "correct": 0},
+            {"question": "Which scikit-learn class trains logistic models?", "options": ["LogisticRegression", "LinearRegression", "KMeans", "DecisionTreeRegressor"], "correct": 0}
+        ]
     },
     {
-        "title": "Time Series Analysis",
-        "slug": "time-series-analysis",
-        "description": "Work with temporal data and basic forecasting workflows.",
-        "duration": "95 min",
-        "difficulty": "Advanced",
-        "objectives": """- Parse and index datetime columns
-- Resample and roll time-based aggregations
-- Identify trend and seasonality
-- Build simple forecasting baselines""",
-        "expected_outcomes": """### Knowledge Outcomes
-- Explain why time series data requires specialized ordering and indexing.
-- Identify the differences between resampling (aggregating time) and rolling window (smoothing time) operations.
-- Describe stationarity and autocorrelation at a high level.
-
-### Practical Outcomes
-- Set and sort datetime indices in Pandas DataFrames.
-- Compute rolling moving averages to reveal underlying trends.
-- Resample higher frequency data to monthly or quarterly figures.
-
-### Industry-Relevant Skills
-- Analyzing climate trends, forecasting malaria outbreaks, and predicting sales targets over fiscal quarters.
-""",
-        "learning_notes": """### Concept Explanation & Theory
-A time series is a sequence of data points recorded at regular time intervals. Specialized techniques are required because temporal data violates the independence assumption of classical statistical models (i.e., today's value is correlated with yesterday's value).
-
-### Important Definitions
-- **Resampling:** Changing the frequency of time series observations (downsampling to monthly aggregates or upsampling to daily interpolations).
-- **Rolling Window:** Computing stats (like mean) inside a moving window of a fixed window size.
-- **Trend:** The long-term direction or progression of a time series.
-
-### Best Practices
-- Always ensure date columns are parsed as Datetime objects and set as the DataFrame index.
-- Fill missing time steps carefully; use forward fill (`ffill`) or linear interpolation.
-
-### Common Mistakes
-- Forgetting to sort the time series index chronologically before performing rolling window tasks.
-
-### Tips & Warnings
-> 💡 **Tip:** Visualizing your time series is the most effective diagnostic step before starting analysis.
-""",
-        "instructions": """#### What you will do:
-You will calculate rolling averages on simulated sales figures over a date range.
-
-#### Step-by-Step Instructions:
-1. **Step 1:** Run the script and review the rolling averages.
-2. **Step 2:** Change the rolling window size from `window=3` to `window=2`.
-3. **Step 3:** Change the frequency of dates from monthly `freq='M'` to weekly `freq='W'`.
-4. **Step 4:** Run again and observe changes.
-""",
-        "content": """## Time Series Analysis
-
-Time series data appears everywhere: sales, weather, health metrics, malaria cases — a core focus at CDAM.
-
-### Key Techniques
-
-- **Datetime indexing** — sort and slice by date
-- **Resampling** — daily → weekly/monthly aggregates
-- **Rolling windows** — moving averages
-- **Forecasting** — predict future values from history
-
-Always visualize your series before modeling.""",
-        "code_examples": """import pandas as pd
-
-dates = pd.date_range('2024-01-01', periods=6, freq='M')
-sales = [120, 135, 128, 150, 160, 172]
-df = pd.DataFrame({'sales': sales}, index=dates)
-df.index.name = 'date'
-
-monthly_avg = df.resample('M').mean()
-rolling = df['sales'].rolling(window=3).mean()
-print(rolling.tail())""",
-        "resources": """- [Pandas Time Series](https://pandas.pydata.org/docs/user_guide/timeseries.html)
-- [CDAM Malaria AI Projects](https://cdam.chuka.ac.ke/projects/)""",
+        "title": "Session 16: Unsupervised Learning & Dimensionality Reduction",
+        "slug": "session-16-unsupervised-learning",
+        "description": "Cluster data with K-Means and simplify columns with Principal Component Analysis.",
+        "duration": "75 min",
+        "difficulty": "Professional",
+        "objectives": """- Differentiate supervised vs unsupervised learning paradigms
+- Implement K-Means clustering to find patterns in unlabeled data
+- Reduce features using PCA (Principal Component Analysis)""",
+        "expected_outcomes": """- Build cluster segments.
+- Reduce column dimensions with PCA.
+- Interpret elbow plots to find optimal cluster sizes.""",
+        "learning_notes": """### Unsupervised Clustering
+Unsupervised algorithms find hidden structures in data without pre-existing labels.
+- **K-Means**: Clusters data into K groups based on distances to cluster centers.
+- **PCA**: Projects high-dimensional datasets onto principal axes to reduce dimensions while saving variance.""",
+        "instructions": "Execute the clustering code to find cluster coordinates and labels.",
+        "content": "Discover customer segments or group biological samples using clustering methods.",
+        "code_examples": """from sklearn.cluster import KMeans
+import numpy as np
+# K-Means clustering simulation
+X = np.array([[1, 2], [1, 4], [1, 0], [10, 2], [10, 4], [10, 0]])
+kmeans = KMeans(n_clusters=2, random_state=0, n_init='auto').fit(X)
+print("Cluster centers:")
+print(kmeans.cluster_centers_)
+print("Labels:", kmeans.labels_)""",
+        "resources": "- [Scikit-Learn Clustering Docs](https://scikit-learn.org/stable/modules/clustering.html)",
         "quiz": [
-            {"question": "pd.to_datetime converts?", "options": ["Strings to datetime objects", "Images to arrays", "HTML to PDF", "SQL to JSON"], "correct": 0},
-            {"question": "Rolling window computes?", "options": ["Moving aggregates", "Random samples", "Duplicate rows", "File checksums"], "correct": 0},
-            {"question": "Time series index is usually?", "options": ["Datetime ordered", "Alphabetical", "Random", "Binary"], "correct": 0},
-        ],
+            {"question": "What is unsupervised learning?", "options": ["Training models on unlabeled data", "Training models with supervised labels", "Running Python without a compiler", "None of the above"], "correct": 0},
+            {"question": "Which parameter determines group counts in K-Means?", "options": ["n_clusters", "max_iter", "n_init", "random_state"], "correct": 0},
+            {"question": "What does PCA stand for?", "options": ["Principal Component Analysis", "Predictive Categorical Association", "Pearson Correlation Analysis", "Polynomial Component Alignment"], "correct": 0}
+        ]
     },
+    {
+        "title": "Session 17: Working with External Data Sources",
+        "slug": "session-17-external-data-sources",
+        "description": "Fetch remote JSON data from REST APIs and parse database schemas.",
+        "duration": "60 min",
+        "difficulty": "Professional",
+        "objectives": """- Send API requests using Python requests library
+- Parse hierarchical JSON responses into clean dicts
+- Load fetched tables directly into Pandas DataFrames""",
+        "expected_outcomes": """- Extract online JSON documents.
+- Load unstructured API feeds into clean Pandas tables.
+- Access public REST APIs.""",
+        "learning_notes": """### REST APIs & JSON
+Much of the world's data is stored in remote servers.
+Web APIs return structured text formatted as JSON (JavaScript Object Notation). Use the requests library to send HTTP GET calls and unpack dictionary responses.""",
+        "instructions": "Run the code to simulate parsing a JSON API server payload response.",
+        "content": "Connect your analysis directly to live web databases and cloud data streams.",
+        "code_examples": """import json
+# Parsing and loading JSON response from APIs
+json_response = '{"status": "success", "data": {"users": [{"name": "AI Coach", "role": "Tutor"}]}}'
+parsed = json.loads(json_response)
+print("API Response Status:", parsed['status'])
+print("Coach Name:", parsed['data']['users'][0]['name'])""",
+        "resources": "- [Python Requests Documentation](https://requests.readthedocs.io/)",
+        "quiz": [
+            {"question": "Which python library is standard for HTTP requests?", "options": ["requests", "json", "urllib_only", "socket"], "correct": 0},
+            {"question": "What data format resembles Python dictionaries?", "options": ["JSON", "CSV", "XML", "YAML"], "correct": 0},
+            {"question": "Which method parses a JSON string into a Python dict?", "options": ["json.loads()", "json.dumps()", "json.parse()", "json.dict()"], "correct": 0}
+        ]
+    },
+    {
+        "title": "Session 18: Reporting & Reproducibility",
+        "slug": "session-18-reporting-reproducibility",
+        "description": "Lock package versions, write requirements files, and package reproducible data reports.",
+        "duration": "60 min",
+        "difficulty": "Professional",
+        "objectives": """- Build lockfiles and requirements.txt manifests
+- Structure notebooks with seeds to guarantee statistical reproducibility
+- Configure clean virtual environments for cloud deployments""",
+        "expected_outcomes": """- Document pipeline environments.
+- Enforce random seed states across models.
+- Set up isolated pip virtual environments.""",
+        "learning_notes": """### Scientific Reproducibility
+A study is reproducible if another researcher can run the identical code on the same data and get the exact same results.
+Always lock package versions (e.g. `pandas==2.1.1`) and enforce seeds in random algorithms.""",
+        "instructions": "Run the script cell to generate a sample reproducible dependency manifest.",
+        "content": "Verify your project will build identical results on any computer in the world.",
+        "code_examples": """# Generate reproducible environment manifest summary
+dependencies = {"python": "3.10.12", "pandas": "2.1.1", "numpy": "1.26.0", "scikit-learn": "1.3.0"}
+print("CDAM Reproducible Environment Manifest:")
+for pkg, ver in dependencies.items():
+    print(f" - {pkg}=={ver}")
+print("Lockfile generated successfully.")""",
+        "resources": "- [Pip Virtual Environments](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)",
+        "quiz": [
+            {"question": "Which file specifies project packages and versions?", "options": ["requirements.txt", "packages.json", "environment.html", "setup.py only"], "correct": 0},
+            {"question": "Why do we set random seeds in machine learning models?", "options": ["To ensure identical results on every run", "To speed up model training times", "To optimize model performance", "To clean raw string inputs"], "correct": 0},
+            {"question": "How do you install requirements in a new environment?", "options": ["pip install -r requirements.txt", "pip install requirements", "python run requirements", "git pull requirements"], "correct": 0}
+        ]
+    }
 ]

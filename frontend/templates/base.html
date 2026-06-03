@@ -42,6 +42,7 @@
       <nav class="nav-links" id="navLinks">
         <a href="{{ url_for('index') }}"><i class="fa-solid fa-house"></i> Home</a>
         
+        {% if not current_user.is_authenticated or not current_user.is_admin %}
         <div class="dropdown">
           <button class="dropbtn"><i class="fa-solid fa-book-open"></i> Sessions <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></button>
           <div class="dropdown-content">
@@ -56,13 +57,14 @@
             {% endfor %}
           </div>
         </div>
+        {% endif %}
         
         {% if current_user.is_authenticated %}
           {% if not current_user.is_admin %}
             <a href="{{ url_for('exams_dashboard') }}"><i class="fa-solid fa-graduation-cap"></i> Exams & Quizzes</a>
+            <a href="{{ url_for('resources') }}"><i class="fa-solid fa-folder-open"></i> Resources</a>
+            <a href="{{ url_for('dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
           {% endif %}
-          <a href="{{ url_for('resources') }}"><i class="fa-solid fa-folder-open"></i> Resources</a>
-          <a href="{{ url_for('dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
           {% if current_user.is_admin %}
             <a href="{{ url_for('admin_panel') }}"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
             <a href="{{ url_for('admin_exams') }}"><i class="fa-solid fa-file-signature"></i> Manage Exams</a>
