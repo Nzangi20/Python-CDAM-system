@@ -4,6 +4,7 @@ from pathlib import Path
 from datetime import datetime, UTC
 
 import pytest
+from werkzeug.security import generate_password_hash
 
 # Ensure backend modules are importable when running from repo root.
 BACKEND_DIR = Path(__file__).resolve().parents[1]
@@ -376,6 +377,124 @@ def test_dashboard_rendering(client):
     resp_complete = client.get("/student/dashboard")
     assert resp_complete.status_code == 200
     assert b"View Certificate" in resp_complete.data
+
+
+def test_admin_delete_student(client):
+    # Register student
+    login_admin(client)
+    student_reg = "EB3/99999/26"
+    
+    with app.app_context():
+        # Setup student user
+        student = User(
+            name="Delete Me Student",
+            email="delete.me@cdam.local",
+            reg_number=student_reg,
+            password_hash=generate_password_hash("password"),
+            study_level="Beginner"
+        )
+        db.session.add(student)
+        db.session.commit()
+        student_id = student.id
+        
+        # Add related progress, quiz, and attempt logs
+        db.session.add(UserProgress(user_id=student_id, session_id=1, completed=True))
+        db.session.commit()
+
+    # Admin deletes the student
+    resp = client.post(f"/admin/users/{student_id}/delete", follow_redirects=True)
+    assert resp.status_code == 200
+    assert b"deleted" in resp.data
+
+    with app.app_context():
+        deleted_user = db.session.get(User, student_id)
+        assert deleted_user is None
+        progress = UserProgress.query.filter_by(user_id=student_id).all()
+        assert len(progress) == 0
+
+
+def test_admin_student_detail(client):
+    login_admin(client)
+    with app.app_context():
+        student = User(
+            name="Detail Student",
+            email="detail.student@cdam.local",
+            reg_number="EB3/88888/26",
+            password_hash=generate_password_hash("password"),
+            study_level="Beginner"
+        )
+        db.session.add(student)
+        db.session.commit()
+        student_id = student.id
+
+    resp = client.get(f"/admin/users/{student_id}/detail")
+    assert resp.status_code == 200
+    assert b"Detail Student" in resp.data
+    assert b"EB3/88888/26" in resp.data
+
+
+def test_admin_attempt_action(client):
+    login_admin(client)
+    with app.app_context():
+        student = User(
+            name="Exam Actions Student",
+            email="exam.actions@cdam.local",
+            reg_number="EB3/77777/26",
+            password_hash=generate_password_hash("password"),
+            study_level="Beginner"
+        )
+        db.session.add(student)
+        db.session.commit()
+        student_id = student.id
+
+        exam = Exam(
+            title="Integrity Exam",
+            description="Testing proctor controls",
+            duration=30,
+            passing_score=50,
+            study_level="Beginner",
+            published=True
+        )
+        db.session.add(exam)
+        db.session.commit()
+        exam_id = exam.id
+
+        attempt = ExamAttemptRecord(
+            user_id=student_id,
+            exam_id=exam_id,
+            status="in_progress"
+        )
+        db.session.add(attempt)
+        db.session.commit()
+        attempt_id = attempt.id
+
+    # 1. Flag attempt
+    resp_flag = client.post(f"/admin/attempts/{attempt_id}/action", data={"action": "flag"}, follow_redirects=True)
+    assert resp_flag.status_code == 200
+    with app.app_context():
+        updated_attempt = db.session.get(ExamAttemptRecord, attempt_id)
+        assert updated_attempt.status == "flagged"
+
+    # 2. Clear flags / Approve attempt
+    resp_approve = client.post(f"/admin/attempts/{attempt_id}/action", data={"action": "approve"}, follow_redirects=True)
+    assert resp_approve.status_code == 200
+    with app.app_context():
+        updated_attempt = db.session.get(ExamAttemptRecord, attempt_id)
+        assert updated_attempt.status == "submitted"
+
+    # 3. Terminate attempt
+    with app.app_context():
+        # Set back to in_progress to test terminate
+        att = db.session.get(ExamAttemptRecord, attempt_id)
+        att.status = "in_progress"
+        db.session.commit()
+
+    resp_term = client.post(f"/admin/attempts/{attempt_id}/action", data={"action": "terminate"}, follow_redirects=True)
+    assert resp_term.status_code == 200
+    with app.app_context():
+        updated_attempt = db.session.get(ExamAttemptRecord, attempt_id)
+        assert updated_attempt.status == "terminated"
+
 
 
 

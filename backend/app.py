@@ -504,6 +504,31 @@ def admin_dashboard_context():
     )
     exam_stats = ExamAttemptRecord.query.order_by(ExamAttemptRecord.created_at.desc()).limit(20).all()
     suspicious_count = IntegrityLog.query.count()
+
+    # --- New analytics ---
+    from datetime import timedelta
+    seven_days_ago = datetime.now(UTC) - timedelta(days=7)
+    recent_registrations = User.query.filter(
+        User.is_admin == False, User.created_at >= seven_days_ago
+    ).order_by(User.created_at.desc()).all()
+
+    total_attempts = ExamAttemptRecord.query.count()
+    passed_attempts = ExamAttemptRecord.query.filter_by(status="submitted").join(
+        Exam, Exam.id == ExamAttemptRecord.exam_id
+    ).filter(ExamAttemptRecord.score >= Exam.passing_score).count()
+    exam_pass_rate = round((passed_attempts / total_attempts * 100), 1) if total_attempts > 0 else 0.0
+
+    exam_results = (
+        db.session.query(ExamAttemptRecord, User.name, User.reg_number, Exam.title, Exam.passing_score)
+        .join(User, User.id == ExamAttemptRecord.user_id)
+        .join(Exam, Exam.id == ExamAttemptRecord.exam_id)
+        .order_by(ExamAttemptRecord.created_at.desc())
+        .limit(30)
+        .all()
+    )
+
+    total_sessions = Session.query.count()
+
     return {
         "users_count": users_count,
         "active_users": active_users,
@@ -520,6 +545,10 @@ def admin_dashboard_context():
         "exam_attempts": exam_stats,
         "suspicious_count": suspicious_count,
         "exams": Exam.query.order_by(Exam.created_at.desc()).all(),
+        "recent_registrations": recent_registrations,
+        "exam_pass_rate": exam_pass_rate,
+        "exam_results": exam_results,
+        "total_sessions": total_sessions,
     }
 
 
@@ -1566,7 +1595,109 @@ def admin_integrity():
     logs = IntegrityLog.query.order_by(IntegrityLog.timestamp.desc()).all()
     users_map = {u.id: u for u in User.query.all()}
     exams_map = {e.id: e for e in Exam.query.all()}
-    return render_template("admin_integrity.html", logs=logs, users_map=users_map, exams_map=exams_map)
+    # Also pass active/ongoing attempts to the template for monitoring
+    attempts = ExamAttemptRecord.query.order_by(ExamAttemptRecord.created_at.desc()).all()
+    return render_template("admin_integrity.html", logs=logs, users_map=users_map, exams_map=exams_map, attempts=attempts)
+
+
+@app.post("/admin/users/<int:user_id>/delete")
+@login_required
+@admin_required
+def admin_delete_user(user_id: int):
+    user = db.session.get(User, user_id)
+    if not user or user.is_admin:
+        flash("User cannot be deleted.", "error")
+        return redirect(url_for("admin_panel"))
+    # Cascade delete relations:
+    UserProgress.query.filter_by(user_id=user.id).delete()
+    QuizResult.query.filter_by(user_id=user.id).delete()
+    Bookmark.query.filter_by(user_id=user.id).delete()
+    LessonView.query.filter_by(user_id=user.id).delete()
+    ActivityLog.query.filter_by(user_id=user.id).delete()
+    Notification.query.filter_by(user_id=user.id).delete()
+    DiscussionComment.query.filter_by(user_id=user.id).delete()
+    ExamAttemptRecord.query.filter_by(user_id=user.id).delete()
+    IntegrityLog.query.filter_by(user_id=user.id).delete()
+    db.session.delete(user)
+    db.session.commit()
+    log_activity("admin.user.delete", user.email)
+    flash(f"Student account '{user.name}' has been deleted.", "success")
+    return redirect(url_for("admin_panel"))
+
+
+@app.route("/admin/users/<int:user_id>/detail")
+@login_required
+@admin_required
+def admin_student_detail(user_id: int):
+    user = db.session.get(User, user_id)
+    if not user or user.is_admin:
+        flash("User not found.", "error")
+        return redirect(url_for("admin_panel"))
+    
+    # Study analytics
+    completed_progress = UserProgress.query.filter_by(user_id=user.id, completed=True).all()
+    completed_sessions = [p.session_id for p in completed_progress]
+    
+    # Quiz results
+    quiz_results = QuizResult.query.filter_by(user_id=user.id).all()
+    
+    # Exam history
+    exam_attempts = ExamAttemptRecord.query.filter_by(user_id=user.id).all()
+    
+    # Activity logs
+    activities = ActivityLog.query.filter_by(user_id=user.id).order_by(ActivityLog.created_at.desc()).all()
+    
+    # Bookmarks
+    bookmarks = Bookmark.query.filter_by(user_id=user.id).all()
+    
+    # Map sessions and exams for easy templates rendering
+    sessions_map = {s.id: s for s in Session.query.all()}
+    exams_map = {e.id: e for e in Exam.query.all()}
+    
+    return render_template(
+        "admin_student_detail.html",
+        student=user,
+        completed_sessions=completed_sessions,
+        quiz_results=quiz_results,
+        exam_attempts=exam_attempts,
+        activities=activities,
+        bookmarks=bookmarks,
+        sessions_map=sessions_map,
+        exams_map=exams_map
+    )
+
+
+@app.post("/admin/attempts/<int:attempt_id>/action")
+@login_required
+@admin_required
+def admin_attempt_action(attempt_id: int):
+    attempt = db.session.get(ExamAttemptRecord, attempt_id)
+    if not attempt:
+        flash("Attempt not found.", "error")
+        return redirect(url_for("admin_integrity"))
+    action = request.form.get("action", "").strip()
+    if action == "force_submit":
+        attempt.status = "submitted"
+        attempt.submitted_at = datetime.now(UTC)
+        flash("Exam attempt force-submitted successfully.", "success")
+        log_activity("admin.exam.force_submit", f"attempt={attempt_id}")
+    elif action == "terminate":
+        attempt.status = "terminated"
+        attempt.submitted_at = datetime.now(UTC)
+        flash("Exam attempt terminated.", "success")
+        log_activity("admin.exam.terminate", f"attempt={attempt_id}")
+    elif action == "flag":
+        attempt.status = "flagged"
+        flash("Exam attempt flagged for review.", "success")
+        log_activity("admin.exam.flag", f"attempt={attempt_id}")
+    elif action == "approve":
+        attempt.status = "submitted"
+        flash("Exam attempt approved / cleared.", "success")
+        log_activity("admin.exam.approve", f"attempt={attempt_id}")
+    else:
+        flash("Invalid action.", "error")
+    db.session.commit()
+    return redirect(url_for("admin_integrity"))
 
 
 

@@ -2,13 +2,101 @@
 {% block content %}
 <div class="dashboard-header fade-in">
   <div>
-    <h1 style="font-weight: 800; font-size: 2rem; letter-spacing: -0.02em;">Proctoring Integrity Logs</h1>
-    <p class="muted" style="margin-top: 0.25rem;">Real-time anti-cheat alerts: fullscreen exits, tab switches, and keyboard shortcuts violation reports.</p>
+    <h1 style="font-weight: 800; font-size: 2rem; letter-spacing: -0.02em;">Proctoring & Exam Monitoring</h1>
+    <p class="muted" style="margin-top: 0.25rem;">Real-time anti-cheat alerts: fullscreen exits, tab switches, and live candidate session controls.</p>
   </div>
 </div>
 
+<!-- Active Proctored Exam Sessions -->
+<div class="card fade-in" style="margin-bottom: 2rem; padding: 1.5rem;">
+  <h2 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 1rem;"><i class="fa-solid fa-desktop" style="color: var(--red-500);"></i> Live Candidate Sessions</h2>
+  
+  {% if attempts %}
+    <div style="overflow-x: auto;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Student candidate</th>
+            <th>Target Assessment</th>
+            <th>Attempt Number</th>
+            <th>Recorded Score</th>
+            <th>IP Address / Browser</th>
+            <th>Proctor Flags</th>
+            <th>Session Status</th>
+            <th style="text-align: right;">Action Control</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for attempt in attempts %}
+            {% set user = users_map.get(attempt.user_id) %}
+            {% set exam = exams_map.get(attempt.exam_id) %}
+            <tr>
+              <td>
+                {% if user %}
+                  <strong>{{ user.name }}</strong> <br/>
+                  <span class="muted" style="font-size: 0.8rem;">{{ user.email }}</span>
+                {% else %}
+                  Student ID: {{ attempt.user_id }}
+                {% endif %}
+              </td>
+              <td><strong>{{ exam.title if exam else 'Exam ID: ' ~ attempt.exam_id }}</strong></td>
+              <td>Attempt {{ attempt.attempt_number }}</td>
+              <td style="font-weight: 700;">{{ attempt.score }}%</td>
+              <td style="font-size: 0.85rem;">
+                <code>{{ attempt.ip_address or '0.0.0.0' }}</code> <br/>
+                <span class="muted" style="font-size: 0.75rem; display: inline-block; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  {{ attempt.user_agent or 'Unknown Agent' }}
+                </span>
+              </td>
+              <td>
+                {% if attempt.violation_count > 0 %}
+                  <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245,158,11,0.25);">
+                    {{ attempt.violation_count }} flags (suspicion: {{ attempt.suspicious_score }}%)
+                  </span>
+                {% else %}
+                  <span class="badge success">Clean</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge {% if attempt.status == 'submitted' or attempt.status == 'passed' %}success{% elif attempt.status == 'flagged' %}warning{% else %}danger{% endif %}" style="text-transform: uppercase;">
+                  {{ attempt.status }}
+                </span>
+              </td>
+              <td style="text-align: right; white-space: nowrap;">
+                {% if attempt.status == 'in_progress' %}
+                  <form method="post" action="{{ url_for('admin_attempt_action', attempt_id=attempt.id) }}" style="display: inline; margin: 0;">
+                    <input type="hidden" name="action" value="force_submit" />
+                    <button type="submit" class="btn primary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;"><i class="fa-solid fa-circle-check"></i> Force Submit</button>
+                  </form>
+                  <form method="post" action="{{ url_for('admin_attempt_action', attempt_id=attempt.id) }}" style="display: inline; margin: 0;" onsubmit="return confirm('Terminate this exam session immediately?')">
+                    <input type="hidden" name="action" value="terminate" />
+                    <button type="submit" class="btn" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: var(--red-500); color: var(--red-400);"><i class="fa-solid fa-ban"></i> Terminate</button>
+                  </form>
+                {% elif attempt.status == 'flagged' %}
+                  <form method="post" action="{{ url_for('admin_attempt_action', attempt_id=attempt.id) }}" style="display: inline; margin: 0;">
+                    <input type="hidden" name="action" value="approve" />
+                    <button type="submit" class="btn success" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16, 185, 129, 0.3);"><i class="fa-solid fa-circle-check"></i> Clear Flags</button>
+                  </form>
+                {% else %}
+                  <form method="post" action="{{ url_for('admin_attempt_action', attempt_id=attempt.id) }}" style="display: inline; margin: 0;">
+                    <input type="hidden" name="action" value="flag" />
+                    <button type="submit" class="btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: var(--border);"><i class="fa-solid fa-flag"></i> Flag Review</button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted" style="text-align: center; padding: 2rem 0; font-size: 0.95rem;">No exam attempts in records.</p>
+  {% endif %}
+</div>
+
+<!-- Flags & Violations Record -->
 <div class="card fade-in">
-  <h2 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 1rem;"><i class="fa-solid fa-triangle-exclamation" style="color: var(--red-500);"></i> Flags & Violations Record</h2>
+  <h2 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 1rem;"><i class="fa-solid fa-triangle-exclamation" style="color: var(--red-500);"></i> Live Proctor Alerts Logs</h2>
   
   {% if logs %}
     <div style="overflow-x: auto;">
@@ -53,7 +141,7 @@
                 {% if log.violation_type in ['fullscreen_exit', 'tab_switch', 'window_blur'] %}
                   <span class="badge" style="background: rgba(220, 38, 38, 0.1); color: var(--red-400); border-color: rgba(220,38,38,0.2); font-weight: 700;">HIGH</span>
                 {% else %}
-                  <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #fbbf24; border-color: rgba(245,158,11,0.2); font-weight: 700;">MEDIUM</span>
+                  <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #fbbf24; border-color: rgba(245, 158, 11, 0.2); font-weight: 700;">MEDIUM</span>
                 {% endif %}
               </td>
               <td style="font-size: 0.9rem; color: var(--text-muted);">

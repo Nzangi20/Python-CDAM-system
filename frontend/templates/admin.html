@@ -12,7 +12,7 @@
 </div>
 
 <!-- Stats Dashboard -->
-<section class="stats fade-in delay" style="margin-bottom: 2.5rem;">
+<section class="stats fade-in delay" style="margin-bottom: 2.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem;">
   <div class="stat-card">
     <h3>Total Enrolled</h3>
     <p>{{ users_count }}</p>
@@ -24,9 +24,9 @@
     <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-circle-nodes"></i> Unique Visitors</span>
   </div>
   <div class="stat-card">
-    <h3>Curriculum Sessions</h3>
-    <p>{{ published_count }}</p>
-    <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-book-open"></i> Published Units</span>
+    <h3>Total Sessions</h3>
+    <p>{{ total_sessions }}</p>
+    <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-book-open"></i> Curriculum Units</span>
   </div>
   <div class="stat-card">
     <h3>Certificates Issued</h3>
@@ -34,15 +34,27 @@
     <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-award"></i> Course Completions</span>
   </div>
   <div class="stat-card">
-    <h3>Average Performance</h3>
-    <p>{{ "%.1f"|format(avg_quiz_score) }}%</p>
-    <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-chart-line"></i> Quiz/Practice scores</span>
+    <h3>Exam Pass Rate</h3>
+    <p>{{ exam_pass_rate }}%</p>
+    <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-chart-pie"></i> Pass Average</span>
+  </div>
+  <div class="stat-card" style="border-color: rgba(239, 68, 68, 0.2);">
+    <h3 style="color: var(--red-400);">Integrity Alerts</h3>
+    <p style="color: var(--red-400);">{{ suspicious_count }}</p>
+    <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-triangle-exclamation" style="color: var(--red-400);"></i> Flags Logged</span>
+  </div>
+  <div class="stat-card">
+    <h3>New (7 Days)</h3>
+    <p>{{ recent_registrations | length }}</p>
+    <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-user-plus"></i> Registrations</span>
   </div>
 </section>
 
 <!-- Main Admin Tabs -->
 <div class="tabs" role="tablist" style="margin-bottom: 2rem;">
   <button class="tab active" data-tab="students"><i class="fa-solid fa-users"></i> Student Roster</button>
+  <button class="tab" data-tab="sessions"><i class="fa-solid fa-book-open"></i> Sessions Management</button>
+  <button class="tab" data-tab="exam-results"><i class="fa-solid fa-square-poll-horizontal"></i> Exam Results</button>
   <button class="tab" data-tab="discussions"><i class="fa-solid fa-comments"></i> Discussions Moderation</button>
   <button class="tab" data-tab="comms"><i class="fa-solid fa-envelope-open-text"></i> System Notifications</button>
 </div>
@@ -50,11 +62,24 @@
 <!-- Student Roster Panel -->
 <section class="tab-panel card active" id="students">
   <h3 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1rem;"><i class="fa-solid fa-users-gear" style="color: var(--red-500);"></i> Student Accounts & Performance</h3>
+  
+  <!-- Search and filter -->
+  <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+    <input type="text" id="studentSearch" placeholder="Search students by name, email, registration number..." style="flex: 1; min-width: 280px; padding: 0.6rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--text);" />
+    <select id="levelFilter" style="padding: 0.6rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--text);">
+      <option value="">All Study Levels</option>
+      <option value="Beginner">Beginner</option>
+      <option value="Intermediate">Intermediate</option>
+      <option value="Professional">Professional</option>
+    </select>
+  </div>
+
   <div style="overflow-x: auto;">
     <table class="admin-table">
       <thead>
         <tr>
           <th>Name</th>
+          <th>Reg Number</th>
           <th>Email Address</th>
           <th>Auth Mode</th>
           <th>Account Level</th>
@@ -62,15 +87,16 @@
           <th style="text-align: right;">Roster Actions</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="studentTableBody">
         {% for user in users %}
-          <tr>
+          <tr data-name="{{ user.name }}" data-email="{{ user.email }}" data-reg="{{ user.reg_number or '' }}" data-level="{{ user.study_level }}">
             <td style="font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
               <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--bg-soft); border: 1px solid var(--border); display: grid; place-items: center; font-size: 0.75rem;">
                 {{ user.name[0] | upper if user.name else 'U' }}
               </div>
               {{ user.name }}
             </td>
+            <td><code>{{ user.reg_number or 'N/A' }}</code></td>
             <td>{{ user.email }}</td>
             <td style="text-transform: capitalize; font-size: 0.9rem;"><i class="fa-solid fa-key" style="font-size: 0.75rem; color: var(--text-muted);"></i> {{ user.auth_provider }}</td>
             <td>
@@ -83,7 +109,10 @@
                 <span class="badge success" style="padding: 0.15rem 0.5rem;"><i class="fa-solid fa-circle-check"></i> Active</span>
               {% endif %}
             </td>
-            <td style="text-align: right;">
+            <td style="text-align: right; white-space: nowrap;">
+              <a class="btn ghost" href="{{ url_for('admin_student_detail', user_id=user.id) }}" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: var(--border);">
+                <i class="fa-solid fa-user-tag"></i> View Profile
+              </a>
               {% if not user.is_admin %}
                 <form method="post" action="{{ url_for('admin_toggle_suspend', user_id=user.id) }}" style="display:inline; margin: 0;">
                   <button class="btn ghost" type="submit" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: var(--border);">
@@ -95,11 +124,157 @@
                     Reset Progress
                   </button>
                 </form>
+                <form method="post" action="{{ url_for('admin_delete_user', user_id=user.id) }}" onsubmit="return confirm('DANGER: This will permanently delete this student profile and all associated logs, attempts, streak stats. Continue?')" style="display:inline; margin: 0;">
+                  <button class="btn ghost" type="submit" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: rgba(239, 68, 68, 0.4); color: var(--red-400); background: rgba(239, 68, 68, 0.05);">
+                    <i class="fa-regular fa-trash-can"></i> Delete
+                  </button>
+                </form>
               {% else %}
                 <span class="badge success" style="background: rgba(185, 28, 28, 0.1); color: var(--red-400); border-color: rgba(185,28,28,0.2);"><i class="fa-solid fa-user-shield"></i> Course Admin</span>
               {% endif %}
             </td>
           </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Sessions Management Panel -->
+<section class="tab-panel card" id="sessions">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <h3 style="font-weight: 800; font-size: 1.25rem;"><i class="fa-solid fa-book-open" style="color: var(--red-500);"></i> Curriculum Sessions</h3>
+    <a class="btn primary" href="{{ url_for('admin_session_new') }}" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;"><i class="fa-solid fa-plus"></i> Add Session</a>
+  </div>
+  
+  <p class="muted" style="font-size: 0.9rem; margin-bottom: 1.5rem;">Below is the ordered list of sessions. Reordering can be managed through the Drag and Drop planner if enabled, or by organizing by order index.</p>
+  
+  <div style="overflow-x: auto;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Session Title</th>
+          <th>Slug</th>
+          <th>Difficulty</th>
+          <th>Duration</th>
+          <th>Status</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in sessions %}
+          <tr>
+            <td style="font-weight: 800; color: var(--red-400);">#{{ s.display_order }}</td>
+            <td style="font-weight: 700;">{{ s.title }}</td>
+            <td><code>{{ s.slug }}</code></td>
+            <td><span class="badge">{{ s.difficulty }}</span></td>
+            <td>{{ s.duration }}</td>
+            <td>
+              {% if s.published %}
+                <span class="badge success">Published</span>
+              {% else %}
+                <span class="badge" style="background: rgba(255,255,255,0.05); border-color: var(--border);">Draft</span>
+              {% endif %}
+            </td>
+            <td style="text-align: right; white-space: nowrap;">
+              <a href="{{ url_for('admin_session_edit', session_id=s.id) }}" class="btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+              <form method="post" action="{{ url_for('admin_toggle_publish', session_id=s.id) }}" style="display: inline; margin: 0;">
+                <button type="submit" class="btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                  {{ "Unpublish" if s.published else "Publish" }}
+                </button>
+              </form>
+              <form method="post" action="{{ url_for('admin_session_delete', session_id=s.id) }}" onsubmit="return confirm('Are you sure you want to delete this session? This action is irreversible.')" style="display: inline; margin: 0;">
+                <button type="submit" class="btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: rgba(239, 68, 68, 0.4); color: var(--red-400); background: rgba(239, 68, 68, 0.05);">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="7" class="muted" style="text-align: center; padding: 2rem 0;">No sessions created yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Exam Results Panel -->
+<section class="tab-panel card" id="exam-results">
+  <h3 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1rem;"><i class="fa-solid fa-square-poll-horizontal" style="color: var(--red-500);"></i> Assessment Submissions & Proctoring</h3>
+  
+  <div style="overflow-x: auto;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Assessment</th>
+          <th>Attempt #</th>
+          <th>Score</th>
+          <th>Pass/Fail</th>
+          <th>Integrity Flags</th>
+          <th>Status</th>
+          <th style="text-align: right;">Monitoring Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for attempt, name, reg_number, exam_title, passing_score in exam_results %}
+          <tr>
+            <td>
+              <strong>{{ name }}</strong> <br/>
+              <span class="muted" style="font-size: 0.8rem;">{{ reg_number or 'N/A' }}</span>
+            </td>
+            <td><strong>{{ exam_title }}</strong></td>
+            <td>Attempt {{ attempt.attempt_number }}</td>
+            <td style="font-weight: 700; font-size: 1.05rem;">{{ attempt.score }}%</td>
+            <td>
+              {% if attempt.status == 'terminated' %}
+                <span class="badge" style="background: rgba(239,68,68,0.15); color: var(--red-400);">TERMINATED</span>
+              {% elif attempt.score >= passing_score %}
+                <span class="badge success">PASSED</span>
+              {% else %}
+                <span class="badge" style="background: rgba(239,68,68,0.1); color: var(--red-400);">FAILED</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if attempt.violation_count > 0 %}
+                <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245,158,11,0.25);">
+                  {{ attempt.violation_count }} flags (suspicion: {{ attempt.suspicious_score }}%)
+                </span>
+              {% else %}
+                <span class="badge success">Clean</span>
+              {% endif %}
+            </td>
+            <td>
+              <span class="badge {% if attempt.status == 'submitted' or attempt.status == 'passed' %}success{% elif attempt.status == 'flagged' %}warning{% endif %}" style="text-transform: uppercase;">
+                {{ attempt.status }}
+              </span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;">
+              {% if attempt.status == 'in_progress' %}
+                <form method="post" action="{{ url_for('admin_attempt_action', attempt_id=attempt.id) }}" style="display: inline; margin: 0;">
+                  <input type="hidden" name="action" value="force_submit" />
+                  <button type="submit" class="btn primary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;"><i class="fa-solid fa-circle-check"></i> Force Submit</button>
+                </form>
+                <form method="post" action="{{ url_for('admin_attempt_action', attempt_id=attempt.id) }}" style="display: inline; margin: 0;" onsubmit="return confirm('Terminate this exam session immediately?')">
+                  <input type="hidden" name="action" value="terminate" />
+                  <button type="submit" class="btn" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: var(--red-500); color: var(--red-400);"><i class="fa-solid fa-ban"></i> Terminate</button>
+                </form>
+              {% elif attempt.status == 'flagged' %}
+                <form method="post" action="{{ url_for('admin_attempt_action', attempt_id=attempt.id) }}" style="display: inline; margin: 0;">
+                  <input type="hidden" name="action" value="approve" />
+                  <button type="submit" class="btn success" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16, 185, 129, 0.3);"><i class="fa-solid fa-circle-check"></i> Clear Flags</button>
+                </form>
+              {% else %}
+                <form method="post" action="{{ url_for('admin_attempt_action', attempt_id=attempt.id) }}" style="display: inline; margin: 0;">
+                  <input type="hidden" name="action" value="flag" />
+                  <button type="submit" class="btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: var(--border);"><i class="fa-solid fa-flag"></i> Flag Review</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="8" class="muted" style="text-align: center; padding: 2rem 0;">No assessments taken yet.</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -209,4 +384,38 @@
     </div>
   </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById('studentSearch');
+  const levelFilter = document.getElementById('levelFilter');
+  const studentRows = document.querySelectorAll('#studentTableBody tr');
+
+  function filterStudents() {
+    const q = searchInput.value.toLowerCase().trim();
+    const level = levelFilter.value;
+    
+    studentRows.forEach(row => {
+      const name = row.getAttribute('data-name').toLowerCase();
+      const email = row.getAttribute('data-email').toLowerCase();
+      const reg = row.getAttribute('data-reg').toLowerCase();
+      const rowLevel = row.getAttribute('data-level');
+      
+      const matchesSearch = !q || name.includes(q) || email.includes(q) || reg.includes(q);
+      const matchesLevel = !level || rowLevel === level;
+      
+      if (matchesSearch && matchesLevel) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  searchInput.addEventListener('input', filterStudents);
+  levelFilter.addEventListener('change', filterStudents);
+});
+</script>
 {% endblock %}
