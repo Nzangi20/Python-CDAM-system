@@ -86,8 +86,8 @@
 
       <div class="form-row">
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-          <label>Embed Video URL (YouTube, Vimeo, etc.)</label>
-          <input type="url" name="video_url" value="{{ session_obj.video_url if session_obj else '' }}" placeholder="https://www.youtube.com/embed/..." />
+          <label>Embed Video URL (Optional)</label>
+          <input type="text" name="video_url" value="{{ session_obj.video_url if session_obj else '' }}" placeholder="e.g., https://www.youtube.com/embed/..." />
         </div>
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
           <label>Estimated Duration text</label>
