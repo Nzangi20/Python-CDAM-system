@@ -190,7 +190,7 @@
         </div>
       {% endif %}
       
-      {% if session.notes_file_path %}
+      {% if notes_exist %}
         <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
           <h4 style="font-weight: 700; margin-bottom: 0.75rem;">Session Learning Materials</h4>
           <a class="btn primary" href="{{ url_for('view_notes', session_id=session.id) }}" target="_blank">

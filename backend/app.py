@@ -756,6 +756,14 @@ def session_detail(slug: str):
     ).all()
     track_lesson_view(current_user.id, session.id)
     log_activity("student.session.view", session.slug)
+    
+    notes_exist = False
+    if session.notes_file_path and session.notes_file_path.strip() and session.notes_file_path != 'None' and session.notes_file_path != 'null':
+        filename = session.notes_file_path.split("/")[-1]
+        filepath = UPLOADS_DIR / filename
+        if filepath.exists() and filepath.is_file():
+            notes_exist = True
+            
     return render_template(
         "session_detail.html",
         session=session,
@@ -767,6 +775,7 @@ def session_detail(slug: str):
         latest_exam_attempt=None,
         show_quiz=False,
         show_exam=False,
+        notes_exist=notes_exist,
     )
 
 
