@@ -709,6 +709,20 @@ def download_notes(session_id: int):
     return send_from_directory(UPLOADS_DIR, filename, as_attachment=False)
 
 
+@app.route("/session/<int:session_id>/view")
+@login_required
+@student_required
+def view_notes(session_id: int):
+    session = db.session.get(Session, session_id)
+    if not session or not session.notes_file_path:
+        flash("Notes file not found.", "error")
+        return redirect(request.referrer or url_for("resources"))
+    if not check_session_access(current_user, session.display_order):
+        flash("Access to this note/revision material is restricted for your experience level.", "error")
+        return redirect(request.referrer or url_for("resources"))
+    return render_template("view_notes.html", session=session)
+
+
 @app.route("/api/run-code", methods=["POST"])
 @login_required
 @student_required

@@ -3,7 +3,7 @@
 <div class="dashboard-header fade-in">
   <div>
     <h1 style="font-weight: 800; font-size: 2rem; letter-spacing: -0.02em;">Learning Resources & Courseware</h1>
-    <p class="muted" style="margin-top: 0.25rem;">Download session notes, datasets, slides, and reference notebook templates compiled by Chuka University CDAM lecturers.</p>
+    <p class="muted" style="margin-top: 0.25rem;">View session notes, datasets, slides, and reference notebook templates compiled by Chuka University CDAM lecturers.</p>
   </div>
 </div>
 
@@ -47,8 +47,8 @@
               </div>
             </div>
             {% if has_access %}
-              <a class="btn primary" href="{{ url_for('download_notes', session_id=s.id) }}" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 6px;">
-                <i class="fa-solid fa-download"></i> Download
+              <a class="btn primary" href="{{ url_for('view_notes', session_id=s.id) }}" target="_blank" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 6px;">
+                <i class="fa-solid fa-eye"></i> View
               </a>
             {% else %}
               <button class="btn ghost" disabled style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 6px; cursor: not-allowed; opacity: 0.5;">

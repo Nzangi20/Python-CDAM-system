@@ -339,7 +339,7 @@ html[data-theme="light"] .hero h1 {
   color: #ffffff !important;
 }
 
-.hero p {
+.hero-copy p {
   font-size: 1.15rem;
   color: rgba(255, 255, 255, 0.9) !important;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
@@ -357,6 +357,59 @@ html[data-theme="light"] .hero h1 {
   gap: 0.6rem;
   flex-wrap: wrap;
   margin-top: 1rem;
+}
+
+/* Force hero elements to remain readable/high-contrast regardless of light/dark theme toggle */
+.hero .badge {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  text-shadow: none !important;
+}
+
+.hero .badge i {
+  color: #ef4444 !important; /* Ensure icons pop */
+  margin-right: 0.4rem;
+}
+
+.hero .btn.ghost {
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.hero .btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+}
+
+.hero .glass-card {
+  background: rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+.hero .glass-card h3 {
+  color: #ffffff !important;
+  font-weight: 800;
+}
+
+.hero .glass-card p {
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-size: 0.9rem !important;
+  text-shadow: none !important;
+}
+
+.hero .glass-card .feature-list li {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 0.95rem !important;
+}
+
+.hero .glass-card .feature-list li::before {
+  color: #ef4444 !important;
 }
 
 .glass-card {
