@@ -9,7 +9,7 @@ import pytest
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_DIR))
 
-from app import app, db, User, Session, Exam, Question, ExamAttemptRecord, IntegrityLog  # noqa: E402
+from app import app, db, User, Session, Exam, Question, ExamAttemptRecord, IntegrityLog, UserProgress  # noqa: E402
 from seed_data import SESSIONS  # noqa: E402
 from sqlalchemy.pool import StaticPool
 
@@ -352,5 +352,30 @@ def test_exam_level_filtering(client):
     # Attempt to take Professional Exam now -> Successful (returns take template, which has form or instructions)
     resp_take_prof_success = client.get(f"/exams/{prof_id}/take")
     assert resp_take_prof_success.status_code == 200
+
+
+def test_dashboard_rendering(client):
+    # Register and login a student
+    register_and_login(client, reg_number="EB3/44444/26")
+    
+    # 1. Access dashboard with 0% progress
+    resp = client.get("/student/dashboard")
+    assert resp.status_code == 200
+    assert b"Welcome back" in resp.data
+    assert b"View Certificate" not in resp.data
+
+    # 2. Access dashboard with 100% progress
+    with app.app_context():
+        user = User.query.filter_by(reg_number="EB3/44444/26").first()
+        sessions = Session.query.all()
+        for s in sessions:
+            prog = UserProgress(user_id=user.id, session_id=s.id, completed=True, progress_percentage=100)
+            db.session.add(prog)
+        db.session.commit()
+        
+    resp_complete = client.get("/student/dashboard")
+    assert resp_complete.status_code == 200
+    assert b"View Certificate" in resp_complete.data
+
 
 

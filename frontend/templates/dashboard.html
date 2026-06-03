@@ -53,7 +53,7 @@
 
   <div style="position: relative; z-index: 2; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
     {% if progress_pct == 100 %}
-      <a class="btn primary" href="{{ url_for('view_certificate', user_id=current_user.id) }}" style="background: #ffffff; color: var(--red-700); font-weight: 700; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 0.65rem 1.25rem; border-radius: 8px;">
+      <a class="btn primary" href="{{ url_for('certificate') }}" style="background: #ffffff; color: var(--red-700); font-weight: 700; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 0.65rem 1.25rem; border-radius: 8px;">
         <i class="fa-solid fa-award"></i> View Certificate
       </a>
     {% endif %}
