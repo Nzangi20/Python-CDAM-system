@@ -11,8 +11,12 @@ from markupsafe import Markup, escape
 
 
 def render_markdown(text: str) -> Markup:
+    if not text:
+        return Markup("")
+    # Standardize escaped newlines from raw seed/db inputs
+    processed_text = text.replace("\\n", "\n")
     html = markdown.markdown(
-        text or "",
+        processed_text,
         extensions=["extra", "nl2br", "sane_lists", "tables"],
     )
     return Markup(html)

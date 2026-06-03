@@ -181,7 +181,7 @@
     <section class="tab-panel card" id="resources">
       <div class="markdown">{{ render_markdown(session.resources) }}</div>
       
-      {% if session.video_url %}
+      {% if session.video_url and session.video_url.strip() and session.video_url != 'None' and session.video_url != 'null' and (session.video_url.startswith('http://') or session.video_url.startswith('https://') or session.video_url.startswith('//')) %}
         <div style="margin-top: 2rem;">
           <h4 style="font-weight: 700; margin-bottom: 1rem;"><i class="fa-solid fa-circle-play" style="color: var(--red-500);"></i> Lesson Video</h4>
           <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow);">
