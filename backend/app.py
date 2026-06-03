@@ -406,7 +406,7 @@ def dashboard_context(user_id: int):
     if study_level == "Beginner":
         total_sessions = 10
     else:
-        total_sessions = 20
+        total_sessions = 18
 
     sessions = sessions[:total_sessions]
 
