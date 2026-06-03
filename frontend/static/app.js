@@ -92,6 +92,18 @@ function initTabs() {
   });
 }
 
+function switchTab(tabId) {
+  const tabButton = document.querySelector(`.tab[data-tab="${tabId}"]`);
+  if (tabButton) {
+    tabButton.click();
+    const tabsContainer = document.querySelector(".tabs");
+    if (tabsContainer) {
+      tabsContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+}
+window.switchTab = switchTab;
+
 function initCodeBlocks() {
   document.querySelectorAll(".copy-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {

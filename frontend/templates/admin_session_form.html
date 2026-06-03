@@ -46,6 +46,21 @@
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label>Expected Outcomes (Markdown format)</label>
+        <textarea name="expected_outcomes" rows="6" placeholder="### Knowledge Outcomes&#10;- Outcome 1&#10;&#10;### Practical Outcomes&#10;- Outcome 2" required style="font-family: monospace;">{{ session_obj.expected_outcomes if session_obj else '' }}</textarea>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label>Learning Notes (Theory, Definitions, Best Practices, Tips, etc.)</label>
+        <textarea name="learning_notes" rows="8" placeholder="Write concept explanation, definition tables, and common errors..." required style="font-family: monospace;">{{ session_obj.learning_notes if session_obj else '' }}</textarea>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <label>Guided Simulator Instructions (Step 1, Step 2, etc.)</label>
+        <textarea name="instructions" rows="5" placeholder="Step 1: Click Run Code.&#10;Step 2: Modify total_sales to 1500.&#10;Step 3: Run again to see calculated average." required style="font-family: monospace;">{{ session_obj.instructions if session_obj else '' }}</textarea>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
         <label>Python Code Examples (Runs inside student code emulator)</label>
         <textarea name="code_examples" rows="6" placeholder="import pandas as pd&#10;df = pd.DataFrame({'A': [1, 2]})&#10;print(df)" required style="font-family: monospace;">{{ session_obj.code_examples if session_obj else '' }}</textarea>
       </div>

@@ -96,6 +96,9 @@ class Session(db.Model):
     description = db.Column(db.Text, nullable=False)
     content = db.Column(db.Text, nullable=False)
     objectives = db.Column(db.Text, nullable=False)
+    expected_outcomes = db.Column(db.Text, nullable=False, default="")
+    learning_notes = db.Column(db.Text, nullable=False, default="")
+    instructions = db.Column(db.Text, nullable=False, default="")
     code_examples = db.Column(db.Text, nullable=False)
     resources = db.Column(db.Text, nullable=False)
     notes_file_path = db.Column(db.String(500), nullable=True)
@@ -337,16 +340,18 @@ def check_session_access(user, display_order):
 
 
 def seed_sessions() -> None:
-    if Session.query.count():
-        return
     for idx, item in enumerate(SESSIONS, start=1):
-        db.session.add(
-            Session(
+        session_obj = Session.query.filter_by(slug=item["slug"]).first()
+        if not session_obj:
+            session_obj = Session(
                 title=item["title"],
                 slug=item["slug"],
                 description=item["description"],
                 content=item["content"],
                 objectives=item["objectives"],
+                expected_outcomes=item.get("expected_outcomes", ""),
+                learning_notes=item.get("learning_notes", ""),
+                instructions=item.get("instructions", ""),
                 code_examples=item["code_examples"],
                 resources=item["resources"],
                 quiz_json=json.dumps(item.get("quiz", [])),
@@ -355,7 +360,12 @@ def seed_sessions() -> None:
                 display_order=idx,
                 published=True,
             )
-        )
+            db.session.add(session_obj)
+        else:
+            # Update fields in case they are missing or updated in seed_data
+            session_obj.expected_outcomes = item.get("expected_outcomes", "")
+            session_obj.learning_notes = item.get("learning_notes", "")
+            session_obj.instructions = item.get("instructions", "")
     db.session.commit()
 
 
@@ -700,7 +710,7 @@ def download_notes(session_id: int):
         return redirect(request.referrer or url_for("resources"))
     
     filename = session.notes_file_path.split("/")[-1]
-    return send_from_directory(UPLOADS_DIR, filename, as_attachment=True)
+    return send_from_directory(UPLOADS_DIR, filename, as_attachment=False)
 
 
 @app.route("/api/run-code", methods=["POST"])
@@ -1068,6 +1078,9 @@ def admin_session_new():
             description=request.form.get("description", ""),
             content=request.form.get("content", ""),
             objectives=request.form.get("objectives", ""),
+            expected_outcomes=request.form.get("expected_outcomes", ""),
+            learning_notes=request.form.get("learning_notes", ""),
+            instructions=request.form.get("instructions", ""),
             code_examples=request.form.get("code_examples", ""),
             resources=request.form.get("resources", ""),
             notes_file_path=notes_path,
@@ -1100,6 +1113,9 @@ def admin_session_edit(session_id: int):
         session_obj.description = request.form.get("description", "")
         session_obj.content = request.form.get("content", "")
         session_obj.objectives = request.form.get("objectives", "")
+        session_obj.expected_outcomes = request.form.get("expected_outcomes", "")
+        session_obj.learning_notes = request.form.get("learning_notes", "")
+        session_obj.instructions = request.form.get("instructions", "")
         session_obj.code_examples = request.form.get("code_examples", "")
         session_obj.resources = request.form.get("resources", "")
         session_obj.video_url = request.form.get("video_url", "").strip() or None
@@ -1371,6 +1387,15 @@ def migrate_schema() -> None:
         if "video_url" not in columns:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE sessions ADD COLUMN video_url VARCHAR(500)"))
+        if "expected_outcomes" not in columns:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE sessions ADD COLUMN expected_outcomes TEXT DEFAULT ''"))
+        if "learning_notes" not in columns:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE sessions ADD COLUMN learning_notes TEXT DEFAULT ''"))
+        if "instructions" not in columns:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE sessions ADD COLUMN instructions TEXT DEFAULT ''"))
     if "users" in inspector.get_table_names():
         columns = {col["name"] for col in inspector.get_columns("users")}
         if "study_level" not in columns:
