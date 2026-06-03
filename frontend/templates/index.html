@@ -2,16 +2,32 @@
 {% block content %}
 <section class="hero fade-in">
   <div class="hero-copy">
-    <span class="badge pulse"><i class="fa-solid fa-fire"></i> CDAM Intake Ongoing!</span>
-    <h1>Master Python for Data Science</h1>
-    <p>
-      Unlock your potential with CDAM's professional masterclass in Python, analytics,
-      machine learning, and AI — inspired by the Center for Data Analytics & Modelling at Chuka University.
-    </p>
-    <div class="hero-actions">
-      <a class="btn primary" href="{{ url_for('register') }}"><i class="fa-solid fa-rocket"></i> Start Learning</a>
-      <a class="btn ghost" href="#curriculum"><i class="fa-solid fa-compass"></i> Explore Sessions</a>
-    </div>
+    {% if current_user.is_authenticated and current_user.is_admin %}
+      <span class="badge pulse"><i class="fa-solid fa-user-shield"></i> Admin Overview</span>
+      <h1>Platform Administration</h1>
+      <p>
+        Welcome back, {{ current_user.name }}. Use this page to review the published curriculum and monitor session content.
+      </p>
+      <div class="hero-actions">
+        <a class="btn primary" href="{{ url_for('admin_panel') }}"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+        <a class="btn ghost" href="#curriculum"><i class="fa-solid fa-compass"></i> Review Curriculum</a>
+      </div>
+    {% else %}
+      <span class="badge pulse"><i class="fa-solid fa-fire"></i> CDAM Intake Ongoing!</span>
+      <h1>Master Python for Data Science</h1>
+      <p>
+        Unlock your potential with CDAM's professional masterclass in Python, analytics,
+        machine learning, and AI — inspired by the Center for Data Analytics & Modelling at Chuka University.
+      </p>
+      <div class="hero-actions">
+        {% if current_user.is_authenticated %}
+          <a class="btn primary" href="{{ url_for('student_dashboard') }}"><i class="fa-solid fa-rocket"></i> Go to Dashboard</a>
+        {% else %}
+          <a class="btn primary" href="{{ url_for('register') }}"><i class="fa-solid fa-rocket"></i> Start Learning</a>
+        {% endif %}
+        <a class="btn ghost" href="#curriculum"><i class="fa-solid fa-compass"></i> Explore Sessions</a>
+      </div>
+    {% endif %}
     <div class="hero-badges">
       <span class="badge"><i class="fa-brands fa-python"></i> Python 3+</span>
       <span class="badge"><i class="fa-solid fa-database"></i> SQL & R Ready</span>
@@ -24,7 +40,7 @@
     <h3 style="font-weight: 800; font-size: 1.25rem;">Python Masterclass</h3>
     <p style="font-size: 0.9rem; color: var(--text-muted);">Build, Analyze, and Automate with Python.</p>
     <ul class="feature-list">
-      <li>10 practical sessions</li>
+      <li>18 practical sessions</li>
       <li>Hands-on code simulations</li>
       <li>Dedicated exams & quizzes</li>
       <li>Industry-recognized certificate</li>
@@ -167,28 +183,26 @@
   <div class="grid">
     {% for session in sessions %}
       {% set has_access = not current_user.is_authenticated or check_session_access(current_user, session.display_order) %}
-      <article class="card hover-scale" style="{% if current_user.is_authenticated and not has_access %}border-color: rgba(245, 158, 11, 0.2);{% endif %}">
+      {# Only show sessions the user can access — admins see all, guests see all, students see only their level #}
+      {% if not current_user.is_authenticated or current_user.is_admin or has_access %}
+      <article class="card hover-scale">
         <div class="card-top">
           <span class="badge">{{ session.difficulty }}</span>
-          {% if current_user.is_authenticated and not has_access %}
-            <span class="badge warning" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);"><i class="fa-solid fa-lock"></i> Locked</span>
-          {% endif %}
           <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;"><i class="fa-regular fa-clock"></i> {{ session.duration }}</span>
         </div>
         <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 0.75rem;">{{ session.display_order }}. {{ session.title }}</h3>
         <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; height: 4.5rem;">{{ session.description }}</p>
         {% if current_user.is_authenticated %}
-          {% if has_access %}
-            <a class="btn primary" href="{{ url_for('session_detail', slug=session.slug) }}" style="width: 100%;"><i class="fa-solid fa-book-open-reader"></i> Learn Session</a>
+          {% if current_user.is_admin %}
+            <a class="btn primary" href="{{ url_for('session_detail', slug=session.slug) }}" style="width: 100%;"><i class="fa-solid fa-eye"></i> Preview Session</a>
           {% else %}
-            <button class="btn ghost" disabled style="width: 100%; cursor: not-allowed; opacity: 0.65; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-              <i class="fa-solid fa-lock" style="color: #fbbf24;"></i> Locked ({{ session.difficulty }} Level)
-            </button>
+            <a class="btn primary" href="{{ url_for('session_detail', slug=session.slug) }}" style="width: 100%;"><i class="fa-solid fa-book-open-reader"></i> Learn Session</a>
           {% endif %}
         {% else %}
           <a class="btn" href="{{ url_for('register') }}" style="width: 100%;"><i class="fa-solid fa-user-plus"></i> Enroll to Access</a>
         {% endif %}
       </article>
+      {% endif %}
     {% else %}
       <p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted); padding: 3rem 0;">No sessions found matching your criteria.</p>
     {% endfor %}

@@ -10,13 +10,12 @@
 <section class="grid fade-in delay">
   {% for s in sessions %}
     {% set has_access = check_session_access(current_user, s.display_order) %}
-    <article class="card hover-scale" style="display: flex; flex-direction: column; justify-content: space-between; {% if not has_access %}border-color: rgba(245, 158, 11, 0.2);{% endif %}">
+    {# Only show sessions the user has access to #}
+    {% if has_access %}
+    <article class="card hover-scale" style="display: flex; flex-direction: column; justify-content: space-between;">
       <div>
         <div class="card-top">
           <span class="badge">{{ s.difficulty }}</span>
-          {% if not has_access %}
-            <span class="badge warning" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);"><i class="fa-solid fa-lock"></i> Locked</span>
-          {% endif %}
           <span class="muted" style="font-size: 0.8rem; font-weight: 600;"><i class="fa-solid fa-layer-group"></i> Unit {{ s.display_order }}</span>
         </div>
         <h3 style="font-weight: 800; font-size: 1.25rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">{{ s.display_order }}. {{ s.title }}</h3>
@@ -26,12 +25,10 @@
       <div style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
         {% if s.notes_file_path %}
           {% set ext = s.notes_file_path.split('.')[-1] | lower %}
-          <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.15); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border); {% if not has_access %}opacity: 0.65;{% endif %}">
+          <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.15); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border);">
             <div style="display: flex; align-items: center; gap: 0.75rem;">
               <div style="font-size: 1.5rem; color: var(--red-400);">
-                {% if not has_access %}
-                  <i class="fa-solid fa-lock" style="color: #fbbf24;"></i>
-                {% elif ext == 'pdf' %}
+                {% if ext == 'pdf' %}
                   <i class="fa-solid fa-file-pdf"></i>
                 {% elif ext == 'ipynb' %}
                   <i class="fa-solid fa-code"></i>
@@ -43,32 +40,21 @@
               </div>
               <div>
                 <strong style="font-size: 0.85rem; text-transform: uppercase;">{{ ext }} File</strong>
-                <p class="muted" style="font-size: 0.75rem; margin: 0;">{% if not has_access %}Locked for Level{% else %}Course Attachment{% endif %}</p>
+                <p class="muted" style="font-size: 0.75rem; margin: 0;">Course Attachment</p>
               </div>
             </div>
-            {% if has_access %}
-              <a class="btn primary" href="{{ url_for('view_notes', session_id=s.id) }}" target="_blank" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 6px;">
-                <i class="fa-solid fa-eye"></i> View
-              </a>
-            {% else %}
-              <button class="btn ghost" disabled style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 6px; cursor: not-allowed; opacity: 0.5;">
-                <i class="fa-solid fa-lock"></i> Locked
-              </button>
-            {% endif %}
+            <a class="btn primary" href="{{ url_for('view_notes', session_id=s.id) }}" target="_blank" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 6px;">
+              <i class="fa-solid fa-eye"></i> View
+            </a>
           </div>
         {% else %}
           <p class="muted" style="font-size: 0.85rem; font-style: italic; text-align: center; padding: 0.5rem 0;">No downloadable assets uploaded for this session yet.</p>
         {% endif %}
         
-        {% if has_access %}
-          <a class="btn ghost" href="{{ url_for('session_detail', slug=s.slug) }}" style="width: 100%; font-size: 0.85rem; padding: 0.5rem 1rem;"><i class="fa-solid fa-book-open"></i> Go to Session Material</a>
-        {% else %}
-          <button class="btn ghost" disabled style="width: 100%; font-size: 0.85rem; padding: 0.5rem 1rem; cursor: not-allowed; opacity: 0.5; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-            <i class="fa-solid fa-lock" style="color: #fbbf24;"></i> Restricted ({{ s.difficulty }} Level)
-          </button>
-        {% endif %}
+        <a class="btn ghost" href="{{ url_for('session_detail', slug=s.slug) }}" style="width: 100%; font-size: 0.85rem; padding: 0.5rem 1rem;"><i class="fa-solid fa-book-open"></i> Go to Session Material</a>
       </div>
     </article>
+    {% endif %}
   {% endfor %}
 </section>
 {% endblock %}

@@ -48,12 +48,11 @@
           <div class="dropdown-content">
             {% for s in nav_sessions %}
               {% set has_access = not current_user.is_authenticated or check_session_access(current_user, s.display_order) %}
+              {% if not current_user.is_authenticated or has_access %}
               <a href="{{ url_for('session_detail', slug=s.slug) if current_user.is_authenticated else url_for('login') }}" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
                 <span>{{ s.display_order }}. {{ s.title }}</span>
-                {% if current_user.is_authenticated and not has_access %}
-                  <i class="fa-solid fa-lock" style="color: #fbbf24; font-size: 0.75rem;"></i>
-                {% endif %}
               </a>
+              {% endif %}
             {% endfor %}
           </div>
         </div>
