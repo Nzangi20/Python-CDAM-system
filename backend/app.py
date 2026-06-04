@@ -338,17 +338,8 @@ def check_session_access(user, display_order):
 
 
 def seed_sessions() -> None:
-    seeded_slugs = {item["slug"] for item in SESSIONS}
-    obsolete_sessions = Session.query.filter(~Session.slug.in_(seeded_slugs)).all()
-    for obs in obsolete_sessions:
-        UserProgress.query.filter_by(session_id=obs.id).delete()
-        QuizResult.query.filter_by(session_id=obs.id).delete()
-        Bookmark.query.filter_by(session_id=obs.id).delete()
-        LessonView.query.filter_by(session_id=obs.id).delete()
-        DiscussionComment.query.filter_by(session_id=obs.id).delete()
-        db.session.delete(obs)
-    db.session.commit()
-
+    # Only seed initial sessions if they are not already in the database.
+    # We do NOT overwrite existing sessions or delete sessions created/edited by admins.
     for idx, item in enumerate(SESSIONS, start=1):
         session_obj = Session.query.filter_by(slug=item["slug"]).first()
         if not session_obj:
@@ -370,20 +361,6 @@ def seed_sessions() -> None:
                 published=True,
             )
             db.session.add(session_obj)
-        else:
-            session_obj.title = item["title"]
-            session_obj.description = item["description"]
-            session_obj.content = item["content"]
-            session_obj.objectives = item["objectives"]
-            session_obj.expected_outcomes = item.get("expected_outcomes", "")
-            session_obj.learning_notes = item.get("learning_notes", "")
-            session_obj.instructions = item.get("instructions", "")
-            session_obj.code_examples = item["code_examples"]
-            session_obj.resources = item["resources"]
-            session_obj.quiz_json = json.dumps(item.get("quiz", []))
-            session_obj.duration = item["duration"]
-            session_obj.difficulty = item["difficulty"]
-            session_obj.display_order = idx
     db.session.commit()
 
 
