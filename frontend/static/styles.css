@@ -1128,30 +1128,18 @@ pre {
   transform: translateY(0);
 }
 
-/* Interactive Simulator Area Three-Panel Layout */
+/* Interactive Simulator Area Two-Panel Layout */
 .simulator-layout {
   display: grid;
-  grid-template-columns: 1fr 1.2fr 1fr;
+  grid-template-columns: 1.2fr 1fr;
   gap: 1.25rem;
   align-items: stretch;
   margin-bottom: 2rem;
 }
 
-@media (max-width: 1400px) {
-  .simulator-layout {
-    grid-template-columns: 1fr 1.2fr;
-  }
-  .ai-column {
-    grid-column: span 2;
-  }
-}
-
 @media (max-width: 992px) {
   .simulator-layout {
     grid-template-columns: 1fr !important;
-  }
-  .ai-column {
-    grid-column: auto !important;
   }
 }
 

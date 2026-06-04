@@ -112,6 +112,11 @@ class Session(db.Model):
     display_order = db.Column(db.Integer, nullable=False)
     published = db.Column(db.Boolean, default=True)
 
+    @property
+    def clean_title(self) -> str:
+        import re
+        return re.sub(r"^Session\s+\d+:\s*", "", self.title)
+
 
 class UserProgress(db.Model):
     __tablename__ = "user_progress"
@@ -353,7 +358,7 @@ def check_session_access(user, display_order):
     if display_order <= 10:
         return True
     else:
-        return level in ("Intermediate", "Professional")
+        return level == "Professional"
 
 
 
@@ -760,7 +765,7 @@ def ensure_notes_file_exists(session) -> bool:
 def session_detail(slug: str):
     session = Session.query.filter_by(slug=slug, published=True).first_or_404()
     if not check_session_access(current_user, session.display_order):
-        required_level = "Intermediate" if session.display_order <= 10 else "Professional"
+        required_level = "Professional"
         flash(f"Session '{session.title}' notes and materials are restricted to {required_level} level students. Please upgrade your profile level to access.", "error")
         return redirect(url_for("student_dashboard"))
         

@@ -27,7 +27,6 @@
         <label>Academic Experience Level</label>
         <select name="study_level" required style="padding: 0.8rem 1rem;">
           <option value="Beginner" {% if current_user.study_level == "Beginner" %}selected{% endif %}>Beginner (Introductory Concepts)</option>
-          <option value="Intermediate" {% if current_user.study_level == "Intermediate" %}selected{% endif %}>Intermediate (Standard Analytics)</option>
           <option value="Professional" {% if current_user.study_level == "Professional" %}selected{% endif %}>Professional (ML / Advanced Coding)</option>
         </select>
       </div>

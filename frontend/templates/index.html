@@ -190,7 +190,7 @@
           <span class="badge">{{ session.difficulty }}</span>
           <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;"><i class="fa-regular fa-clock"></i> {{ session.duration }}</span>
         </div>
-        <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 0.75rem;">{{ session.display_order }}. {{ session.title }}</h3>
+        <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 0.75rem;">{{ session.display_order }}. {{ session.clean_title }}</h3>
         <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; height: 4.5rem;">{{ session.description }}</p>
         {% if current_user.is_authenticated %}
           {% if current_user.is_admin %}
