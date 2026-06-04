@@ -182,6 +182,35 @@
           {% endif %}
         </div>
       {% endif %}
+
+      <!-- Sandbox Dataset Upload Section -->
+      <div class="card" style="margin-top: 2rem; padding: 1.5rem; border-top: 4px solid var(--purple-brand); background: rgba(139, 92, 246, 0.02);">
+        <h4 style="font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text); margin-bottom: 0.75rem;">
+          <i class="fa-solid fa-file-csv" style="color: var(--purple-brand);"></i> Sandbox Datasets & Files
+        </h4>
+        <p class="muted" style="font-size: 0.875rem; margin-bottom: 1.25rem;">
+          Upload data files (CSV, Excel, JSON, TXT) here. You can then import and analyze them inside the <strong>Interactive Code Simulator</strong> tab using standard Python code (e.g., <code>import pandas as pd</code> and <code>df = pd.read_csv("filename.csv")</code>).
+        </p>
+
+        <!-- Upload Form Row -->
+        <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+          <input type="file" id="sandboxFileInput" style="display: none;" accept=".csv,.xlsx,.xls,.json,.txt">
+          <button class="btn secondary" onclick="document.getElementById('sandboxFileInput').click()" style="padding: 0.6rem 1.25rem;">
+            <i class="fa-solid fa-folder-open"></i> Select File
+          </button>
+          <span id="sandboxSelectedFileName" class="muted" style="font-size: 0.85rem; font-style: italic;">No file chosen</span>
+          <button class="btn primary" id="sandboxUploadBtn" disabled style="padding: 0.6rem 1.25rem;">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Upload File
+          </button>
+        </div>
+
+        <!-- File List Container -->
+        <h5 style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text);">My Uploaded Sandbox Files:</h5>
+        <div id="sandboxFilesList" style="display: flex; flex-direction: column; gap: 0.5rem; min-height: 50px;">
+          <!-- Managed dynamically via JS -->
+          <p class="muted" style="font-size: 0.85rem; font-style: italic;">Loading files...</p>
+        </div>
+      </div>
     </section>
   </div>
 

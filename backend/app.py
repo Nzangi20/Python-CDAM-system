@@ -843,18 +843,24 @@ def view_notes(session_id: int):
 def run_code():
     import subprocess
     import sys
+    import os
     payload = request.get_json(silent=True) or {}
     code = payload.get("code", "")
     if not code.strip():
         return jsonify({"output": "", "error": "No code provided."})
     
+    # Establish user-specific sandbox workspace directory
+    workspace_dir = os.path.join(app.root_path, "sandbox_workspace", f"user_{current_user.id}")
+    os.makedirs(workspace_dir, exist_ok=True)
+    
     try:
-        # Run code in a subprocess using Python with a 15 second timeout
+        # Run code in a subprocess inside the user's workspace directory
         process = subprocess.run(
             [sys.executable, "-c", code],
             capture_output=True,
             text=True,
-            timeout=15.0
+            timeout=15.0,
+            cwd=workspace_dir
         )
         return jsonify({
             "output": process.stdout,
@@ -871,6 +877,72 @@ def run_code():
             "output": "",
             "error": f"Internal execution error: {str(e)}"
         })
+
+
+@app.route("/api/sandbox/upload", methods=["POST"])
+@login_required
+def sandbox_upload():
+    import os
+    from werkzeug.utils import secure_filename
+    
+    if "file" not in request.files:
+        return jsonify({"error": "No file part in the request"}), 400
+        
+    file = request.files["file"]
+    if file.filename == "":
+        return jsonify({"error": "No selected file"}), 400
+        
+    # Check file size (limit to 15MB)
+    file.seek(0, os.SEEK_END)
+    size = file.tell()
+    file.seek(0)
+    if size > 15 * 1024 * 1024:
+        return jsonify({"error": "File size exceeds 15MB limit."}), 400
+
+    filename = secure_filename(file.filename)
+    if not filename:
+        return jsonify({"error": "Invalid filename."}), 400
+        
+    workspace_dir = os.path.join(app.root_path, "sandbox_workspace", f"user_{current_user.id}")
+    os.makedirs(workspace_dir, exist_ok=True)
+    
+    file.save(os.path.join(workspace_dir, filename))
+    return jsonify({"success": True, "filename": filename, "size": size})
+
+
+@app.route("/api/sandbox/files", methods=["GET"])
+@login_required
+def sandbox_list_files():
+    import os
+    workspace_dir = os.path.join(app.root_path, "sandbox_workspace", f"user_{current_user.id}")
+    if not os.path.exists(workspace_dir):
+        return jsonify([])
+        
+    files = []
+    for f in os.listdir(workspace_dir):
+        path = os.path.join(workspace_dir, f)
+        if os.path.isfile(path):
+            files.append({
+                "name": f,
+                "size": os.path.getsize(path)
+            })
+    return jsonify(files)
+
+
+@app.route("/api/sandbox/files/<filename>", methods=["DELETE"])
+@login_required
+def sandbox_delete_file(filename):
+    import os
+    from werkzeug.utils import secure_filename
+    filename = secure_filename(filename)
+    
+    workspace_dir = os.path.join(app.root_path, "sandbox_workspace", f"user_{current_user.id}")
+    file_path = os.path.join(workspace_dir, filename)
+    
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        os.remove(file_path)
+        return jsonify({"success": True})
+    return jsonify({"error": "File not found"}), 404
 
 
 def _ai_check_access():

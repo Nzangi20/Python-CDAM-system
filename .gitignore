@@ -21,6 +21,7 @@ htmlcov/
 *.sqlite3
 backend/cdam.db
 frontend/static/uploads/notes/*
+backend/sandbox_workspace/
 
 # 4. Virtual Environments & Local Packages
 venv/

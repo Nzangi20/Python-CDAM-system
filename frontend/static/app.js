@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initCodeBlocks();
   initToasts();
   initAIPanel();
+  initSandboxFiles();
   initScrollReveal();
   initStatsCounters();
   initActiveNav();
@@ -422,4 +423,122 @@ function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
+}
+
+function initSandboxFiles() {
+  const fileInput = document.getElementById("sandboxFileInput");
+  const fileNameLabel = document.getElementById("sandboxSelectedFileName");
+  const uploadBtn = document.getElementById("sandboxUploadBtn");
+  const filesList = document.getElementById("sandboxFilesList");
+
+  if (!fileInput || !filesList) return;
+
+  // Format bytes helper
+  function formatBytes(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  // Load and render existing files
+  async function loadFiles() {
+    try {
+      const response = await fetch("/api/sandbox/files");
+      const files = await response.json();
+      
+      if (files.length === 0) {
+        filesList.innerHTML = `<p class="muted" style="font-size: 0.85rem; font-style: italic; padding: 0.5rem 0;">No datasets uploaded yet.</p>`;
+        return;
+      }
+
+      filesList.innerHTML = files.map(file => `
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.02); padding: 0.6rem 1rem; border-radius: 6px; border: 1px solid var(--border); font-size: 0.875rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text);">
+            <i class="fa-regular fa-file" style="color: var(--purple-brand);"></i>
+            <strong style="color: var(--text);">${escapeHtml(file.name)}</strong>
+            <span class="muted" style="font-size: 0.775rem;">(${formatBytes(file.size)})</span>
+          </div>
+          <button class="btn ghost delete-file-btn" data-filename="${encodeURIComponent(file.name)}" style="padding: 0.25rem 0.5rem; color: var(--red-500); hover:background: rgba(239, 68, 68, 0.1);" title="Delete file">
+            <i class="fa-regular fa-trash-can"></i>
+          </button>
+        </div>
+      `).join('');
+
+      // Add delete click listeners
+      filesList.querySelectorAll(".delete-file-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const filename = decodeURIComponent(btn.dataset.filename);
+          if (confirm(`Are you sure you want to delete "${filename}"?`)) {
+            try {
+              const res = await fetch(`/api/sandbox/files/${btn.dataset.filename}`, {
+                method: "DELETE"
+              });
+              const resData = await res.json();
+              if (resData.success) {
+                showToast("File deleted successfully.", "success");
+                loadFiles();
+              } else {
+                showToast(resData.error || "Failed to delete file.", "error");
+              }
+            } catch (err) {
+              showToast("Error deleting file.", "error");
+            }
+          }
+        });
+      });
+    } catch (err) {
+      filesList.innerHTML = `<p class="muted" style="font-size: 0.85rem; color: var(--red-500);">Failed to load files.</p>`;
+    }
+  }
+
+  // Handle file select change
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (file) {
+      fileNameLabel.textContent = file.name;
+      uploadBtn.disabled = false;
+    } else {
+      fileNameLabel.textContent = "No file chosen";
+      uploadBtn.disabled = true;
+    }
+  });
+
+  // Handle upload button click
+  uploadBtn.addEventListener("click", async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    uploadBtn.disabled = true;
+    uploadBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Uploading...`;
+
+    try {
+      const response = await fetch("/api/sandbox/upload", {
+        method: "POST",
+        body: formData
+      });
+      
+      const data = await response.json();
+      if (response.ok && data.success) {
+        showToast("File uploaded successfully to sandbox.", "success");
+        fileInput.value = "";
+        fileNameLabel.textContent = "No file chosen";
+        loadFiles();
+      } else {
+        showToast(data.error || "Upload failed.", "error");
+      }
+    } catch (err) {
+      showToast("Error uploading file.", "error");
+    } finally {
+      uploadBtn.disabled = true;
+      uploadBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Upload File`;
+    }
+  });
+
+  // Initial load
+  loadFiles();
 }
