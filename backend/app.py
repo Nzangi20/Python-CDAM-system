@@ -849,12 +849,12 @@ def run_code():
         return jsonify({"output": "", "error": "No code provided."})
     
     try:
-        # Run code in a subprocess using Python with a 5 second timeout
+        # Run code in a subprocess using Python with a 15 second timeout
         process = subprocess.run(
             [sys.executable, "-c", code],
             capture_output=True,
             text=True,
-            timeout=5.0
+            timeout=15.0
         )
         return jsonify({
             "output": process.stdout,
@@ -864,7 +864,7 @@ def run_code():
     except subprocess.TimeoutExpired:
         return jsonify({
             "output": "",
-            "error": "Execution timed out (5 seconds limit)."
+            "error": "Execution timed out (15 seconds limit)."
         })
     except Exception as e:
         return jsonify({

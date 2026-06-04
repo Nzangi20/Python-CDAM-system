@@ -280,6 +280,17 @@ def test_api_run_code(client):
     assert res_data["error"] == ""
     assert res_data["exit_code"] == 0
     
+    # Verify sandbox can import key libraries
+    resp_imports = client.post(
+        "/api/run-code",
+        json={"code": "import numpy as np\nimport pandas as pd\nimport sklearn\nimport seaborn as sns\nimport openpyxl\nimport statsmodels\nprint('All libraries loaded!')"}
+    )
+    assert resp_imports.status_code == 200
+    res_data_imports = json.loads(resp_imports.data)
+    assert "All libraries loaded!" in res_data_imports["output"]
+    assert res_data_imports["error"] == ""
+    assert res_data_imports["exit_code"] == 0
+
     # Run timeout infinite loop
     resp_timeout = client.post(
         "/api/run-code",
