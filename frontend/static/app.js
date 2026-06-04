@@ -12,6 +12,46 @@ document.addEventListener("DOMContentLoaded", () => {
   if (window.hljs) {
     document.querySelectorAll("pre code").forEach((block) => hljs.highlightElement(block));
   }
+
+  // Event delegation for AI code block action buttons (Copy, Export, Run)
+  document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".ai-code-copy-btn, .ai-code-export-btn, .ai-code-run-btn");
+    if (!btn) return;
+    
+    e.preventDefault();
+    const container = btn.closest(".ai-code-container");
+    if (!container) return;
+    
+    const codeEl = container.querySelector("pre.ai-code-block code");
+    if (!codeEl) return;
+    
+    const code = codeEl.textContent;
+    
+    if (btn.classList.contains("ai-code-copy-btn")) {
+      await navigator.clipboard.writeText(code);
+      showToast("Code copied to clipboard.", "success");
+    } else if (btn.classList.contains("ai-code-export-btn")) {
+      const codeEditor = document.getElementById("codeEditor");
+      if (codeEditor) {
+        codeEditor.value = code;
+        showToast("Code exported to simulator.", "success");
+      }
+      switchTab("code");
+      if (codeEditor) {
+        codeEditor.focus();
+      }
+    } else if (btn.classList.contains("ai-code-run-btn")) {
+      const codeEditor = document.getElementById("codeEditor");
+      const btnRun = document.getElementById("btnRunCode");
+      if (codeEditor) {
+        codeEditor.value = code;
+      }
+      switchTab("code");
+      if (btnRun) {
+        btnRun.click();
+      }
+    }
+  });
 });
 
 function initActiveNav() {
@@ -641,7 +681,25 @@ function formatAIMarkdown(text) {
   codeBlocks.forEach((block, idx) => {
     const placeholder = `<!--CODE_BLOCK_${idx}-->`;
     const langClass = block.lang ? ` class="language-${block.lang}"` : "";
-    const restored = `<pre class="ai-code-block"><code${langClass}>${escapeHtml(block.code)}</code></pre>`;
+    const restored = `
+      <div class="ai-code-container" style="position: relative; margin: 1rem 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: rgba(0, 0, 0, 0.2);">
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.03); padding: 0.4rem 0.75rem; font-size: 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-muted);">
+          <span style="text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">${block.lang || 'python'}</span>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button class="btn ghost ai-code-copy-btn" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; color: var(--text-muted); cursor: pointer;" title="Copy code">
+              <i class="fa-regular fa-copy"></i> Copy
+            </button>
+            <button class="btn ghost ai-code-export-btn" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; color: var(--purple-brand); cursor: pointer;" title="Load into simulator editor">
+              <i class="fa-solid fa-file-import"></i> Export to Editor
+            </button>
+            <button class="btn ghost ai-code-run-btn" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; color: var(--green-500); cursor: pointer;" title="Run in Sandbox simulator">
+              <i class="fa-solid fa-play"></i> Run Code
+            </button>
+          </div>
+        </div>
+        <pre class="ai-code-block" style="margin: 0; padding: 0.75rem; overflow-x: auto; font-family: monospace; background: transparent;"><code${langClass}>${escapeHtml(block.code)}</code></pre>
+      </div>
+    `;
     html = html.replace(placeholder, restored);
   });
 
