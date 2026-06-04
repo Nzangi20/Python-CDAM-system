@@ -330,47 +330,7 @@ function initAIPanel() {
     }
   });
 
-  // --- Auto-trigger hooks for code execution ---
-  window._aiPanelExplainError = async (errorText) => {
-    showAILoading(responseContent, copyBtn);
-    try {
-      const response = await fetch("/api/ai/explain-error", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          session_id: sessionId,
-          code: codeEditor ? codeEditor.value : "",
-          error: errorText,
-        }),
-      });
-      const data = await response.json();
-      lastRawResponse = data.reply || "";
-      renderAIResponse(responseContent, copyBtn, data.reply);
-      // Switch to AI tab
-      switchTab("ai-assistant");
-    } catch {
-      // Silent fail for auto-trigger
-    }
-  };
-
-  window._aiPanelAutoReview = async () => {
-    showAILoading(responseContent, copyBtn);
-    try {
-      const response = await fetch("/api/ai/review-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          session_id: sessionId,
-          code: codeEditor ? codeEditor.value : "",
-        }),
-      });
-      const data = await response.json();
-      lastRawResponse = data.reply || "";
-      renderAIResponse(responseContent, copyBtn, data.reply);
-    } catch {
-      // Silent fail for auto-trigger
-    }
-  };
+  // Auto-trigger hooks for code execution removed to prevent automatic AI generation on run code.
 }
 
 function showAILoading(container, copyBtn) {

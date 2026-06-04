@@ -163,7 +163,7 @@
           <div style="display: flex; flex-direction: column; gap: 0.75rem;">
             {% for session in bookmarked %}
               <div style="display: flex; align-items: center; justify-content: space-between;">
-                <a href="{{ url_for('session_detail', slug=session.slug) }}" style="color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.95rem;">{{ session.display_order }}. {{ session.clean_title }}</a>
+                <a href="{{ url_for('session_detail', slug=session.slug) }}" style="color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.95rem;">Session {{ session.display_order }}: {{ session.clean_title }}</a>
               </div>
             {% endfor %}
           </div>
