@@ -50,7 +50,7 @@
               {% set has_access = not current_user.is_authenticated or check_session_access(current_user, s.display_order) %}
               {% if not current_user.is_authenticated or has_access %}
               <a href="{{ url_for('session_detail', slug=s.slug) if current_user.is_authenticated else url_for('login') }}" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-                <span>{{ s.display_order }}. {{ s.title }}</span>
+                <span>Session {{ s.display_order }}: {{ s.clean_title }}</span>
               </a>
               {% endif %}
             {% endfor %}

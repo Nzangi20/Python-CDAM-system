@@ -115,7 +115,7 @@
           {% set latest = recent_sessions[0] %}
           <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
             <div>
-              <h4 style="font-weight: 700; font-size: 1.15rem; margin-bottom: 0.25rem; color: #fff;">{{ latest.display_order }}. {{ latest.clean_title }}</h4>
+              <h4 style="font-weight: 700; font-size: 1.15rem; margin-bottom: 0.25rem; color: #fff;">Session {{ latest.display_order }}: {{ latest.clean_title }}</h4>
               <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.8); margin: 0;">Resume masterclass session</p>
             </div>
             <a class="btn primary" href="{{ url_for('session_detail', slug=latest.slug) }}" style="background: var(--red-500); border: none; box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);"><i class="fa-solid fa-arrow-right"></i> Resume Session</a>

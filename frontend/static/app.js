@@ -141,17 +141,9 @@ function initCodeBlocks() {
         if (data.error) {
           outputText.textContent = (data.output ? data.output + "\n" : "") + "--- ERROR ---\n" + data.error;
           showToast("Code completed with error.", "error");
-          // Auto-trigger AI error explainer
-          if (window._aiPanelExplainError) {
-            window._aiPanelExplainError(data.error);
-          }
         } else {
           outputText.textContent = data.output || ">>> Execution finished (no standard output to show).";
           showToast("Execution completed successfully.", "success");
-          // Auto-trigger AI code review
-          if (window._aiPanelAutoReview) {
-            window._aiPanelAutoReview();
-          }
         }
       } catch (err) {
         outputText.textContent = ">>> Error: Failed to contact the backend code sandbox. " + err;

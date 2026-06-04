@@ -172,7 +172,7 @@
         {% for s in sessions %}
           <tr>
             <td style="font-weight: 800; color: var(--red-400);">#{{ s.display_order }}</td>
-            <td style="font-weight: 700;">{{ s.title }}</td>
+            <td style="font-weight: 700;">{{ s.clean_title }}</td>
             <td><code>{{ s.slug }}</code></td>
             <td><span class="badge">{{ s.difficulty }}</span></td>
             <td>{{ s.duration }}</td>
