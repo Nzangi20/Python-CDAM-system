@@ -345,16 +345,22 @@ Please analyze this dataset and provide:
 6. **Machine Learning Approaches** — if applicable, suggest ML models suited to this dataset"""
         return self._call(prompt, max_tokens=3000)
 
-    def chat(self, query: str, code: str, session) -> str:
+    def chat(self, query: str, code: str, session, history: list[dict] = None) -> str:
         context = self._build_context(session)
         code_section = ""
         if code and code.strip():
             code_section = f"\n\n**Student's Current Code:**\n```python\n{code[:1500]}\n```"
 
-        prompt = f"""A student asks the following question about this lesson:
+        history_str = ""
+        if history:
+            history_str = "\n\n**Previous Conversation History:**\n"
+            for msg in history:
+                role_name = "Student" if msg["role"] == "user" else "Tutor"
+                history_str += f"{role_name}: {msg['content']}\n\n"
 
+        prompt = f"""You are continuing a conversation with a student.
 {context}{code_section}
-
+{history_str}
 **Student's Question:** {query}
 
 Provide a helpful, educational answer. If the question involves code, include Python examples. Stay focused on the lesson context."""

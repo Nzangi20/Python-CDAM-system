@@ -133,9 +133,14 @@
               <h4 style="font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 0.35rem; margin: 0; color: var(--text);">
                 <i class="fa-solid fa-sparkles" style="color: var(--purple-brand);"></i> AI Response
               </h4>
-              <button class="btn ghost" id="aiCopyBtn" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; display: none;" title="Copy response">
-                <i class="fa-regular fa-copy"></i> Copy
-              </button>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <button class="btn ghost text-muted" id="aiClearChatBtn" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; color: var(--text-muted);" title="Clear Chat History">
+                  <i class="fa-solid fa-trash-can"></i> Clear
+                </button>
+                <button class="btn ghost" id="aiCopyBtn" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; display: none;" title="Copy response">
+                  <i class="fa-regular fa-copy"></i> Copy
+                </button>
+              </div>
             </div>
             <div id="aiResponseContent" class="markdown ai-response-body" style="flex: 1; font-size: 0.875rem; line-height: 1.6;">
               <div style="text-align: center; padding: 1rem; color: var(--text-muted);">

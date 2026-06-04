@@ -103,6 +103,16 @@ class UserSandboxFile(db.Model):
     )
 
 
+class AIChatMessage(db.Model):
+    __tablename__ = "ai_chat_messages"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    session_id = db.Column(db.Integer, db.ForeignKey("sessions.id"), nullable=False, index=True)
+    role = db.Column(db.String(50), nullable=False) # 'user' or 'assistant'
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+
+
 class Session(db.Model):
     __tablename__ = "sessions"
     id = db.Column(db.Integer, primary_key=True)
@@ -1203,9 +1213,88 @@ def ai_chat():
     code = payload.get("code", "")
     if not query:
         return jsonify({"reply": "Please type a question and I will help you!"})
+    
+    # Save student message to chat history
+    try:
+        user_msg = AIChatMessage(
+            user_id=current_user.id,
+            session_id=session_obj.id,
+            role="user",
+            content=query
+        )
+        db.session.add(user_msg)
+        db.session.commit()
+    except Exception:
+        pass
+
+    # Retrieve recent chat history (e.g. last 10 messages) for conversational context
+    history_list = []
+    try:
+        past_msgs = AIChatMessage.query.filter_by(
+            user_id=current_user.id,
+            session_id=session_obj.id
+        ).order_by(AIChatMessage.created_at.asc()).all()
+        # Exclude the message we just added so it's not duplicated
+        history_list = [{
+            "role": msg.role,
+            "content": msg.content
+        } for msg in past_msgs[:-1]]
+    except Exception:
+        pass
+
     _log_ai_usage("chat", session_obj.id)
-    reply = ai.chat(query, code, session_obj)
+    
+    # Generate contextual reply
+    reply = ai.chat(query, code, session_obj, history=history_list)
+    
+    # Save AI response to chat history
+    try:
+        ai_msg = AIChatMessage(
+            user_id=current_user.id,
+            session_id=session_obj.id,
+            role="assistant",
+            content=reply
+        )
+        db.session.add(ai_msg)
+        db.session.commit()
+    except Exception:
+        pass
+
     return jsonify({"reply": reply})
+
+
+@app.route("/api/ai/chat/history", methods=["GET"])
+@login_required
+@student_required
+def get_ai_chat_history():
+    session_id = request.args.get("session_id", type=int)
+    if not session_id:
+        return jsonify([])
+    messages = AIChatMessage.query.filter_by(
+        user_id=current_user.id,
+        session_id=session_id
+    ).order_by(AIChatMessage.created_at.asc()).all()
+    
+    return jsonify([{
+        "role": msg.role,
+        "content": msg.content
+    } for msg in messages])
+
+
+@app.route("/api/ai/chat/clear", methods=["POST"])
+@login_required
+@student_required
+def clear_ai_chat_history():
+    payload = request.get_json(silent=True) or {}
+    session_id = payload.get("session_id")
+    if not session_id:
+        return jsonify({"error": "No session ID provided."}), 400
+    AIChatMessage.query.filter_by(
+        user_id=current_user.id,
+        session_id=session_id
+    ).delete()
+    db.session.commit()
+    return jsonify({"success": True})
 
 
 # --- Admin AI Management ---

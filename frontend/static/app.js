@@ -229,6 +229,7 @@ function initAIPanel() {
   const responseContent = document.getElementById("aiResponseContent");
   const responseCard = document.getElementById("aiResponseCard");
   const copyBtn = document.getElementById("aiCopyBtn");
+  const clearChatBtn = document.getElementById("aiClearChatBtn");
   const chatForm = document.getElementById("aiPanelChatForm");
   const chatInput = document.getElementById("aiPanelChatInput");
   const codeEditor = document.getElementById("codeEditor");
@@ -236,7 +237,173 @@ function initAIPanel() {
 
   let lastRawResponse = "";
 
-  // --- Action Buttons ---
+  // Helper: escape HTML to prevent XSS in user messages
+  function escapeHtml(unsafe) {
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // Scroll response card to bottom
+  function scrollToBottom() {
+    setTimeout(() => {
+      if (responseCard) {
+        responseCard.scrollTop = responseCard.scrollHeight;
+      }
+    }, 50);
+  }
+
+  // Render a list of messages from database history
+  function renderHistory(history) {
+    let html = `<div id="aiChatHistory" style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">`;
+    
+    history.forEach(msg => {
+      if (msg.role === "user") {
+        html += `
+          <div style="display: flex; flex-direction: column; align-items: flex-end; width: 100%; margin-bottom: 0.75rem;">
+            <div style="max-width: 85%; padding: 0.65rem 0.9rem; border-radius: 12px 12px 0 12px; background: linear-gradient(135deg, var(--purple-brand), var(--red-500)); color: #fff; font-size: 0.875rem; line-height: 1.5; font-weight: 500;">
+              ${escapeHtml(msg.content)}
+            </div>
+            <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem; margin-right: 0.25rem;">You</span>
+          </div>
+        `;
+      } else {
+        html += `
+          <div style="display: flex; flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 0.75rem;">
+            <div class="markdown ai-response-body" style="max-width: 85%; padding: 0.75rem 1rem; border-radius: 12px 12px 12px 0; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); color: var(--text); font-size: 0.875rem; line-height: 1.6;">
+              ${formatAIMarkdown(msg.content)}
+            </div>
+            <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem; margin-left: 0.25rem;">AI Assistant</span>
+          </div>
+        `;
+      }
+    });
+    
+    html += `</div>`;
+    responseContent.innerHTML = html;
+    
+    // Highlight code blocks
+    if (window.hljs) {
+      responseContent.querySelectorAll("pre code").forEach((block) => hljs.highlightElement(block));
+    }
+    
+    // Show copy button for last response if there is one
+    const lastAI = [...history].reverse().find(msg => msg.role === "assistant");
+    if (lastAI && copyBtn) {
+      lastRawResponse = lastAI.content;
+      copyBtn.style.display = "inline-flex";
+    } else if (copyBtn) {
+      copyBtn.style.display = "none";
+    }
+    
+    scrollToBottom();
+  }
+
+  // Load chat history on load
+  async function loadChatHistory() {
+    try {
+      const response = await fetch(`/api/ai/chat/history?session_id=${sessionId}`);
+      const history = await response.json();
+      
+      if (history.length === 0) {
+        responseContent.innerHTML = `
+          <div id="aiChatWelcome" style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
+            <i class="fa-solid fa-robot" style="font-size: 2.25rem; margin-bottom: 0.5rem; opacity: 0.3; display: block;"></i>
+            <p>Type a question in the box below to ask the AI agent about Python, coding errors, or concept explanations.</p>
+          </div>
+        `;
+        if (copyBtn) copyBtn.style.display = "none";
+        return;
+      }
+      
+      renderHistory(history);
+    } catch (err) {
+      showToast("Failed to load chat history.", "error");
+    }
+  }
+
+  // Append user bubble to UI immediately
+  function appendUserBubble(content) {
+    const welcome = responseContent.querySelector("#aiChatWelcome");
+    if (welcome) welcome.remove();
+
+    let historyContainer = responseContent.querySelector("#aiChatHistory");
+    if (!historyContainer) {
+      responseContent.innerHTML = `<div id="aiChatHistory" style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;"></div>`;
+      historyContainer = responseContent.querySelector("#aiChatHistory");
+    }
+    
+    const userDiv = document.createElement("div");
+    userDiv.style.cssText = "display: flex; flex-direction: column; align-items: flex-end; width: 100%; margin-bottom: 0.75rem;";
+    userDiv.innerHTML = `
+      <div style="max-width: 85%; padding: 0.65rem 0.9rem; border-radius: 12px 12px 0 12px; background: linear-gradient(135deg, var(--purple-brand), var(--red-500)); color: #fff; font-size: 0.875rem; line-height: 1.5; font-weight: 500;">
+        ${escapeHtml(content)}
+      </div>
+      <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem; margin-right: 0.25rem;">You</span>
+    `;
+    historyContainer.appendChild(userDiv);
+  }
+
+  // Append AI loading bubble
+  function appendAILoadingBubble() {
+    const welcome = responseContent.querySelector("#aiChatWelcome");
+    if (welcome) welcome.remove();
+
+    let historyContainer = responseContent.querySelector("#aiChatHistory");
+    if (!historyContainer) {
+      responseContent.innerHTML = `<div id="aiChatHistory" style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;"></div>`;
+      historyContainer = responseContent.querySelector("#aiChatHistory");
+    }
+    
+    const loadingDiv = document.createElement("div");
+    loadingDiv.id = "aiLoadingBubble";
+    loadingDiv.style.cssText = "display: flex; flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 0.75rem;";
+    loadingDiv.innerHTML = `
+      <div style="padding: 0.75rem 1rem; border-radius: 12px 12px 12px 0; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); color: var(--text); font-size: 0.875rem;">
+        <div class="ai-loading">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+      <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem; margin-left: 0.25rem;">AI Assistant is thinking...</span>
+    `;
+    historyContainer.appendChild(loadingDiv);
+    return loadingDiv;
+  }
+
+  // Append AI message bubble to UI
+  function appendAIBubble(content) {
+    const welcome = responseContent.querySelector("#aiChatWelcome");
+    if (welcome) welcome.remove();
+
+    let historyContainer = responseContent.querySelector("#aiChatHistory");
+    if (!historyContainer) {
+      responseContent.innerHTML = `<div id="aiChatHistory" style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;"></div>`;
+      historyContainer = responseContent.querySelector("#aiChatHistory");
+    }
+    
+    const aiDiv = document.createElement("div");
+    aiDiv.style.cssText = "display: flex; flex-direction: column; align-items: flex-start; width: 100%; margin-bottom: 0.75rem;";
+    aiDiv.innerHTML = `
+      <div class="markdown ai-response-body" style="max-width: 85%; padding: 0.75rem 1rem; border-radius: 12px 12px 12px 0; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); color: var(--text); font-size: 0.875rem; line-height: 1.6;">
+        ${formatAIMarkdown(content)}
+      </div>
+      <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem; margin-left: 0.25rem;">AI Assistant</span>
+    `;
+    historyContainer.appendChild(aiDiv);
+    
+    // Highlight code blocks
+    if (window.hljs) {
+      aiDiv.querySelectorAll("pre code").forEach((block) => hljs.highlightElement(block));
+    }
+  }
+
+  // Run on startup
+  loadChatHistory();
+
+  // --- Action Buttons (Keep support in case any triggers remain) ---
   document.querySelectorAll(".ai-action-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const action = btn.dataset.aiAction;
@@ -249,12 +416,15 @@ function initAIPanel() {
       let endpoint = `/api/ai/${action}`;
       let body = { session_id: sessionId, code };
 
-      // For explain-error, include the last error
       if (action === "explain-error") {
         body.error = lastError;
       }
 
-      showAILoading(responseContent, copyBtn);
+      appendUserBubble(`Perform action: ${action.replace("-", " ")}`);
+      scrollToBottom();
+
+      const loadingBubble = appendAILoadingBubble();
+      scrollToBottom();
 
       try {
         const response = await fetch(endpoint, {
@@ -263,10 +433,21 @@ function initAIPanel() {
           body: JSON.stringify(body),
         });
         const data = await response.json();
-        lastRawResponse = data.reply || "";
-        renderAIResponse(responseContent, copyBtn, data.reply);
+        
+        loadingBubble.remove();
+        
+        if (data.reply) {
+          lastRawResponse = data.reply;
+          appendAIBubble(data.reply);
+          if (copyBtn) copyBtn.style.display = "inline-flex";
+        } else {
+          appendAIBubble("No response received.");
+        }
+        scrollToBottom();
       } catch (err) {
-        renderAIResponse(responseContent, copyBtn, "AI service is temporarily unavailable. Please try again.");
+        loadingBubble.remove();
+        appendAIBubble("AI service is temporarily unavailable. Please try again.");
+        scrollToBottom();
       }
     });
   });
@@ -277,7 +458,11 @@ function initAIPanel() {
       const file = datasetInput.files[0];
       if (!file) return;
 
-      showAILoading(responseContent, copyBtn);
+      appendUserBubble(`Analyze uploaded dataset: ${file.name}`);
+      scrollToBottom();
+
+      const loadingBubble = appendAILoadingBubble();
+      scrollToBottom();
 
       const formData = new FormData();
       formData.append("session_id", sessionId);
@@ -289,10 +474,21 @@ function initAIPanel() {
           body: formData,
         });
         const data = await response.json();
-        lastRawResponse = data.reply || "";
-        renderAIResponse(responseContent, copyBtn, data.reply);
+        
+        loadingBubble.remove();
+
+        if (data.reply) {
+          lastRawResponse = data.reply;
+          appendAIBubble(data.reply);
+          if (copyBtn) copyBtn.style.display = "inline-flex";
+        } else {
+          appendAIBubble("No response received.");
+        }
+        scrollToBottom();
       } catch (err) {
-        renderAIResponse(responseContent, copyBtn, "Failed to analyze dataset. Please try again.");
+        loadingBubble.remove();
+        appendAIBubble("Failed to analyze dataset. Please try again.");
+        scrollToBottom();
       }
       datasetInput.value = "";
     });
@@ -305,9 +501,13 @@ function initAIPanel() {
     if (!query) return;
     chatInput.value = "";
 
-    const code = codeEditor ? codeEditor.value : "";
+    appendUserBubble(query);
+    scrollToBottom();
 
-    showAILoading(responseContent, copyBtn);
+    const loadingBubble = appendAILoadingBubble();
+    scrollToBottom();
+
+    const code = codeEditor ? codeEditor.value : "";
 
     try {
       const response = await fetch("/api/ai/chat", {
@@ -316,10 +516,21 @@ function initAIPanel() {
         body: JSON.stringify({ session_id: sessionId, query, code }),
       });
       const data = await response.json();
-      lastRawResponse = data.reply || "";
-      renderAIResponse(responseContent, copyBtn, data.reply);
+      
+      loadingBubble.remove();
+
+      if (data.reply) {
+        lastRawResponse = data.reply;
+        appendAIBubble(data.reply);
+        if (copyBtn) copyBtn.style.display = "inline-flex";
+      } else {
+        appendAIBubble("No response received.");
+      }
+      scrollToBottom();
     } catch (err) {
-      renderAIResponse(responseContent, copyBtn, "AI service is temporarily unavailable. Please try again.");
+      loadingBubble.remove();
+      appendAIBubble("AI service is temporarily unavailable. Please try again.");
+      scrollToBottom();
     }
   });
 
@@ -331,7 +542,25 @@ function initAIPanel() {
     }
   });
 
-  // Auto-trigger hooks for code execution removed to prevent automatic AI generation on run code.
+  // --- Clear Chat Button ---
+  clearChatBtn?.addEventListener("click", async () => {
+    if (confirm("Are you sure you want to clear this conversation history?")) {
+      try {
+        const response = await fetch("/api/ai/chat/clear", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id: sessionId })
+        });
+        const data = await response.json();
+        if (data.success) {
+          showToast("Conversation history cleared.", "success");
+          loadChatHistory();
+        }
+      } catch (err) {
+        showToast("Failed to clear chat history.", "error");
+      }
+    }
+  });
 }
 
 function showAILoading(container, copyBtn) {
