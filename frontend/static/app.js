@@ -143,7 +143,7 @@ function initCodeBlocks() {
           outputText.textContent = (data.output ? data.output + "\n" : "") + "--- ERROR ---\n" + data.error;
           showToast("Code completed with error.", "error");
         } else {
-          outputText.textContent = data.output || ">>> Execution finished (no standard output to show).";
+          outputText.textContent = data.output || ">>> Execution finished (no standard output to show).\n\nHint: Use the print() function to display results, values, or dataframe contents in the console.\nExample: print(df.head())";
           showToast("Execution completed successfully.", "success");
         }
       } catch (err) {
