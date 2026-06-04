@@ -31,7 +31,7 @@ class BaseProvider(ABC):
 class GeminiProvider(BaseProvider):
     """Google Gemini API provider using google-generativeai SDK."""
 
-    def __init__(self, api_key: str, model_name: str = "gemini-2.0-flash"):
+    def __init__(self, api_key: str, model_name: str = "gemini-1.5-flash"):
         import google.generativeai as genai
         genai.configure(api_key=api_key)
         self._model_name = model_name
