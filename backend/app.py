@@ -96,6 +96,7 @@ class UserSandboxFile(db.Model):
     filename = db.Column(db.String(255), nullable=False)
     file_data = db.Column(db.LargeBinary, nullable=False)
     file_size = db.Column(db.Integer, nullable=False)
+    is_global = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
 
     __table_args__ = (
@@ -879,8 +880,14 @@ def run_code():
     
     # Dynamically restore missing sandbox files from database
     try:
-        db_files = UserSandboxFile.query.filter_by(user_id=current_user.id).all()
-        for db_file in db_files:
+        private_files = UserSandboxFile.query.filter_by(user_id=current_user.id, is_global=False).all()
+        global_files = UserSandboxFile.query.filter_by(is_global=True).all()
+        for db_file in global_files:
+            local_path = os.path.join(workspace_dir, db_file.filename)
+            if not os.path.exists(local_path):
+                with open(local_path, "wb") as lf:
+                    lf.write(db_file.file_data)
+        for db_file in private_files:
             local_path = os.path.join(workspace_dir, db_file.filename)
             if not os.path.exists(local_path):
                 with open(local_path, "wb") as lf:
@@ -949,10 +956,19 @@ def sandbox_upload():
         
     # Save to database to ensure durability/persistence
     try:
-        sandbox_file = UserSandboxFile.query.filter_by(user_id=current_user.id, filename=filename).first()
-        if not sandbox_file:
-            sandbox_file = UserSandboxFile(user_id=current_user.id, filename=filename)
-            db.session.add(sandbox_file)
+        is_global = current_user.is_admin
+        if is_global:
+            sandbox_file = UserSandboxFile.query.filter_by(filename=filename, is_global=True).first()
+            if not sandbox_file:
+                sandbox_file = UserSandboxFile(user_id=current_user.id, filename=filename, is_global=True)
+                db.session.add(sandbox_file)
+            else:
+                sandbox_file.user_id = current_user.id
+        else:
+            sandbox_file = UserSandboxFile.query.filter_by(user_id=current_user.id, filename=filename, is_global=False).first()
+            if not sandbox_file:
+                sandbox_file = UserSandboxFile(user_id=current_user.id, filename=filename, is_global=False)
+                db.session.add(sandbox_file)
         sandbox_file.file_data = file_bytes
         sandbox_file.file_size = size
         db.session.commit()
@@ -971,21 +987,41 @@ def sandbox_list_files():
     
     try:
         # Load from database to ensure durability
-        db_files = UserSandboxFile.query.filter_by(user_id=current_user.id).all()
+        private_files = UserSandboxFile.query.filter_by(user_id=current_user.id, is_global=False).all()
+        global_files = UserSandboxFile.query.filter_by(is_global=True).all()
         
         # Restore files that are missing on disk
-        for db_file in db_files:
+        for db_file in global_files:
+            local_path = os.path.join(workspace_dir, db_file.filename)
+            if not os.path.exists(local_path):
+                with open(local_path, "wb") as lf:
+                    lf.write(db_file.file_data)
+                    
+        for db_file in private_files:
             local_path = os.path.join(workspace_dir, db_file.filename)
             if not os.path.exists(local_path):
                 with open(local_path, "wb") as lf:
                     lf.write(db_file.file_data)
                     
         files = []
-        for db_file in db_files:
+        # Add global files
+        for db_file in global_files:
             files.append({
                 "name": db_file.filename,
-                "size": db_file.file_size
+                "size": db_file.file_size,
+                "is_global": True,
+                "can_delete": current_user.is_admin
             })
+        # Add private files (filter out duplicates)
+        global_names = {f.filename for f in global_files}
+        for db_file in private_files:
+            if db_file.filename not in global_names:
+                files.append({
+                    "name": db_file.filename,
+                    "size": db_file.file_size,
+                    "is_global": False,
+                    "can_delete": True
+                })
         return jsonify(files)
     except Exception as e:
         return jsonify({"error": f"Failed to load files: {str(e)}"}), 500
@@ -1000,10 +1036,18 @@ def sandbox_delete_file(filename):
     
     # Delete from database first
     try:
-        sandbox_file = UserSandboxFile.query.filter_by(user_id=current_user.id, filename=filename).first()
+        if current_user.is_admin:
+            # Admins can delete global files AND their own private files
+            sandbox_file = UserSandboxFile.query.filter_by(filename=filename).first()
+        else:
+            # Students can only delete their own private files
+            sandbox_file = UserSandboxFile.query.filter_by(user_id=current_user.id, filename=filename, is_global=False).first()
+            
         if sandbox_file:
             db.session.delete(sandbox_file)
             db.session.commit()
+        else:
+            return jsonify({"error": "File not found or permission denied"}), 404
     except Exception as e:
         return jsonify({"error": f"Failed to delete record: {str(e)}"}), 500
         
@@ -2134,6 +2178,11 @@ def migrate_schema() -> None:
         if "study_level" not in columns:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE exams ADD COLUMN study_level VARCHAR(30) DEFAULT 'Beginner'"))
+    if "user_sandbox_files" in inspector.get_table_names():
+        columns = {col["name"] for col in inspector.get_columns("user_sandbox_files")}
+        if "is_global" not in columns:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE user_sandbox_files ADD COLUMN is_global BOOLEAN DEFAULT 0"))
 
 
 def initialize():

@@ -684,14 +684,19 @@ function initSandboxFiles() {
 
       filesList.innerHTML = files.map(file => `
         <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.02); padding: 0.6rem 1rem; border-radius: 6px; border: 1px solid var(--border); font-size: 0.875rem;">
-          <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text);">
+          <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text); flex-wrap: wrap;">
             <i class="fa-regular fa-file" style="color: var(--purple-brand);"></i>
             <strong style="color: var(--text);">${escapeHtml(file.name)}</strong>
             <span class="muted" style="font-size: 0.775rem;">(${formatBytes(file.size)})</span>
+            ${file.is_global ? '<span class="badge" style="background: rgba(139, 92, 246, 0.15); color: var(--purple-brand); font-size: 0.7rem; padding: 0.15rem 0.4rem; border-radius: 4px; border: 1px solid rgba(139, 92, 246, 0.3); font-weight: 600;">Global Dataset</span>' : ''}
           </div>
-          <button class="btn ghost delete-file-btn" data-filename="${encodeURIComponent(file.name)}" style="padding: 0.25rem 0.5rem; color: var(--red-500); hover:background: rgba(239, 68, 68, 0.1);" title="Delete file">
-            <i class="fa-regular fa-trash-can"></i>
-          </button>
+          ${file.can_delete ? `
+            <button class="btn ghost delete-file-btn" data-filename="${encodeURIComponent(file.name)}" style="padding: 0.25rem 0.5rem; color: var(--red-500); hover:background: rgba(239, 68, 68, 0.1);" title="Delete file">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+          ` : `
+            <span class="muted" style="font-size: 0.75rem; color: var(--text-muted); font-style: italic; padding: 0.25rem 0.5rem;"><i class="fa-solid fa-lock"></i> Read-only</span>
+          `}
         </div>
       `).join('');
 
