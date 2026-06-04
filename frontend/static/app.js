@@ -360,12 +360,19 @@ function renderAIResponse(container, copyBtn, text) {
 function formatAIMarkdown(text) {
   if (!text) return "";
 
-  let html = text
-    // Code blocks (```python ... ```)
-    .replace(/```(\w+)?\n([\s\S]*?)```/g, (_, lang, code) => {
-      const langClass = lang ? ` class="language-${lang}"` : "";
-      return `<pre class="ai-code-block"><code${langClass}>${escapeHtml(code.trim())}</code></pre>`;
-    })
+  // Normalize newlines (CRLF/CR -> LF)
+  text = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+  const codeBlocks = [];
+
+  // Extract code blocks first to protect them from downstream markdown replacements
+  let html = text.replace(/```(\w+)?\n([\s\S]*?)```/g, (_, lang, code) => {
+    const placeholder = `<!--CODE_BLOCK_${codeBlocks.length}-->`;
+    codeBlocks.push({ lang, code: code.trim() });
+    return placeholder;
+  });
+
+  html = html
     // Inline code
     .replace(/`([^`]+)`/g, '<code class="ai-inline-code">$1</code>')
     // Headers
@@ -390,7 +397,7 @@ function formatAIMarkdown(text) {
       const tag = isHeader ? 'th' : 'td';
       return '<tr>' + cells.map(c => `<${tag} style="padding: 0.4rem 0.75rem; border: 1px solid var(--border);">${c.trim()}</${tag}>`).join('') + '</tr>';
     })
-    // Line breaks
+    // Line breaks for standard text
     .replace(/\n\n/g, "</p><p>")
     .replace(/\n/g, "<br>");
 
@@ -399,6 +406,14 @@ function formatAIMarkdown(text) {
 
   // Clean up empty elements
   html = html.replace(/<p><\/p>/g, "").replace(/<p><br><\/p>/g, "");
+
+  // Restore the code blocks with preserved spacing and formatting
+  codeBlocks.forEach((block, idx) => {
+    const placeholder = `<!--CODE_BLOCK_${idx}-->`;
+    const langClass = block.lang ? ` class="language-${block.lang}"` : "";
+    const restored = `<pre class="ai-code-block"><code${langClass}>${escapeHtml(block.code)}</code></pre>`;
+    html = html.replace(placeholder, restored);
+  });
 
   return html;
 }
