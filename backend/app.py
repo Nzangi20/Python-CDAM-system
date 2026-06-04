@@ -103,6 +103,8 @@ class Session(db.Model):
     code_examples = db.Column(db.Text, nullable=False)
     resources = db.Column(db.Text, nullable=False)
     notes_file_path = db.Column(db.String(500), nullable=True)
+    notes_file_name = db.Column(db.String(255), nullable=True)
+    notes_file_data = db.Column(db.LargeBinary, nullable=True)
     video_url = db.Column(db.String(500), nullable=True)
     quiz_json = db.Column(db.Text, nullable=False, default="[]")
     duration = db.Column(db.String(50), nullable=False)
@@ -734,6 +736,25 @@ def transcript():
     )
 
 
+def ensure_notes_file_exists(session) -> bool:
+    """Ensure session's note file exists on disk, auto-restoring from DB BLOB if missing."""
+    if not session or not session.notes_file_path:
+        return False
+    filename = session.notes_file_path.split("/")[-1]
+    filepath = UPLOADS_DIR / filename
+    if filepath.exists() and filepath.is_file():
+        return True
+    if session.notes_file_data:
+        try:
+            UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+            with open(filepath, "wb") as f:
+                f.write(session.notes_file_data)
+            return True
+        except Exception as e:
+            app.logger.error(f"Failed to auto-restore session note file: {e}")
+    return False
+
+
 @app.route("/session/<slug>")
 @login_required
 def session_detail(slug: str):
@@ -757,16 +778,14 @@ def session_detail(slug: str):
     notes_exist = False
     is_viewable = False
     notes_filename = ""
-    if session.notes_file_path and session.notes_file_path.strip() and session.notes_file_path != 'None' and session.notes_file_path != 'null':
+    if ensure_notes_file_exists(session):
         filename = session.notes_file_path.split("/")[-1]
-        filepath = UPLOADS_DIR / filename
-        if filepath.exists() and filepath.is_file():
-            notes_exist = True
-            notes_filename = filename.split("-", 2)[-1] if len(filename.split("-", 2)) > 2 else filename
-            import os
-            ext = os.path.splitext(filename)[1].lower()
-            if ext in {".pdf", ".txt", ".md", ".png", ".jpg", ".jpeg", ".gif", ".svg"}:
-                is_viewable = True
+        notes_exist = True
+        notes_filename = filename.split("-", 2)[-1] if len(filename.split("-", 2)) > 2 else filename
+        import os
+        ext = os.path.splitext(filename)[1].lower()
+        if ext in {".pdf", ".txt", ".md", ".png", ".jpg", ".jpeg", ".gif", ".svg"}:
+            is_viewable = True
             
     return render_template(
         "session_detail.html",
@@ -790,7 +809,7 @@ def session_detail(slug: str):
 def download_notes(session_id: int):
     from flask import send_from_directory
     session = db.session.get(Session, session_id)
-    if not session or not session.notes_file_path:
+    if not session or not ensure_notes_file_exists(session):
         flash("Notes file not found.", "error")
         return redirect(request.referrer or url_for("student_dashboard"))
     if not check_session_access(current_user, session.display_order):
@@ -805,7 +824,7 @@ def download_notes(session_id: int):
 @login_required
 def view_notes(session_id: int):
     session = db.session.get(Session, session_id)
-    if not session or not session.notes_file_path:
+    if not session or not ensure_notes_file_exists(session):
         flash("Notes file not found.", "error")
         return redirect(request.referrer or url_for("student_dashboard"))
     if not check_session_access(current_user, session.display_order):
@@ -1424,13 +1443,18 @@ def admin_session_new():
         slug = slugify(request.form.get("slug") or title)
         uploaded_note = request.files.get("notes_file")
         notes_path = None
+        notes_name = None
+        notes_data = None
         if uploaded_note and uploaded_note.filename:
             UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
             safe_name = secure_filename(uploaded_note.filename)
             stored_name = f"{slug}-{int(datetime.now(UTC).timestamp())}-{safe_name}"
             destination = UPLOADS_DIR / stored_name
+            notes_data = uploaded_note.read()
+            uploaded_note.seek(0)
             uploaded_note.save(destination)
             notes_path = f"uploads/notes/{stored_name}"
+            notes_name = safe_name
         session = Session(
             title=title,
             slug=slug,
@@ -1443,6 +1467,8 @@ def admin_session_new():
             code_examples=request.form.get("code_examples", ""),
             resources=request.form.get("resources", ""),
             notes_file_path=notes_path,
+            notes_file_name=notes_name,
+            notes_file_data=notes_data,
             video_url=request.form.get("video_url", "").strip() or None,
             duration=request.form.get("duration", "60 min"),
             difficulty=request.form.get("difficulty", "Beginner"),
@@ -1484,8 +1510,11 @@ def admin_session_edit(session_id: int):
             safe_name = secure_filename(uploaded_note.filename)
             stored_name = f"{session_obj.slug}-{int(datetime.now(UTC).timestamp())}-{safe_name}"
             destination = UPLOADS_DIR / stored_name
+            session_obj.notes_file_data = uploaded_note.read()
+            uploaded_note.seek(0)
             uploaded_note.save(destination)
             session_obj.notes_file_path = f"uploads/notes/{stored_name}"
+            session_obj.notes_file_name = safe_name
         session_obj.duration = request.form.get("duration", "60 min")
         session_obj.difficulty = request.form.get("difficulty", "Beginner")
         session_obj.display_order = int(request.form.get("display_order", session_obj.display_order))
@@ -1857,6 +1886,13 @@ def migrate_schema() -> None:
         if "instructions" not in columns:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE sessions ADD COLUMN instructions TEXT"))
+        if "notes_file_name" not in columns:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE sessions ADD COLUMN notes_file_name VARCHAR(255)"))
+        if "notes_file_data" not in columns:
+            with db.engine.begin() as conn:
+                db_type = "LONGBLOB" if "mysql" in str(db.engine.url) else "BLOB"
+                conn.execute(text(f"ALTER TABLE sessions ADD COLUMN notes_file_data {db_type}"))
     if "users" in inspector.get_table_names():
         columns = {col["name"] for col in inspector.get_columns("users")}
         if "study_level" not in columns:

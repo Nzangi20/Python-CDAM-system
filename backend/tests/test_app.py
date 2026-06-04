@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_DIR))
 
-from app import app, db, User, Session, Exam, Question, ExamAttemptRecord, IntegrityLog, UserProgress  # noqa: E402
+from app import app, db, User, Session, Exam, Question, ExamAttemptRecord, IntegrityLog, UserProgress, UPLOADS_DIR  # noqa: E402
 from seed_data import SESSIONS  # noqa: E402
 from sqlalchemy.pool import StaticPool
 
@@ -675,6 +675,82 @@ def test_ai_rate_limiter(client):
     finally:
         with app.app_context():
             get_ai_service()._provider = old_provider
+
+
+def test_session_material_persistence_and_restoration(client):
+    import io
+    import os
+    
+    # Login as admin
+    login_admin(client)
+    
+    with app.app_context():
+        sess = Session.query.first()
+        sess_id = sess.id
+        sess_slug = sess.slug
+        
+    file_content = b"This is a persistent revision note data."
+    data = {
+        "title": "Updated Session with Note",
+        "slug": sess_slug,
+        "description": "Short desc",
+        "content": "Full markdown content",
+        "objectives": "* Obj 1",
+        "expected_outcomes": "Outcomes",
+        "learning_notes": "Learning Notes",
+        "instructions": "Step 1: run code",
+        "code_examples": "print('hello')",
+        "resources": "http://example.com",
+        "video_url": "http://youtube.com/embed/test",
+        "notes_file": (io.BytesIO(file_content), "test_revision_notes.txt"),
+        "duration": "45 min",
+        "difficulty": "Beginner",
+        "display_order": "1",
+        "published": "on"
+    }
+    
+    resp = client.post(f"/admin/session/{sess_id}/edit", data=data)
+    assert resp.status_code == 302
+    
+    with app.app_context():
+        sess_updated = db.session.get(Session, sess_id)
+        assert sess_updated.notes_file_name == "test_revision_notes.txt"
+        assert sess_updated.notes_file_data == file_content
+        notes_path = sess_updated.notes_file_path
+        
+    filename = notes_path.split("/")[-1]
+    filepath = UPLOADS_DIR / filename
+    
+    if filepath.exists():
+        os.remove(filepath)
+    assert not filepath.exists()
+    
+    # Log out admin
+    client.get("/logout")
+    
+    register_and_login(client, reg_number="EB3/11111/11")
+    
+    resp_detail = client.get(f"/session/{sess_slug}")
+    assert resp_detail.status_code == 200
+    
+    # Check physical file restored
+    assert filepath.exists()
+    with open(filepath, "rb") as f:
+        assert f.read() == file_content
+        
+    # Check download works
+    resp_dl = client.get(f"/session/{sess_id}/download")
+    assert resp_dl.status_code == 200
+    assert resp_dl.data == file_content
+    
+    # Close response to release Windows file lock
+    resp_dl.close()
+    # Cleanup physical file
+    try:
+        if filepath.exists():
+            os.remove(filepath)
+    except Exception:
+        pass
 
 
 
