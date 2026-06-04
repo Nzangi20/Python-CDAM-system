@@ -53,6 +53,65 @@ class GeminiProvider(BaseProvider):
             return f"AI service encountered an error: {exc}"
 
 
+class GroqProvider(BaseProvider):
+    """Groq API provider using standard library HTTP requests or requests library."""
+
+    def __init__(self, api_key: str, model_name: str = "llama-3.3-70b-versatile"):
+        self._api_key = api_key
+        self._model_name = model_name
+
+    def generate(self, prompt: str, system_instruction: str = "", max_tokens: int = 2048) -> str:
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {self._api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        messages = []
+        if system_instruction:
+            messages.append({"role": "system", "content": system_instruction})
+        messages.append({"role": "user", "content": prompt})
+
+        data = {
+            "model": self._model_name,
+            "messages": messages,
+            "max_tokens": max_tokens,
+            "temperature": 0.7
+        }
+
+        try:
+            import requests
+            response = requests.post(url, json=data, headers=headers, timeout=30)
+            if response.status_code == 200:
+                res_json = response.json()
+                choices = res_json.get("choices", [])
+                if choices:
+                    return choices[0]["message"]["content"].strip()
+                return "Error: Empty choices list received from Groq API."
+            return f"AI service (Groq) error: HTTP {response.status_code} - {response.text}"
+        except ImportError:
+            import urllib.request
+            import json
+            try:
+                req = urllib.request.Request(
+                    url, 
+                    data=json.dumps(data).encode("utf-8"), 
+                    headers=headers, 
+                    method="POST"
+                )
+                with urllib.request.urlopen(req, timeout=30) as response:
+                    res_body = response.read().decode("utf-8")
+                    res_json = json.loads(res_body)
+                    choices = res_json.get("choices", [])
+                    if choices:
+                        return choices[0]["message"]["content"].strip()
+                return "Error: Empty response from Groq API."
+            except Exception as exc:
+                return f"AI service (Groq urllib) encountered an error: {exc}"
+        except Exception as exc:
+            return f"AI service (Groq) encountered an error: {exc}"
+
+
 # ---------------------------------------------------------------------------
 # Rate limiter
 # ---------------------------------------------------------------------------
@@ -133,7 +192,7 @@ class AIService:
 
     def _call(self, prompt: str, max_tokens: int = 2048) -> str:
         if not self._provider:
-            return "AI service is not configured. Please add a GEMINI_API_KEY to the environment."
+            return "AI service is not configured. Please add a GROQ_API_KEY or GEMINI_API_KEY to the environment."
         return self._provider.generate(prompt, system_instruction=SYSTEM_INSTRUCTION, max_tokens=max_tokens)
 
     # ----- Feature methods -----
@@ -308,29 +367,46 @@ Provide a helpful, educational answer. If the question involves code, include Py
 
 def create_ai_service() -> AIService:
     """Factory function to create the AI service with environment configuration."""
-    api_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    if not api_key:
-        return AIService(provider=None)
-    try:
-        provider = GeminiProvider(api_key=api_key)
-        return provider, AIService(provider=provider)
-    except Exception:
-        return AIService(provider=None)
+    groq_key = os.environ.get("GROQ_API_KEY", "").strip()
+    gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    
+    if groq_key:
+        try:
+            provider = GroqProvider(api_key=groq_key)
+            return provider, AIService(provider=provider)
+        except Exception:
+            pass
+            
+    if gemini_key:
+        try:
+            provider = GeminiProvider(api_key=gemini_key)
+            return provider, AIService(provider=provider)
+        except Exception:
+            pass
+            
+    return AIService(provider=None)
 
 
 def get_ai_service() -> AIService:
     """Get or create the global AI service singleton."""
     global _ai_service_instance
     if _ai_service_instance is None:
-        api_key = os.environ.get("GEMINI_API_KEY", "").strip()
-        if api_key:
+        groq_key = os.environ.get("GROQ_API_KEY", "").strip()
+        gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
+        
+        provider = None
+        if groq_key:
             try:
-                provider = GeminiProvider(api_key=api_key)
-                _ai_service_instance = AIService(provider=provider)
+                provider = GroqProvider(api_key=groq_key)
             except Exception:
-                _ai_service_instance = AIService(provider=None)
-        else:
-            _ai_service_instance = AIService(provider=None)
+                pass
+        elif gemini_key:
+            try:
+                provider = GeminiProvider(api_key=gemini_key)
+            except Exception:
+                pass
+                
+        _ai_service_instance = AIService(provider=provider)
     return _ai_service_instance
 
 

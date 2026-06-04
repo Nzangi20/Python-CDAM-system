@@ -753,6 +753,32 @@ def test_session_material_persistence_and_restoration(client):
         pass
 
 
+def test_groq_provider_initialization():
+    from ai_service import GroqProvider, get_ai_service
+    import os
+    
+    # Test initializer
+    provider = GroqProvider(api_key="mock-groq-key")
+    assert provider._api_key == "mock-groq-key"
+    assert provider._model_name == "llama-3.3-70b-versatile"
+    
+    # Test singleton fallback under env variables
+    os.environ["GROQ_API_KEY"] = "mock-groq-key-env"
+    os.environ.pop("GEMINI_API_KEY", None)
+    
+    # Re-initialize singleton instance
+    import ai_service
+    ai_service._ai_service_instance = None
+    ai = get_ai_service()
+    assert ai.is_configured
+    assert isinstance(ai._provider, GroqProvider)
+    assert ai._provider._api_key == "mock-groq-key-env"
+    
+    # Cleanup env
+    os.environ.pop("GROQ_API_KEY", None)
+    ai_service._ai_service_instance = None
+
+
 
 
 
