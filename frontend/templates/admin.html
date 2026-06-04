@@ -48,6 +48,11 @@
     <p>{{ recent_registrations | length }}</p>
     <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-user-plus"></i> Registrations</span>
   </div>
+  <div class="stat-card" style="border-color: rgba(139, 92, 246, 0.2);">
+    <h3 style="color: var(--purple-brand);">AI Service</h3>
+    <p style="color: var(--purple-brand); font-size: 1.4rem; line-height: 2.2rem; font-weight: 800;">{% if ai_enabled %}ACTIVE{% else %}DISABLED{% endif %}</p>
+    <span class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-robot"></i> {{ ai_total_requests }} Requests</span>
+  </div>
 </section>
 
 <!-- Main Admin Tabs -->
@@ -57,6 +62,7 @@
   <button class="tab" data-tab="exam-results"><i class="fa-solid fa-square-poll-horizontal"></i> Exam Results</button>
   <button class="tab" data-tab="discussions"><i class="fa-solid fa-comments"></i> Discussions Moderation</button>
   <button class="tab" data-tab="comms"><i class="fa-solid fa-envelope-open-text"></i> System Notifications</button>
+  <button class="tab" data-tab="ai-management"><i class="fa-solid fa-robot"></i> AI Management</button>
 </div>
 
 <!-- Student Roster Panel -->
@@ -384,6 +390,77 @@
     </div>
   </div>
 </section>
+
+<!-- AI Management Panel -->
+<section class="tab-panel card" id="ai-management">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h3 style="font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text);">
+        <i class="fa-solid fa-gears" style="color: var(--purple-brand);"></i> AI Configuration & Usage
+      </h3>
+      <p class="muted" style="font-size: 0.9rem;">Enable/disable AI learning assistance and monitor real-time API invocation analytics.</p>
+    </div>
+    <div>
+      <form method="post" action="{{ url_for('admin_ai_toggle') }}" style="margin: 0; display: inline-block;">
+        <button class="btn {% if ai_enabled %}primary{% else %}ghost{% endif %}" type="submit" style="padding: 0.6rem 1.25rem;">
+          {% if ai_enabled %}
+            <i class="fa-solid fa-toggle-on" style="color: #10b981; font-size: 1.2rem; vertical-align: middle; margin-right: 0.5rem;"></i> AI Active (Click to Disable)
+          {% else %}
+            <i class="fa-solid fa-toggle-off" style="color: var(--text-muted); font-size: 1.2rem; vertical-align: middle; margin-right: 0.5rem;"></i> AI Disabled (Click to Enable)
+          {% endif %}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Stats row inside AI panel -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem;">
+    <div class="stat-card" style="border-top: 3px solid var(--purple-brand);">
+      <h3 style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted);">Total Requests</h3>
+      <p id="ai-stat-total" style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0;">0</p>
+      <span class="muted" style="font-size: 0.8rem;"><i class="fa-solid fa-chart-line"></i> Invocations All-time</span>
+    </div>
+    <div class="stat-card" style="border-top: 3px solid var(--purple-brand);">
+      <h3 style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted);">Requests Today</h3>
+      <p id="ai-stat-today" style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0;">0</p>
+      <span class="muted" style="font-size: 0.8rem;"><i class="fa-regular fa-clock"></i> Last 24 Hours</span>
+    </div>
+    <div class="stat-card" style="border-top: 3px solid var(--purple-brand);">
+      <h3 style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted);">Unique Users</h3>
+      <p id="ai-stat-users" style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0;">0</p>
+      <span class="muted" style="font-size: 0.8rem;"><i class="fa-solid fa-users"></i> Students Reached</span>
+    </div>
+    <div class="stat-card" style="border-top: 3px solid var(--purple-brand);">
+      <h3 style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted);">Popular Action</h3>
+      <p id="ai-stat-popular" style="font-size: 1.2rem; font-weight: 800; margin: 0.85rem 0 0.85rem 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: capitalize; color: var(--purple-brand);">N/A</p>
+      <span class="muted" style="font-size: 0.8rem;"><i class="fa-solid fa-fire"></i> Most Used Feature</span>
+    </div>
+  </div>
+
+  <!-- Recent activity table -->
+  <div class="card" style="padding: 1.5rem;">
+    <h3 style="font-weight: 800; font-size: 1.15rem; margin-bottom: 1rem; color: var(--text); display: flex; align-items: center; gap: 0.5rem;">
+      <i class="fa-solid fa-history" style="color: var(--purple-brand);"></i> Audit Log: Recent AI Activity
+    </h3>
+    <div style="overflow-x: auto;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>AI Action Invocated</th>
+            <th>Session Reference ID</th>
+            <th>Invoked Time</th>
+          </tr>
+        </thead>
+        <tbody id="aiActivityTableBody">
+          <tr>
+            <td colspan="4" class="muted" style="text-align: center; padding: 2rem 0;">Loading AI logs...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
 {% endblock %}
 
 {% block scripts %}
@@ -414,8 +491,51 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  searchInput.addEventListener('input', filterStudents);
-  levelFilter.addEventListener('change', filterStudents);
+  if (searchInput && levelFilter) {
+    searchInput.addEventListener('input', filterStudents);
+    levelFilter.addEventListener('change', filterStudents);
+  }
+
+  // --- Dynamic AI Stats Fetching ---
+  const aiTabBtn = document.querySelector('.tab[data-tab="ai-management"]');
+  if (aiTabBtn) {
+    aiTabBtn.addEventListener('click', loadAIStats);
+  }
+
+  async function loadAIStats() {
+    try {
+      const res = await fetch('/admin/ai/stats');
+      const data = await res.json();
+      
+      document.getElementById('ai-stat-total').textContent = data.total;
+      document.getElementById('ai-stat-today').textContent = data.today;
+      document.getElementById('ai-stat-users').textContent = data.unique_users;
+      document.getElementById('ai-stat-popular').textContent = data.popular_action;
+      
+      const tableBody = document.getElementById('aiActivityTableBody');
+      if (data.recent.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align: center; padding: 2rem 0;">No AI activity logs recorded.</td></tr>';
+      } else {
+        tableBody.innerHTML = data.recent.map(log => `
+          <tr>
+            <td style="font-weight: 600;">${escapeHtml(log.user)}</td>
+            <td><span class="badge" style="font-size: 0.8rem; text-transform: capitalize;">${escapeHtml(log.action.replace('_', ' '))}</span></td>
+            <td><code>${log.session_id ? 'Session ' + log.session_id : 'Global'}</code></td>
+            <td class="muted">${escapeHtml(log.timestamp)}</td>
+          </tr>
+        `).join('');
+      }
+    } catch (err) {
+      console.error('Failed to load AI stats', err);
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
 });
 </script>
 {% endblock %}

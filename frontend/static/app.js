@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initCodeBlocks();
   initToasts();
   initChatbot();
-  initAIAssistant();
+  initAIPanel();
   initScrollReveal();
   initStatsCounters();
   initActiveNav();
@@ -142,14 +142,16 @@ function initCodeBlocks() {
         if (data.error) {
           outputText.textContent = (data.output ? data.output + "\n" : "") + "--- ERROR ---\n" + data.error;
           showToast("Code completed with error.", "error");
-          if (window.triggerAIDebugger) {
-            window.triggerAIDebugger(data.error);
+          // Auto-trigger AI error explainer
+          if (window._aiPanelExplainError) {
+            window._aiPanelExplainError(data.error);
           }
         } else {
           outputText.textContent = data.output || ">>> Execution finished (no standard output to show).";
           showToast("Execution completed successfully.", "success");
-          if (window.triggerAISuccessSuggestion) {
-            window.triggerAISuccessSuggestion();
+          // Auto-trigger AI code review
+          if (window._aiPanelAutoReview) {
+            window._aiPanelAutoReview();
           }
         }
       } catch (err) {
@@ -258,137 +260,238 @@ function appendChat(container, text, role) {
   container.scrollTop = container.scrollHeight;
 }
 
-function initAIAssistant() {
-  const panel = document.getElementById("code");
-  if (!panel) return;
-  const sessionId = panel.dataset.sessionId;
+
+/* ===================================================================
+   AI LEARNING ASSISTANT PANEL (Gemini-powered)
+   =================================================================== */
+
+function initAIPanel() {
+  const aiPanel = document.getElementById("ai-assistant");
+  if (!aiPanel) return;
+
+  const sessionId = aiPanel.dataset.sessionId;
   if (!sessionId) return;
 
-  const chatMessages = document.getElementById("aiChatMessages");
-  const chatForm = document.getElementById("aiChatForm");
-  const chatInput = document.getElementById("aiChatInput");
+  const responseContent = document.getElementById("aiResponseContent");
+  const responseCard = document.getElementById("aiResponseCard");
+  const copyBtn = document.getElementById("aiCopyBtn");
+  const chatForm = document.getElementById("aiPanelChatForm");
+  const chatInput = document.getElementById("aiPanelChatInput");
   const codeEditor = document.getElementById("codeEditor");
+  const datasetInput = document.getElementById("datasetUpload");
 
-  // Handle Action Pills
-  document.querySelectorAll(".ai-action-pill").forEach(pill => {
-    pill.addEventListener("click", async () => {
-      const action = pill.dataset.action;
+  let lastRawResponse = "";
+
+  // --- Action Buttons ---
+  document.querySelectorAll(".ai-action-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const action = btn.dataset.aiAction;
+      if (!action) return;
+
       const code = codeEditor ? codeEditor.value : "";
-      
-      appendChatBubble(chatMessages, `AI Coach, please run a code ${action} check.`, "user");
-      
-      const botLoading = appendChatBubble(chatMessages, "🤖 AI Coach is typing...", "bot");
-      
+      const outputText = document.getElementById("runOutputText");
+      const lastError = outputText ? outputText.textContent : "";
+
+      let endpoint = `/api/ai/${action}`;
+      let body = { session_id: sessionId, code };
+
+      // For explain-error, include the last error
+      if (action === "explain-error") {
+        body.error = lastError;
+      }
+
+      showAILoading(responseContent, copyBtn);
+
       try {
-        const response = await fetch("/api/ai-assistant", {
+        const response = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ session_id: sessionId, code, action })
+          body: JSON.stringify(body),
         });
         const data = await response.json();
-        botLoading.innerHTML = `<strong>🤖 AI Coach:</strong> ${formatMarkdown(data.reply)}`;
+        lastRawResponse = data.reply || "";
+        renderAIResponse(responseContent, copyBtn, data.reply);
       } catch (err) {
-        botLoading.textContent = "AI Tutor is temporarily offline.";
+        renderAIResponse(responseContent, copyBtn, "AI service is temporarily unavailable. Please try again.");
       }
-      chatMessages.scrollTop = chatMessages.scrollHeight;
     });
   });
 
-  // Handle Form Submission
+  // --- Dataset Upload ---
+  if (datasetInput) {
+    datasetInput.addEventListener("change", async () => {
+      const file = datasetInput.files[0];
+      if (!file) return;
+
+      showAILoading(responseContent, copyBtn);
+
+      const formData = new FormData();
+      formData.append("session_id", sessionId);
+      formData.append("dataset", file);
+
+      try {
+        const response = await fetch("/api/ai/analyze-dataset", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await response.json();
+        lastRawResponse = data.reply || "";
+        renderAIResponse(responseContent, copyBtn, data.reply);
+      } catch (err) {
+        renderAIResponse(responseContent, copyBtn, "Failed to analyze dataset. Please try again.");
+      }
+      datasetInput.value = "";
+    });
+  }
+
+  // --- Free-form Chat ---
   chatForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const query = chatInput.value.trim();
     if (!query) return;
-
-    appendChatBubble(chatMessages, query, "user");
     chatInput.value = "";
-    chatMessages.scrollTop = chatMessages.scrollHeight;
 
     const code = codeEditor ? codeEditor.value : "";
-    const botLoading = appendChatBubble(chatMessages, "🤖 AI Coach is typing...", "bot");
+
+    showAILoading(responseContent, copyBtn);
 
     try {
-      const response = await fetch("/api/ai-assistant", {
+      const response = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId, code, query, action: "chat" })
+        body: JSON.stringify({ session_id: sessionId, query, code }),
       });
       const data = await response.json();
-      botLoading.innerHTML = `<strong>🤖 AI Coach:</strong> ${formatMarkdown(data.reply)}`;
+      lastRawResponse = data.reply || "";
+      renderAIResponse(responseContent, copyBtn, data.reply);
     } catch (err) {
-      botLoading.textContent = "AI Tutor is temporarily offline.";
+      renderAIResponse(responseContent, copyBtn, "AI service is temporarily unavailable. Please try again.");
     }
-    chatMessages.scrollTop = chatMessages.scrollHeight;
   });
 
-  window.triggerAIDebugger = async (errorText) => {
-    if (!chatMessages) return;
-    appendChatBubble(chatMessages, "🚨 Code failed with an execution error.", "user");
-    const botLoading = appendChatBubble(chatMessages, "🤖 AI Debugger is analyzing...", "bot");
+  // --- Copy Button ---
+  copyBtn?.addEventListener("click", async () => {
+    if (lastRawResponse) {
+      await navigator.clipboard.writeText(lastRawResponse);
+      showToast("AI response copied to clipboard.", "success");
+    }
+  });
+
+  // --- Auto-trigger hooks for code execution ---
+  window._aiPanelExplainError = async (errorText) => {
+    showAILoading(responseContent, copyBtn);
     try {
-      const response = await fetch("/api/ai-assistant", {
+      const response = await fetch("/api/ai/explain-error", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId, code: codeEditor.value, action: "debug", error: errorText })
+        body: JSON.stringify({
+          session_id: sessionId,
+          code: codeEditor ? codeEditor.value : "",
+          error: errorText,
+        }),
       });
       const data = await response.json();
-      botLoading.innerHTML = `<strong>🤖 AI Coach:</strong> ${formatMarkdown(data.reply)}`;
+      lastRawResponse = data.reply || "";
+      renderAIResponse(responseContent, copyBtn, data.reply);
+      // Switch to AI tab
+      switchTab("ai-assistant");
     } catch {
-      botLoading.textContent = "AI Tutor is temporarily offline.";
+      // Silent fail for auto-trigger
     }
-    chatMessages.scrollTop = chatMessages.scrollHeight;
   };
 
-  window.triggerAISuccessSuggestion = async () => {
-    if (!chatMessages) return;
-    appendChatBubble(chatMessages, "✅ Code executed successfully.", "user");
-    const botLoading = appendChatBubble(chatMessages, "🤖 AI Coach is reviewing...", "bot");
+  window._aiPanelAutoReview = async () => {
+    showAILoading(responseContent, copyBtn);
     try {
-      const response = await fetch("/api/ai-assistant", {
+      const response = await fetch("/api/ai/review-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId, code: codeEditor.value, action: "review" })
+        body: JSON.stringify({
+          session_id: sessionId,
+          code: codeEditor ? codeEditor.value : "",
+        }),
       });
       const data = await response.json();
-      
-      const challengeResponse = await fetch("/api/ai-assistant", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId, code: codeEditor.value, action: "challenge" })
-      });
-      const challengeData = await challengeResponse.json();
-      
-      botLoading.innerHTML = `<strong>🤖 AI Coach:</strong> Excellent! Here is my feedback and your next challenge:<br><br>${formatMarkdown(data.reply)}<br><br>${formatMarkdown(challengeData.reply)}`;
+      lastRawResponse = data.reply || "";
+      renderAIResponse(responseContent, copyBtn, data.reply);
     } catch {
-      botLoading.textContent = "AI Tutor is temporarily offline.";
+      // Silent fail for auto-trigger
     }
-    chatMessages.scrollTop = chatMessages.scrollHeight;
   };
 }
 
-function appendChatBubble(container, text, role) {
-  if (!container) return null;
-  const bubble = document.createElement("div");
-  if (role === "user") {
-    bubble.className = "user-msg";
-    bubble.style.cssText = "align-self: flex-end; background: var(--purple-brand); color: #ffffff; border-radius: 8px 8px 0 8px; padding: 0.65rem 0.85rem; font-size: 0.875rem; max-width: 90%; margin-bottom: 0.5rem;";
-    bubble.textContent = text;
-  } else {
-    bubble.className = "bot-msg";
-    bubble.style.cssText = "padding: 0.65rem 0.85rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px 8px 8px 0; font-size: 0.875rem; align-self: flex-start; max-width: 90%; margin-bottom: 0.5rem;";
-    bubble.innerHTML = `<strong>🤖 AI Coach:</strong> ${text}`;
+function showAILoading(container, copyBtn) {
+  if (copyBtn) copyBtn.style.display = "none";
+  if (container) {
+    container.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; gap: 1rem;">
+        <div class="ai-loading">
+          <span></span><span></span><span></span>
+        </div>
+        <p class="muted" style="font-size: 0.9rem;">Gemini AI is thinking...</p>
+      </div>
+    `;
   }
-  container.appendChild(bubble);
-  container.scrollTop = container.scrollHeight;
-  return bubble;
 }
 
-function formatMarkdown(text) {
+function renderAIResponse(container, copyBtn, text) {
+  if (!container) return;
+  if (copyBtn) copyBtn.style.display = "inline-flex";
+  container.innerHTML = formatAIMarkdown(text || "No response received.");
+  // Highlight code blocks if hljs is available
+  if (window.hljs) {
+    container.querySelectorAll("pre code").forEach((block) => hljs.highlightElement(block));
+  }
+}
+
+function formatAIMarkdown(text) {
   if (!text) return "";
-  let formatted = text
+
+  let html = text
+    // Code blocks (```python ... ```)
+    .replace(/```(\w+)?\n([\s\S]*?)```/g, (_, lang, code) => {
+      const langClass = lang ? ` class="language-${lang}"` : "";
+      return `<pre class="ai-code-block"><code${langClass}>${escapeHtml(code.trim())}</code></pre>`;
+    })
+    // Inline code
+    .replace(/`([^`]+)`/g, '<code class="ai-inline-code">$1</code>')
+    // Headers
+    .replace(/^### (.*$)/gm, '<h4 style="font-weight: 700; margin: 1rem 0 0.5rem; font-size: 1.1rem;">$1</h4>')
+    .replace(/^## (.*$)/gm, '<h3 style="font-weight: 800; margin: 1.25rem 0 0.5rem; font-size: 1.2rem;">$1</h3>')
+    .replace(/^# (.*$)/gm, '<h2 style="font-weight: 800; margin: 1.5rem 0 0.5rem; font-size: 1.3rem;">$1</h2>')
+    // Bold
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    // Italic
     .replace(/\*(.*?)\*/g, "<em>$1</em>")
-    .replace(/`(.*?)`/g, "<code style='background: rgba(0,0,0,0.1); padding: 2px 4px; border-radius: 4px; font-family: monospace;'>$1</code>")
+    // Unordered lists
+    .replace(/^- (.*$)/gm, '<li style="margin-left: 1.5rem; margin-bottom: 0.25rem;">$1</li>')
+    // Ordered lists
+    .replace(/^\d+\. (.*$)/gm, '<li style="margin-left: 1.5rem; margin-bottom: 0.25rem; list-style-type: decimal;">$1</li>')
+    // Blockquotes
+    .replace(/^> (.*$)/gm, '<blockquote style="border-left: 3px solid var(--purple-brand); padding: 0.5rem 1rem; margin: 0.5rem 0; background: rgba(139, 92, 246, 0.05); border-radius: 0 6px 6px 0;">$1</blockquote>')
+    // Tables (simple markdown table support)
+    .replace(/\|(.+)\|/g, (match) => {
+      const cells = match.split('|').filter(c => c.trim());
+      if (cells.every(c => /^[-:]+$/.test(c.trim()))) return '';
+      const isHeader = false;
+      const tag = isHeader ? 'th' : 'td';
+      return '<tr>' + cells.map(c => `<${tag} style="padding: 0.4rem 0.75rem; border: 1px solid var(--border);">${c.trim()}</${tag}>`).join('') + '</tr>';
+    })
+    // Line breaks
+    .replace(/\n\n/g, "</p><p>")
     .replace(/\n/g, "<br>");
-  return formatted;
+
+  // Wrap in paragraph
+  html = `<p>${html}</p>`;
+
+  // Clean up empty elements
+  html = html.replace(/<p><\/p>/g, "").replace(/<p><br><\/p>/g, "");
+
+  return html;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
 }

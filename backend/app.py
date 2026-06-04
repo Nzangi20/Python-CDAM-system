@@ -22,6 +22,7 @@ from werkzeug.utils import secure_filename
 
 from seed_data import SESSIONS
 from utils import chatbot_reply, compute_streak, parse_quiz, render_markdown, slugify
+from ai_service import get_ai_service
 
 import os
 from dotenv import load_dotenv
@@ -266,6 +267,23 @@ class IntegrityLog(db.Model):
     severity = db.Column(db.String(30), default="warning")
     details = db.Column(db.Text, default="")
     timestamp = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+
+
+class AIUsageLog(db.Model):
+    __tablename__ = "ai_usage_logs"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    session_id = db.Column(db.Integer, nullable=True)
+    action = db.Column(db.String(50), nullable=False)
+    tokens_used = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+
+
+class PlatformSetting(db.Model):
+    __tablename__ = "platform_settings"
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(100), unique=True, nullable=False)
+    value = db.Column(db.Text, nullable=True)
 
 
 @app.context_processor
@@ -526,6 +544,8 @@ def admin_dashboard_context():
         "exam_pass_rate": exam_pass_rate,
         "exam_results": exam_results,
         "total_sessions": total_sessions,
+        "ai_enabled": (PlatformSetting.query.filter_by(key="ai_enabled").first() or PlatformSetting(value="true")).value == "true",
+        "ai_total_requests": AIUsageLog.query.count(),
     }
 
 
@@ -829,177 +849,253 @@ def run_code():
         })
 
 
-def generate_ai_response(action: str, query: str, code: str, error: str, session: Session) -> str:
-    import random
-    import re
-    title = session.title
-    objectives = session.objectives
-    outcomes = session.expected_outcomes or ""
-    learning_notes = session.learning_notes or ""
-    
-    if action == "debug":
-        if not error:
-            return "Your code executed successfully without errors! Great job."
-        msg = f"### 🔍 AI Error Debugger\n"
-        if "SyntaxError" in error:
-            msg += f"It looks like there is a **Syntax Error** in your code.\n\n"
-            msg += f"**What this means:** Python couldn't parse your code because of a typo or formatting mistake. Check for:\n"
-            msg += f"- Missing closing parentheses `()`, brackets `[]`, or braces `{{}}`.\n"
-            msg += f"- Missing colon `:` at the end of `if`, `for`, `def`, or `else` lines.\n"
-            msg += f"- Unmatched or unclosed quotes (`'` or `\"`).\n\n"
-        elif "NameError" in error:
-            match = re.search(r"name '(\w+)' is not defined", error)
-            name = f"`{match.group(1)}`" if match else "a variable or function"
-            msg += f"It looks like there is a **Name Error** in your code.\n\n"
-            msg += f"**What this means:** You are trying to use {name} before defining or importing it. Check if you misspelled it or forgot to assign it a value.\n\n"
-        elif "TypeError" in error:
-            msg += f"It looks like there is a **Type Error** in your code.\n\n"
-            msg += f"**What this means:** You tried to perform an operation on incompatible types (for example, adding a string to an integer, or calling something that isn't a function).\n\n"
-        elif "IndexError" in error:
-            msg += f"It looks like there is an **Index Error** in your code.\n\n"
-            msg += f"**What this means:** You are trying to access an element of a list or array at an index that doesn't exist (e.g. accessing index 5 in a list of size 3).\n\n"
-        else:
-            msg += f"Python reported the following error:\n`{error}`\n\n"
-        
-        msg += f"**How to Fix:** Review the instructions and notes under the **Learning Notes** tab to compare your syntax, or ask me *'How do I fix my code?'* in the chat."
-        return msg
+def _ai_check_access():
+    """Common checks for AI endpoints. Returns (error_response, session) tuple."""
+    # Check if AI is enabled platform-wide
+    setting = PlatformSetting.query.filter_by(key="ai_enabled").first()
+    if setting and setting.value == "false":
+        return jsonify({"reply": "AI assistance has been disabled by the administrator."}), None
 
-    elif action == "explain":
-        if not code.strip():
-            return "Your code editor is currently empty! Write some Python code or select a template to explain."
-        
-        msg = f"### 💡 Code Explanation\n"
-        msg += f"Here is a breakdown of what your code does in the context of **{title}**:\n\n"
-        
-        lines = code.split("\n")
-        msg += f"- It runs a script with {len(lines)} lines of Python code.\n"
-        
-        if "import pandas" in code or "pd." in code:
-            msg += f"- **Data Analysis**: It imports/uses **Pandas** to work with structured datasets (DataFrames).\n"
-        if "import numpy" in code or "np." in code:
-            msg += f"- **Numerical Operations**: It utilizes **NumPy** arrays for fast vectorized operations.\n"
-        if "import matplotlib" in code or "plt." in code or "sns." in code:
-            msg += f"- **Visualization**: It utilizes plotting libraries to generate charts/graphs.\n"
-        if "for " in code or "while " in code:
-            msg += f"- **Looping**: It iterates over a sequence or condition using a loop.\n"
-        if "def " in code:
-            msg += f"- **Functions**: It defines a custom function to encapsulate reusable logic.\n"
-        
-        msg += f"\n**Line-by-Line Highlight:**\n"
-        for line in lines[:5]:
-            if line.strip() and not line.strip().startswith("#"):
-                msg += f"- `{line.strip()}`: Executed to initialize, process, or render data.\n"
-        if len(lines) > 5:
-            msg += f"- *(and {len(lines)-5} more lines)*\n"
-            
-        msg += f"\n**Reference Concept:**\n"
-        msg += f"This aligns with our learning objectives:\n"
-        msg += "\n".join(objectives.split("\n")[:3])
-        return msg
+    # Check if student has an active exam in progress
+    active_exam = ExamAttemptRecord.query.filter_by(
+        user_id=current_user.id, status="in_progress"
+    ).first()
+    if active_exam:
+        return jsonify({"reply": "⚠️ AI assistance is unavailable during assessments. Complete your exam first."}), None
 
-    elif action == "review":
-        if not code.strip():
-            return "Write some code first, and I will review it for quality, pep-8 compatibility, and performance!"
-        
-        suggestions = []
-        if len(code) > 10 and "def " not in code and ("for " in code or "import " in code):
-            suggestions.append("Consider encapsulating your main code block inside a reusable function (e.g., `def run_analysis():`).")
-        if any(len(line) > 79 for line in code.split("\n")):
-            suggestions.append("Some lines of code exceed 79 characters. Consider splitting them to comply with PEP 8 readability standards.")
-        if "=" in code and not re.search(r"\s=\s", code):
-            suggestions.append("Add spacing around operators (e.g., `x = 10` instead of `x=10`) to enhance visual hierarchy.")
-        if "import " in code and not code.startswith("import"):
-            suggestions.append("Place all your library imports (like `pandas` or `numpy`) at the very top of the script.")
-            
-        msg = f"### 🛠️ Code Review & Optimization\n"
-        if suggestions:
-            msg += "I've reviewed your workspace. Here are some suggestions for improvement:\n\n"
-            for s in suggestions:
-                msg += f"- {s}\n"
-        else:
-            msg += "Excellent work! Your code is highly readable, PEP 8 compliant, and uses optimal structures for this exercise.\n"
-            
-        msg += f"\n**Performance Tip:** Keep in mind that for Data Science, vectorized operations (e.g., `df['col'] * 2` in Pandas) are significantly faster than looping through rows with `for` loops."
-        return msg
+    # Rate limit check
+    ai = get_ai_service()
+    if not ai.check_rate_limit(current_user.id):
+        return jsonify({"reply": "You've reached the AI request limit (10/minute). Please wait a moment before trying again."}), None
 
-    elif action == "challenge":
-        challenges = {
-            "introduction-to-python": "Write a Python script that calculates the area of a circle. Define a variable `radius = 7`, compute the area using the formula `area = 3.14159 * (radius ** 2)`, and print the result.",
-            "python-data-structures": "Create a list named `temperatures` with values `[22, 25, 19, 31, 28]`. Add a new temperature `24` to the end of the list, compute the average temperature, and print it.",
-            "control-flow-and-functions": "Write a function named `is_even(n)` that returns `True` if a number is even, and `False` otherwise. Test the function on the numbers `4` and `7`.",
-            "numpy-fundamentals": "Use NumPy to create a 1D array of 20 numbers from 1 to 20. Reshape it into a 4x5 2D matrix, and print the mean of each column.",
-            "pandas-dataframes": "Create a Pandas DataFrame from a dictionary containing names and scores. Select only the rows where the score is greater than 80.",
-            "data-cleaning-prep": "Write a snippet using Pandas to fill missing values in a DataFrame column named `Salary` with the column's median value, then drop any rows that have missing values in the `Email` column.",
-            "matplotlib-seaborn": "Write a Matplotlib script to plot a simple line chart where the X-axis represents years `[2020, 2021, 2022, 2023]` and the Y-axis represents revenue `[500, 750, 1000, 1400]`. Set the title to 'Annual Growth'.",
-            "statistical-analysis": "Use scipy or numpy to compute the Pearson correlation coefficient between two lists: `x = [1, 2, 3, 4, 5]` and `y = [2, 4, 5, 4, 5]`. Explain if the correlation is positive or negative.",
-            "introduction-to-machine-learning": "Define a Scikit-Learn `DecisionTreeClassifier` with `max_depth=3`. Fit it on your training features `X_train` and labels `y_train`, then predict labels on `X_test`.",
-            "model-evaluation": "Write a snippet using Scikit-Learn to compute and print the confusion matrix and classification report for a set of true labels `y_true` and predicted labels `y_pred`."
-        }
-        challenge = challenges.get(session.slug, "Write a function that accepts a list of numbers and returns a new list containing only the unique numbers.")
-        msg = f"### 🏋️ Practice Challenge\n"
-        msg += f"Ready to test your skills? Try this challenge for **{title}**:\n\n"
-        msg += f"> **Challenge:** {challenge}\n\n"
-        msg += "Write your solution in the **Code Simulator** editor in the center panel, then click **Run Code** to test it!"
-        return msg
-
-    elif action == "career":
-        careers = {
-            "introduction-to-python": "Python is the entry point for almost all Data roles. Data Analysts and Engineers use it daily. Highlight your understanding of fundamental syntax and environment management in your resume.",
-            "python-data-structures": "Efficient data handling is vital. Interviewers frequently ask about lists vs. tuples vs. dictionaries. Learn when to use which structure to optimize performance.",
-            "control-flow-and-functions": "Writing clean, functional code is a key software engineering skill for Data Scientists. Break down complex scripts into modular functions to make them testable.",
-            "numpy-fundamentals": "NumPy is the backbone of scientific computing. Machine Learning engineers use it to manipulate matrices (tensors). Make sure you understand array reshaping and slicing.",
-            "pandas-dataframes": "Pandas is the absolute #1 library for Data Analysts. 80% of your time on the job will be spent manipulating tables with Pandas. Build portfolio projects showing data exploration with Pandas.",
-            "data-cleaning-prep": "Data cleaning is where data professionals spend most of their time. Showing that you can handle missing data, duplicates, and type mismatches makes you stand out in technical interviews.",
-            "matplotlib-seaborn": "Visual storytelling is critical for communicating insights to business managers. Data Analysts who can build clear, uncluttered visualizations are highly sought after.",
-            "statistical-analysis": "A strong foundation in statistics separates amateur builders from professional data scientists. Focus on understanding hypothesis testing, p-values, and statistical distributions.",
-            "introduction-to-machine-learning": "Machine learning is the gateway to Data Science and AI Engineering. Start by understanding standard models like Linear Regression and Decision Trees before moving to Deep Learning.",
-            "model-evaluation": "Any model is useless without proper evaluation. Understanding metrics like Precision, Recall, and ROC-AUC is crucial when explaining your model's performance to clients or stakeholders."
-        }
-        advice = careers.get(session.slug, "Building a strong personal GitHub portfolio is the best way to get noticed by recruiters. Focus on clean code, clear documentation, and solved problems.")
-        msg = f"### 💼 Career Mentorship\n"
-        msg += f"**How this session applies to your career:**\n\n"
-        msg += f"{advice}\n\n"
-        msg += "**Action Step:** Build a small script incorporating today's concepts and push it to your GitHub portfolio. It shows recruiters you are actively learning and writing clean code!"
-        return msg
-
-    else:
-        text = query.lower()
-        if "numpy" in text:
-            return "NumPy stands for Numerical Python. It provides high-performance multidimensional array objects and tools to work with them. Essential for scientific operations!"
-        elif "pandas" in text or "dataframe" in text:
-            return "Pandas is the standard data manipulation library. It introduces DataFrames, which are 2D tabular data structures with labeled axes (rows and columns) like an Excel sheet."
-        elif "matplotlib" in text or "seaborn" in text or "plot" in text or "chart" in text:
-            return "Visualization is key! Matplotlib provides low-level control, while Seaborn offers high-level, beautiful statistic visualizations. Remember to call `plt.show()` or return figures."
-        elif "machine learning" in text or "ml" in text:
-            return "Machine Learning allows systems to learn from data patterns instead of explicit programming. Today we are focusing on supervised models like decision trees or regressions."
-        elif "error" in text or "fail" in text or "debug" in text or "fix" in text:
-            if code:
-                return "Click the **Review Code** button above, and I will analyze your current code editor contents and help you fix any formatting or logical errors."
-            return "If you are getting a syntax error, check for missing colons, parenthesis, or quotes. Paste your code here and I will help you look at it."
-        elif "career" in text or "job" in text or "interview" in text:
-            return "To prepare for a career in Data Science: 1. Master Pandas/NumPy. 2. Build a project portfolio on GitHub. 3. Learn SQL. 4. Practice coding challenges. Ask me for *Career Mentor* advice using the action pill!"
-        elif "how do i" in text or "what is" in text or "explain" in text:
-            return f"In the context of **{title}**, this topic deals with key concepts like variables, loops, or arrays. Based on the **Learning Notes**, the main idea is: {learning_notes[:250]}..."
-        
-        return f"I am your AI Learning assistant for **{title}**. Ask me any question about Python, libraries, or concepts in this lesson! You can also click the quick action pills above for instant code review, explanations, or coding challenges."
+    return None, ai
 
 
-@app.route("/api/ai-assistant", methods=["POST"])
+def _log_ai_usage(action: str, session_id=None):
+    """Log an AI usage event for admin analytics."""
+    db.session.add(AIUsageLog(
+        user_id=current_user.id,
+        session_id=session_id,
+        action=action,
+    ))
+    db.session.commit()
+
+
+@app.route("/api/ai/explain-topic", methods=["POST"])
 @login_required
-def ai_assistant_api():
+@student_required
+def ai_explain_topic():
+    err, ai = _ai_check_access()
+    if err:
+        return err
     payload = request.get_json(silent=True) or {}
-    session_id = payload.get("session_id")
-    code = payload.get("code", "")
-    query = payload.get("query", "").strip()
-    action = payload.get("action", "chat")
-    error = payload.get("error", "")
-
-    session = db.session.get(Session, session_id) if session_id else None
-    if not session:
-        return jsonify({"reply": "I couldn't load the context for this session. Please refresh the page."})
-
-    reply = generate_ai_response(action, query, code, error, session)
+    session_obj = db.session.get(Session, payload.get("session_id"))
+    if not session_obj:
+        return jsonify({"reply": "Session not found. Please refresh the page."})
+    _log_ai_usage("explain_topic", session_obj.id)
+    reply = ai.explain_topic(session_obj)
     return jsonify({"reply": reply})
+
+
+@app.route("/api/ai/explain-error", methods=["POST"])
+@login_required
+@student_required
+def ai_explain_error():
+    err, ai = _ai_check_access()
+    if err:
+        return err
+    payload = request.get_json(silent=True) or {}
+    session_obj = db.session.get(Session, payload.get("session_id"))
+    if not session_obj:
+        return jsonify({"reply": "Session not found. Please refresh the page."})
+    code = payload.get("code", "")
+    error_text = payload.get("error", "")
+    if not error_text:
+        return jsonify({"reply": "No error message provided. Run your code first to see if there are errors."})
+    _log_ai_usage("explain_error", session_obj.id)
+    reply = ai.explain_error(error_text, code, session_obj)
+    return jsonify({"reply": reply})
+
+
+@app.route("/api/ai/review-code", methods=["POST"])
+@login_required
+@student_required
+def ai_review_code():
+    err, ai = _ai_check_access()
+    if err:
+        return err
+    payload = request.get_json(silent=True) or {}
+    session_obj = db.session.get(Session, payload.get("session_id"))
+    if not session_obj:
+        return jsonify({"reply": "Session not found. Please refresh the page."})
+    code = payload.get("code", "")
+    if not code.strip():
+        return jsonify({"reply": "Write some code first, and I will review it for quality and best practices!"})
+    _log_ai_usage("review_code", session_obj.id)
+    reply = ai.review_code(code, session_obj)
+    return jsonify({"reply": reply})
+
+
+@app.route("/api/ai/generate-questions", methods=["POST"])
+@login_required
+@student_required
+def ai_generate_questions():
+    err, ai = _ai_check_access()
+    if err:
+        return err
+    payload = request.get_json(silent=True) or {}
+    session_obj = db.session.get(Session, payload.get("session_id"))
+    if not session_obj:
+        return jsonify({"reply": "Session not found. Please refresh the page."})
+    _log_ai_usage("generate_questions", session_obj.id)
+    reply = ai.generate_questions(session_obj)
+    return jsonify({"reply": reply})
+
+
+@app.route("/api/ai/generate-project", methods=["POST"])
+@login_required
+@student_required
+def ai_generate_project():
+    err, ai = _ai_check_access()
+    if err:
+        return err
+    payload = request.get_json(silent=True) or {}
+    session_obj = db.session.get(Session, payload.get("session_id"))
+    if not session_obj:
+        return jsonify({"reply": "Session not found. Please refresh the page."})
+    _log_ai_usage("generate_project", session_obj.id)
+    reply = ai.generate_project(session_obj)
+    return jsonify({"reply": reply})
+
+
+@app.route("/api/ai/summarize", methods=["POST"])
+@login_required
+@student_required
+def ai_summarize():
+    err, ai = _ai_check_access()
+    if err:
+        return err
+    payload = request.get_json(silent=True) or {}
+    session_obj = db.session.get(Session, payload.get("session_id"))
+    if not session_obj:
+        return jsonify({"reply": "Session not found. Please refresh the page."})
+    _log_ai_usage("summarize", session_obj.id)
+    reply = ai.summarize_session(session_obj)
+    return jsonify({"reply": reply})
+
+
+@app.route("/api/ai/career-coach", methods=["POST"])
+@login_required
+@student_required
+def ai_career_coach():
+    err, ai = _ai_check_access()
+    if err:
+        return err
+    payload = request.get_json(silent=True) or {}
+    session_obj = db.session.get(Session, payload.get("session_id"))
+    if not session_obj:
+        return jsonify({"reply": "Session not found. Please refresh the page."})
+    _log_ai_usage("career_coach", session_obj.id)
+    reply = ai.career_guidance(session_obj)
+    return jsonify({"reply": reply})
+
+
+@app.route("/api/ai/analyze-dataset", methods=["POST"])
+@login_required
+@student_required
+def ai_analyze_dataset():
+    err, ai = _ai_check_access()
+    if err:
+        return err
+    session_id = request.form.get("session_id")
+    session_obj = db.session.get(Session, session_id) if session_id else None
+    if not session_obj:
+        return jsonify({"reply": "Session not found. Please refresh the page."})
+    uploaded = request.files.get("dataset")
+    if not uploaded or not uploaded.filename:
+        return jsonify({"reply": "Please upload a CSV, Excel, or JSON file to analyze."})
+    filename = secure_filename(uploaded.filename)
+    ext = os.path.splitext(filename)[1].lower()
+    if ext not in {".csv", ".xlsx", ".xls", ".json"}:
+        return jsonify({"reply": "Unsupported file format. Please upload CSV, Excel (.xlsx/.xls), or JSON files."})
+    try:
+        raw = uploaded.read(2 * 1024 * 1024)  # Max 2MB
+        content = raw.decode("utf-8", errors="replace")
+    except Exception:
+        return jsonify({"reply": "Could not read the uploaded file. Please check the file format."})
+    _log_ai_usage("analyze_dataset", session_obj.id)
+    reply = ai.analyze_dataset(content, filename, session_obj)
+    return jsonify({"reply": reply})
+
+
+@app.route("/api/ai/chat", methods=["POST"])
+@login_required
+@student_required
+def ai_chat():
+    err, ai = _ai_check_access()
+    if err:
+        return err
+    payload = request.get_json(silent=True) or {}
+    session_obj = db.session.get(Session, payload.get("session_id"))
+    if not session_obj:
+        return jsonify({"reply": "Session not found. Please refresh the page."})
+    query = payload.get("query", "").strip()
+    code = payload.get("code", "")
+    if not query:
+        return jsonify({"reply": "Please type a question and I will help you!"})
+    _log_ai_usage("chat", session_obj.id)
+    reply = ai.chat(query, code, session_obj)
+    return jsonify({"reply": reply})
+
+
+# --- Admin AI Management ---
+
+@app.route("/admin/ai/toggle", methods=["POST"])
+@login_required
+@admin_required
+def admin_ai_toggle():
+    setting = PlatformSetting.query.filter_by(key="ai_enabled").first()
+    if not setting:
+        setting = PlatformSetting(key="ai_enabled", value="true")
+        db.session.add(setting)
+    setting.value = "false" if setting.value == "true" else "true"
+    db.session.commit()
+    status = "enabled" if setting.value == "true" else "disabled"
+    log_activity("admin.ai.toggle", status)
+    flash(f"AI assistance has been {status} platform-wide.", "success")
+    return redirect(url_for("admin_panel"))
+
+
+@app.route("/admin/ai/stats")
+@login_required
+@admin_required
+def admin_ai_stats():
+    from sqlalchemy import func
+    total = AIUsageLog.query.count()
+    today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+    today_count = AIUsageLog.query.filter(AIUsageLog.created_at >= today_start).count()
+    unique_users = db.session.query(func.count(func.distinct(AIUsageLog.user_id))).scalar() or 0
+    popular = db.session.query(
+        AIUsageLog.action, func.count(AIUsageLog.id).label("cnt")
+    ).group_by(AIUsageLog.action).order_by(func.count(AIUsageLog.id).desc()).first()
+    popular_action = popular[0] if popular else "N/A"
+    recent = AIUsageLog.query.order_by(AIUsageLog.created_at.desc()).limit(20).all()
+    recent_list = []
+    for log_entry in recent:
+        user = db.session.get(User, log_entry.user_id)
+        recent_list.append({
+            "user": user.name if user else "Unknown",
+            "action": log_entry.action,
+            "session_id": log_entry.session_id,
+            "timestamp": log_entry.created_at.strftime("%Y-%m-%d %H:%M") if log_entry.created_at else "",
+        })
+    return jsonify({
+        "total": total,
+        "today": today_count,
+        "unique_users": unique_users,
+        "popular_action": popular_action,
+        "recent": recent_list,
+    })
 
 
 

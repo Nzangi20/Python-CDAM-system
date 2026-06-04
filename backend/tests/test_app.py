@@ -571,6 +571,114 @@ def test_transcript_and_trials_limit(client):
     assert resp_att_passed.status_code == 302
 
 
+def test_ai_platform_toggle(client):
+    from app import PlatformSetting
+    register_and_login(client)
+    
+    with app.app_context():
+        sess = Session.query.first()
+        sess_id = sess.id
+        # Turn off AI
+        setting = PlatformSetting.query.filter_by(key="ai_enabled").first()
+        if not setting:
+            setting = PlatformSetting(key="ai_enabled", value="false")
+            db.session.add(setting)
+        else:
+            setting.value = "false"
+        db.session.commit()
+
+    # Request AI assistance while disabled
+    resp = client.post("/api/ai/explain-topic", json={"session_id": sess_id})
+    assert resp.status_code == 200
+    data = json.loads(resp.data.decode("utf-8"))
+    assert "disabled" in data["reply"].lower()
+
+    # Re-enable AI
+    with app.app_context():
+        setting = PlatformSetting.query.filter_by(key="ai_enabled").first()
+        setting.value = "true"
+        db.session.commit()
+
+
+def test_ai_exam_lockout(client):
+    from app import PlatformSetting, Exam, ExamAttemptRecord, User
+    register_and_login(client)
+    
+    with app.app_context():
+        sess = Session.query.first()
+        sess_id = sess.id
+        # Query the registered student
+        user = User.query.filter_by(reg_number="EB3/10001/26").first()
+        user_id = user.id
+        
+        # Ensure AI is enabled
+        setting = PlatformSetting.query.filter_by(key="ai_enabled").first()
+        if setting:
+            setting.value = "true"
+            db.session.commit()
+            
+        # Create an exam and a record in_progress
+        exam = Exam(title="ML Exam", description="...", duration=10, passing_score=60)
+        db.session.add(exam)
+        db.session.commit()
+        
+        attempt = ExamAttemptRecord(user_id=user_id, exam_id=exam.id, status="in_progress")
+        db.session.add(attempt)
+        db.session.commit()
+
+    # Request AI assistance during active exam
+    resp = client.post("/api/ai/explain-topic", json={"session_id": sess_id})
+    assert resp.status_code == 200
+    data = json.loads(resp.data.decode("utf-8"))
+    assert "assessment" in data["reply"].lower() or "exam" in data["reply"].lower()
+
+    with app.app_context():
+        # Clean up the exam attempt
+        ExamAttemptRecord.query.filter_by(user_id=user_id).delete()
+        db.session.commit()
+
+
+def test_ai_rate_limiter(client):
+    from ai_service import get_ai_service, BaseProvider
+    
+    class DummyProvider(BaseProvider):
+        def generate(self, prompt, system_instruction="", max_tokens=2048):
+            return "Mocked AI Response"
+
+    register_and_login(client)
+    
+    with app.app_context():
+        sess = Session.query.first()
+        sess_id = sess.id
+        
+        # Set dummy provider on global AI service
+        ai_service = get_ai_service()
+        old_provider = ai_service._provider
+        ai_service._provider = DummyProvider()
+        
+        # Reset rate limiter buckets for clean test run
+        ai_service._rate_limiter._buckets.clear()
+
+    try:
+        # Fire 10 fast requests (they should pass/be accepted)
+        for i in range(10):
+            resp = client.post("/api/ai/explain-topic", json={"session_id": sess_id})
+            assert resp.status_code == 200
+            data = json.loads(resp.data.decode("utf-8"))
+            assert "mocked" in data["reply"].lower()
+            
+        # 11th request must trigger the rate limit error response
+        resp = client.post("/api/ai/explain-topic", json={"session_id": sess_id})
+        assert resp.status_code == 200
+        data = json.loads(resp.data.decode("utf-8"))
+        assert "limit" in data["reply"].lower() or "rate" in data["reply"].lower() or "reach" in data["reply"].lower()
+    finally:
+        with app.app_context():
+            get_ai_service()._provider = old_provider
+
+
+
+
 
 
 
