@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initTabs();
   initCodeBlocks();
   initToasts();
-  initChatbot();
   initAIPanel();
   initScrollReveal();
   initStatsCounters();
@@ -221,44 +220,6 @@ function showToast(message, type = "success") {
   setTimeout(() => toast.remove(), 3200);
 }
 
-function initChatbot() {
-  const toggle = document.getElementById("chatbotToggle");
-  const panel = document.getElementById("chatbotPanel");
-  const close = document.getElementById("chatbotClose");
-  const form = document.getElementById("chatbotForm");
-  const input = document.getElementById("chatbotInput");
-  const messages = document.getElementById("chatbotMessages");
-
-  toggle?.addEventListener("click", () => panel?.classList.add("open"));
-  close?.addEventListener("click", () => panel?.classList.remove("open"));
-
-  form?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const message = input.value.trim();
-    if (!message) return;
-    appendChat(messages, message, "user");
-    input.value = "";
-    try {
-      const response = await fetch("/api/chatbot", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
-      });
-      const data = await response.json();
-      appendChat(messages, data.reply || "I am here to help with CDAM learning.", "bot");
-    } catch {
-      appendChat(messages, "Assistant is temporarily unavailable.", "bot");
-    }
-  });
-}
-
-function appendChat(container, text, role) {
-  const node = document.createElement("div");
-  node.className = role === "user" ? "user-msg" : "bot-msg";
-  node.textContent = text;
-  container.appendChild(node);
-  container.scrollTop = container.scrollHeight;
-}
 
 
 /* ===================================================================

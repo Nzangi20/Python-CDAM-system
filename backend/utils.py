@@ -53,25 +53,3 @@ def compute_streak(completed_dates: list[date]) -> int:
         return 0
     return streak
 
-
-def chatbot_reply(message: str) -> str:
-    text = message.lower().strip()
-    if not text:
-        return "Ask me about Python, sessions, quizzes, or your CDAM learning path."
-    if "numpy" in text:
-        return "NumPy powers numerical computing. Start with Session 4: NumPy Fundamentals."
-    if "pandas" in text or "dataframe" in text:
-        return "Pandas is ideal for tabular analysis. Check Session 5 and Session 6 for analysis and cleaning."
-    if "quiz" in text or "test" in text:
-        return "Each session has a Quiz tab. Submit answers to track your score on the dashboard."
-    if "certificate" in text:
-        return "Complete all 10 sessions to unlock your CDAM Python for Data Science certificate."
-    if "login" in text or "register" in text:
-        return "Use Register to create an account, then access your dashboard and track progress."
-    if "cdam" in text:
-        return "CDAM (Center for Data Analytics & Modelling) at Chuka University offers professional data science training."
-    if "python" in text:
-        return "Python is the core language here. Begin with Session 1 and follow the curriculum sequentially."
-    if "help" in text or "start" in text:
-        return "Click Start Learning on the homepage, open Session 1, and use the tabbed lesson interface."
-    return "I can help with sessions, quizzes, certificates, and Python topics. Try asking about Pandas, NumPy, or ML."

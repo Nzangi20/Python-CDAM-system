@@ -110,24 +110,7 @@
     <p class="copyright" style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);">© Chuka University. All rights reserved.</p>
   </footer>
 
-  {% if current_user.is_authenticated and request.endpoint != 'exam_take' %}
-  <button class="chatbot-toggle" id="chatbotToggle" aria-label="Open assistant">
-    <i class="fa-solid fa-comment-dots"></i>
-  </button>
-  <aside class="chatbot-panel" id="chatbotPanel">
-    <header>
-      <strong style="display: flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-robot"></i> CDAM Assistant</strong>
-      <button id="chatbotClose"><i class="fa-solid fa-xmark" style="font-size: 1.1rem;"></i></button>
-    </header>
-    <div class="chatbot-messages" id="chatbotMessages">
-      <div class="bot-msg">Hi! I am your CDAM Learning Assistant. Ask me about Python, datasets, or exams!</div>
-    </div>
-    <form id="chatbotForm" class="chatbot-form">
-      <input type="text" id="chatbotInput" placeholder="Ask a question..." />
-      <button type="submit" class="btn primary" style="padding: 0.5rem 1rem;"><i class="fa-solid fa-paper-plane"></i></button>
-    </form>
-  </aside>
-  {% endif %}
+
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>

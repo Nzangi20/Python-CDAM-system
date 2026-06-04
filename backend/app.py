@@ -28,7 +28,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
 from seed_data import SESSIONS
-from utils import chatbot_reply, compute_streak, parse_quiz, render_markdown, slugify
+from utils import compute_streak, parse_quiz, render_markdown, slugify
 from ai_service import get_ai_service
 
 FRONTEND_DIR = BASE_DIR.parent / "frontend"
@@ -1367,11 +1367,6 @@ def exam_violation(attempt_id: int):
     return jsonify({"ok": True, "terminate": terminate, "count": attempt.violation_count})
 
 
-@app.post("/api/chatbot")
-def chatbot_api():
-    payload = request.get_json(silent=True) or {}
-    message = payload.get("message", "")
-    return jsonify({"reply": chatbot_reply(message)})
 
 
 @app.route("/admin")
