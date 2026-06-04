@@ -89,6 +89,20 @@ class User(UserMixin, db.Model):
         return "admin" if self.is_admin else "student"
 
 
+class UserSandboxFile(db.Model):
+    __tablename__ = "user_sandbox_files"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    filename = db.Column(db.String(255), nullable=False)
+    file_data = db.Column(db.LargeBinary, nullable=False)
+    file_size = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "filename", name="uq_user_sandbox_filename"),
+    )
+
+
 class Session(db.Model):
     __tablename__ = "sessions"
     id = db.Column(db.Integer, primary_key=True)
@@ -853,6 +867,17 @@ def run_code():
     workspace_dir = os.path.join(app.root_path, "sandbox_workspace", f"user_{current_user.id}")
     os.makedirs(workspace_dir, exist_ok=True)
     
+    # Dynamically restore missing sandbox files from database
+    try:
+        db_files = UserSandboxFile.query.filter_by(user_id=current_user.id).all()
+        for db_file in db_files:
+            local_path = os.path.join(workspace_dir, db_file.filename)
+            if not os.path.exists(local_path):
+                with open(local_path, "wb") as lf:
+                    lf.write(db_file.file_data)
+    except Exception:
+        pass
+    
     try:
         # Run code in a subprocess inside the user's workspace directory
         process = subprocess.run(
@@ -906,7 +931,24 @@ def sandbox_upload():
     workspace_dir = os.path.join(app.root_path, "sandbox_workspace", f"user_{current_user.id}")
     os.makedirs(workspace_dir, exist_ok=True)
     
-    file.save(os.path.join(workspace_dir, filename))
+    # Save to disk first
+    file_bytes = file.read()
+    local_path = os.path.join(workspace_dir, filename)
+    with open(local_path, "wb") as f:
+        f.write(file_bytes)
+        
+    # Save to database to ensure durability/persistence
+    try:
+        sandbox_file = UserSandboxFile.query.filter_by(user_id=current_user.id, filename=filename).first()
+        if not sandbox_file:
+            sandbox_file = UserSandboxFile(user_id=current_user.id, filename=filename)
+            db.session.add(sandbox_file)
+        sandbox_file.file_data = file_bytes
+        sandbox_file.file_size = size
+        db.session.commit()
+    except Exception as e:
+        return jsonify({"error": f"Database storage failed: {str(e)}"}), 500
+        
     return jsonify({"success": True, "filename": filename, "size": size})
 
 
@@ -915,18 +957,28 @@ def sandbox_upload():
 def sandbox_list_files():
     import os
     workspace_dir = os.path.join(app.root_path, "sandbox_workspace", f"user_{current_user.id}")
-    if not os.path.exists(workspace_dir):
-        return jsonify([])
+    os.makedirs(workspace_dir, exist_ok=True)
+    
+    try:
+        # Load from database to ensure durability
+        db_files = UserSandboxFile.query.filter_by(user_id=current_user.id).all()
         
-    files = []
-    for f in os.listdir(workspace_dir):
-        path = os.path.join(workspace_dir, f)
-        if os.path.isfile(path):
+        # Restore files that are missing on disk
+        for db_file in db_files:
+            local_path = os.path.join(workspace_dir, db_file.filename)
+            if not os.path.exists(local_path):
+                with open(local_path, "wb") as lf:
+                    lf.write(db_file.file_data)
+                    
+        files = []
+        for db_file in db_files:
             files.append({
-                "name": f,
-                "size": os.path.getsize(path)
+                "name": db_file.filename,
+                "size": db_file.file_size
             })
-    return jsonify(files)
+        return jsonify(files)
+    except Exception as e:
+        return jsonify({"error": f"Failed to load files: {str(e)}"}), 500
 
 
 @app.route("/api/sandbox/files/<filename>", methods=["DELETE"])
@@ -936,13 +988,25 @@ def sandbox_delete_file(filename):
     from werkzeug.utils import secure_filename
     filename = secure_filename(filename)
     
+    # Delete from database first
+    try:
+        sandbox_file = UserSandboxFile.query.filter_by(user_id=current_user.id, filename=filename).first()
+        if sandbox_file:
+            db.session.delete(sandbox_file)
+            db.session.commit()
+    except Exception as e:
+        return jsonify({"error": f"Failed to delete record: {str(e)}"}), 500
+        
+    # Delete from local disk
     workspace_dir = os.path.join(app.root_path, "sandbox_workspace", f"user_{current_user.id}")
     file_path = os.path.join(workspace_dir, filename)
-    
     if os.path.exists(file_path) and os.path.isfile(file_path):
-        os.remove(file_path)
-        return jsonify({"success": True})
-    return jsonify({"error": "File not found"}), 404
+        try:
+            os.remove(file_path)
+        except Exception:
+            pass
+            
+    return jsonify({"success": True})
 
 
 def _ai_check_access():
