@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent
+# Load .env file from project root if it exists
+load_dotenv(BASE_DIR.parent / ".env")
+
 import csv
 import io
 import json
 from datetime import UTC, datetime
 from functools import wraps
-from pathlib import Path
 
 from flask import Flask, flash, jsonify, make_response, redirect, render_template, request, url_for
 from flask_login import (
@@ -23,13 +30,6 @@ from werkzeug.utils import secure_filename
 from seed_data import SESSIONS
 from utils import chatbot_reply, compute_streak, parse_quiz, render_markdown, slugify
 from ai_service import get_ai_service
-
-import os
-from dotenv import load_dotenv
-
-BASE_DIR = Path(__file__).resolve().parent
-# Load .env file from project root if it exists
-load_dotenv(BASE_DIR.parent / ".env")
 
 FRONTEND_DIR = BASE_DIR.parent / "frontend"
 DB_PATH = BASE_DIR / "cdam.db"
