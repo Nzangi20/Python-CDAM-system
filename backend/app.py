@@ -766,7 +766,7 @@ def resources():
 @student_required
 def exams_dashboard():
     now = utc_now()
-    exams = Exam.query.filter_by(published=True, study_level=current_user.study_level).all()
+    exams = Exam.query.filter_by(published=True).all()
     upcoming = [e for e in exams if e.start_time and to_naive(e.start_time) > now]
     available = [
         e
@@ -1583,9 +1583,6 @@ def exam_take(exam_id: int):
     if not exam or not exam.published:
         flash("Exam not available.", "error")
         return redirect(url_for("exams_dashboard"))
-    if exam.study_level != current_user.study_level:
-        flash("You can only take examinations mapped to your study level.", "error")
-        return redirect(url_for("exams_dashboard"))
     now = utc_now()
     if exam.start_time and to_naive(exam.start_time) > now:
         flash("Exam has not started yet.", "error")
@@ -2383,6 +2380,14 @@ def initialize():
         db.create_all()
         migrate_schema()
         seed_sessions()
+        try:
+            for e in Exam.query.all():
+                if not e.published:
+                    e.published = True
+            db.session.commit()
+        except Exception as ex:
+            db.session.rollback()
+            print(f"Error auto-publishing exams: {ex}")
         admin = User.query.filter_by(email="admin@cdam.local").first()
         if not admin:
             admin = User(
