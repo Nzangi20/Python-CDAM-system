@@ -271,6 +271,90 @@ Create exactly:
 Format each section with clear headers and numbering. For MCQs, mark the correct answer."""
         return self._call(prompt, max_tokens=3000)
 
+    def generate_structured_questions(
+        self,
+        topic: str,
+        num_questions: int,
+        question_types: list[str],
+        difficulty: str,
+        context_type: str = "exam"
+    ) -> list[dict]:
+        """
+        Generate structured questions as a JSON array and parse them into a list of dicts.
+        """
+        types_str = ", ".join(question_types)
+        if context_type == "quiz":
+            prompt = f"""You are a Python for Data Science and Machine Learning teacher.
+Generate a practice quiz for the topic: "{topic}".
+The target difficulty is: {difficulty}.
+Generate exactly {num_questions} multiple-choice questions.
+
+You must return ONLY a raw JSON array of objects representing the questions. Do NOT wrap it in HTML, markdown code blocks (like ```json), or any other text.
+
+Each question object in the JSON array must follow this structure exactly:
+{{
+  "question": "The question text, clear and educational.",
+  "options": [
+    "Option 1",
+    "Option 2",
+    "Option 3",
+    "Option 4"
+  ],
+  "correct": 0
+}}
+Where "correct" is the 0-indexed integer (0, 1, 2, or 3) representing the index of the correct option.
+"""
+        else:
+            prompt = f"""You are a Python for Data Science and Machine Learning teacher.
+Generate an examination for the topic: "{topic}".
+The target difficulty is: {difficulty}.
+Generate exactly {num_questions} questions of types: {types_str}.
+
+You must return ONLY a raw JSON array of objects representing the questions. Do NOT wrap it in HTML, markdown code blocks (like ```json), or any other text.
+
+Each question object in the JSON array must follow this structure exactly:
+{{
+  "questionText": "The question text, clear and educational.",
+  "questionType": "mcq" or "true_false" or "essay",
+  "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+  "correctAnswer": "0" or "1" or "2" or "3" or "True" or "False" or "",
+  "marks": 1
+}}
+
+Rules:
+- For "mcq" type: provide exactly 4 options. "correctAnswer" must be the 0-indexed string index of the correct option (e.g., "0", "1", "2", "3").
+- For "true_false" type: options must be ["True", "False"]. "correctAnswer" must be "True" or "False".
+- For "essay" type: options must be empty list []. "correctAnswer" must be empty string "". Marks can be higher (e.g., 2 or 5).
+"""
+        if not self._provider:
+            raise ValueError("AI Provider is not configured.")
+        
+        system_inst = "You are an expert curriculum developer. You must return ONLY raw JSON arrays. Do not include conversational text or markdown code blocks."
+        raw_res = self._provider.generate(prompt, system_instruction=system_inst, max_tokens=3000)
+        
+        cleaned = raw_res.strip()
+        if cleaned.startswith("```"):
+            lines = cleaned.split("\n")
+            if lines[0].startswith("```"):
+                lines = lines[1:]
+            if lines and lines[-1].startswith("```"):
+                lines = lines[:-1]
+            cleaned = "\n".join(lines).strip()
+            
+        import json
+        try:
+            return json.loads(cleaned)
+        except json.JSONDecodeError as e:
+            start_idx = cleaned.find("[")
+            end_idx = cleaned.rfind("]")
+            if start_idx != -1 and end_idx != -1:
+                try:
+                    return json.loads(cleaned[start_idx:end_idx+1])
+                except json.JSONDecodeError:
+                    pass
+            raise ValueError(f"AI returned invalid JSON: {raw_res}. Error: {e}")
+
+
     def generate_project(self, session) -> str:
         context = self._build_context(session)
         prompt = f"""Generate a practical mini-project for a student based on this lesson.

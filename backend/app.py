@@ -1166,6 +1166,38 @@ def ai_generate_questions():
     return jsonify({"reply": reply})
 
 
+@app.route("/api/admin/ai/generate-questions", methods=["POST"])
+@login_required
+@admin_required
+def admin_ai_generate_questions():
+    ai = get_ai_service()
+    if not ai.is_configured:
+        return jsonify({"error": "AI service is not configured. Please check your environment variables."}), 503
+
+    payload = request.get_json(silent=True) or {}
+    topic = payload.get("topic", "").strip()
+    num_questions = int(payload.get("num_questions", 5))
+    question_types = payload.get("question_types", ["mcq"])
+    difficulty = payload.get("difficulty", "Intermediate")
+    context_type = payload.get("context_type", "exam")
+
+    if not topic:
+        return jsonify({"error": "Topic is required."}), 400
+
+    try:
+        questions = ai.generate_structured_questions(
+            topic=topic,
+            num_questions=num_questions,
+            question_types=question_types,
+            difficulty=difficulty,
+            context_type=context_type
+        )
+        return jsonify({"questions": questions})
+    except Exception as e:
+        return jsonify({"error": f"Failed to generate questions: {str(e)}"}), 500
+
+
+
 @app.route("/api/ai/generate-project", methods=["POST"])
 @login_required
 @student_required
@@ -1743,6 +1775,7 @@ def admin_session_new():
             difficulty=request.form.get("difficulty", "Beginner"),
             display_order=int(request.form.get("display_order", Session.query.count() + 1)),
             published=request.form.get("published") == "on",
+            quiz_json=request.form.get("quiz_json", "[]"),
         )
         db.session.add(session)
         db.session.commit()
@@ -1788,6 +1821,7 @@ def admin_session_edit(session_id: int):
         session_obj.difficulty = request.form.get("difficulty", "Beginner")
         session_obj.display_order = int(request.form.get("display_order", session_obj.display_order))
         session_obj.published = request.form.get("published") == "on"
+        session_obj.quiz_json = request.form.get("quiz_json", "[]")
         db.session.commit()
         log_activity("admin.session.edit", session_obj.slug)
         flash("Session updated.", "success")
