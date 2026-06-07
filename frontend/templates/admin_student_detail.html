@@ -35,6 +35,15 @@
             <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245,158,11,0.25);"><i class="fa-solid fa-key"></i> Password Change Pending</span>
           </div>
         {% endif %}
+        {% if student.password_reset_status == 'requested' %}
+          <div>
+            <span class="badge animate-pulse" style="background: rgba(239, 68, 68, 0.15); color: var(--red-500); border-color: rgba(239,68,68,0.25); font-weight: 700;"><i class="fa-solid fa-circle-exclamation"></i> Password Reset Requested</span>
+          </div>
+        {% elif student.password_reset_status == 'approved' %}
+          <div>
+            <span class="badge success" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16, 185, 129, 0.25);"><i class="fa-solid fa-circle-check"></i> Reset Approved (Waiting for student)</span>
+          </div>
+        {% endif %}
       </div>
 
       <div style="border-top: 1px solid var(--border); padding-top: 1rem; text-align: left; font-size: 0.875rem; display: flex; flex-direction: column; gap: 0.5rem;">
@@ -58,6 +67,18 @@
             <i class="fa-solid fa-key" style="margin-right: 0.5rem;"></i> {{ "Cancel Password Change Request" if student.require_password_change else "Require/Approve Password Change" }}
           </button>
         </form>
+        {% if student.password_reset_status == 'requested' %}
+        <form method="post" action="{{ url_for('admin_approve_password_reset', user_id=student.id) }}" style="width: 100%;">
+          <button class="btn ghost" type="submit" style="width: 100%; text-align: left; padding: 0.5rem 1rem; justify-content: flex-start; color: #10b981; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.05);">
+            <i class="fa-solid fa-circle-check" style="margin-right: 0.5rem;"></i> Approve Password Reset Request
+          </button>
+        </form>
+        <form method="post" action="{{ url_for('admin_reject_password_reset', user_id=student.id) }}" style="width: 100%;">
+          <button class="btn ghost" type="submit" style="width: 100%; text-align: left; padding: 0.5rem 1rem; justify-content: flex-start; color: var(--red-400); border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.05);">
+            <i class="fa-solid fa-circle-xmark" style="margin-right: 0.5rem;"></i> Reject Password Reset Request
+          </button>
+        </form>
+        {% endif %}
         <form method="post" action="{{ url_for('admin_reset_progress', user_id=student.id) }}" onsubmit="return confirm('Reset all progress for this student?')" style="width: 100%;">
           <button class="btn ghost" type="submit" style="width: 100%; text-align: left; padding: 0.5rem 1rem; justify-content: flex-start;">
             <i class="fa-solid fa-rotate-left" style="margin-right: 0.5rem;"></i> Reset Learning Progress

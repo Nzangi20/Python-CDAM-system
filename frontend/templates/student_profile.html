@@ -31,11 +31,19 @@
         </select>
       </div>
 
+      {% if current_user.require_password_change %}
       <div style="display: flex; flex-direction: column; gap: 0.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem; margin-top: 1rem;">
         <h4 style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--red-400);">Security Credential Refresh</h4>
-        <label>New Password (Leave blank to keep current)</label>
-        <input type="password" name="new_password" placeholder="••••••••" />
+        <p style="font-size: 0.85rem; color: #10b981; margin-bottom: 0.5rem; font-weight: 600;"><i class="fa-solid fa-circle-check"></i> Password update authorized by administrator.</p>
+        <label>New Password</label>
+        <input type="password" name="new_password" placeholder="Enter new password" required />
       </div>
+      {% else %}
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem; margin-top: 1rem; opacity: 0.8;">
+        <h4 style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-muted);">Security Credential Refresh</h4>
+        <p class="muted" style="font-size: 0.85rem;"><i class="fa-solid fa-lock"></i> Password changes must be approved by an administrator.</p>
+      </div>
+      {% endif %}
 
       <button class="btn primary" type="submit" style="width: 100%; margin-top: 1.5rem; padding: 0.85rem; font-weight: 700;"><i class="fa-solid fa-save"></i> Save Changes</button>
     </form>

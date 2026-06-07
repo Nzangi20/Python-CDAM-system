@@ -11,7 +11,7 @@ load_dotenv(BASE_DIR.parent / ".env")
 import csv
 import io
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timezone
 from functools import wraps
 
 def to_naive(dt):
@@ -91,6 +91,7 @@ class User(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     is_suspended = db.Column(db.Boolean, default=False)
     require_password_change = db.Column(db.Boolean, default=False, nullable=False)
+    password_reset_status = db.Column(db.String(30), nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
 
     @property
@@ -327,6 +328,15 @@ class PlatformSetting(db.Model):
     value = db.Column(db.Text, nullable=True)
 
 
+def to_local_datetime_str(dt):
+    if not dt:
+        return ''
+    try:
+        local_dt = dt.replace(tzinfo=timezone.utc).astimezone(None).replace(tzinfo=None)
+        return local_dt.strftime('%Y-%m-%dT%H:%M')
+    except Exception:
+        return dt.strftime('%Y-%m-%dT%H:%M')
+
 @app.context_processor
 def inject_globals():
     sessions = Session.query.filter_by(published=True).order_by(Session.display_order).all()
@@ -336,6 +346,7 @@ def inject_globals():
         "nav_sessions": sessions,
         "render_markdown": render_markdown,
         "check_session_access": check_session_access,
+        "to_local_datetime_str": to_local_datetime_str,
     }
 
 
@@ -668,6 +679,48 @@ def login():
     return render_template("login.html")
 
 
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        reg_number = request.form.get("reg_number", "").strip().upper()
+        
+        user = User.query.filter_by(email=email, reg_number=reg_number).first()
+        if not user:
+            flash("No user found with the provided email and registration number.", "error")
+            return redirect(url_for("forgot_password"))
+            
+        action = request.form.get("action", "")
+        if action == "reset":
+            if user.password_reset_status != "approved":
+                flash("Password reset request must be approved by an administrator.", "error")
+                return redirect(url_for("forgot_password"))
+            new_password = request.form.get("new_password", "").strip()
+            if not new_password:
+                flash("Please enter a new password.", "error")
+                return render_template("forgot_password.html", user=user, status="approved")
+            user.password_hash = generate_password_hash(new_password)
+            user.password_reset_status = None
+            db.session.commit()
+            log_activity("auth.password_reset_complete", f"User={user.email}")
+            flash("Password updated successfully. You can now sign in.", "success")
+            return redirect(url_for("login"))
+            
+        # Default action: check status / submit request
+        if not user.password_reset_status:
+            user.password_reset_status = "requested"
+            db.session.commit()
+            log_activity("auth.password_reset_request", f"User={user.email}")
+            flash("Password reset request submitted successfully.", "success")
+            return render_template("forgot_password.html", user=user, status="requested")
+        elif user.password_reset_status == "requested":
+            return render_template("forgot_password.html", user=user, status="requested")
+        elif user.password_reset_status == "approved":
+            return render_template("forgot_password.html", user=user, status="approved")
+            
+    return render_template("forgot_password.html", user=None, status=None)
+
+
 @app.route("/logout")
 @login_required
 def logout():
@@ -740,6 +793,9 @@ def student_profile():
         current_user.avatar = request.form.get("avatar", current_user.avatar).strip() or current_user.avatar
         current_user.study_level = request.form.get("study_level", current_user.study_level)
         if new_password:
+            if not current_user.require_password_change:
+                flash("Password change must be approved by an administrator.", "error")
+                return redirect(url_for("student_profile"))
             current_user.password_hash = generate_password_hash(new_password)
             current_user.require_password_change = False
         db.session.commit()
@@ -1714,8 +1770,20 @@ def admin_exams():
     if request.method == "POST":
         start_time_raw = request.form.get("start_time", "").strip()
         end_time_raw = request.form.get("end_time", "").strip()
-        start_time = datetime.fromisoformat(start_time_raw) if start_time_raw else None
-        end_time = datetime.fromisoformat(end_time_raw) if end_time_raw else None
+        
+        start_time = None
+        if start_time_raw:
+            try:
+                start_time = datetime.fromisoformat(start_time_raw).astimezone(timezone.utc).replace(tzinfo=None)
+            except Exception:
+                pass
+                
+        end_time = None
+        if end_time_raw:
+            try:
+                end_time = datetime.fromisoformat(end_time_raw).astimezone(timezone.utc).replace(tzinfo=None)
+            except Exception:
+                pass
         
         exam = Exam(
             title=request.form.get("title", "").strip(),
@@ -1728,7 +1796,7 @@ def admin_exams():
             randomize_options=request.form.get("randomize_options") == "on",
             one_device_only=request.form.get("one_device_only") == "on",
             proctoring_enabled=request.form.get("proctoring_enabled") == "on",
-            published=request.form.get("published") == "on",
+            published=True,
             study_level=request.form.get("study_level", "Beginner").strip(),
             start_time=start_time,
             end_time=end_time,
@@ -1915,6 +1983,36 @@ def admin_require_password_change(user_id: int):
     return redirect(url_for("admin_student_detail", user_id=user_id))
 
 
+@app.post("/admin/users/<int:user_id>/approve-reset")
+@login_required
+@admin_required
+def admin_approve_password_reset(user_id: int):
+    user = db.session.get(User, user_id)
+    if not user or user.is_admin:
+        flash("Cannot approve password reset for this user.", "error")
+        return redirect(url_for("admin_panel"))
+    user.password_reset_status = "approved"
+    db.session.commit()
+    log_activity("admin.user.approve_password_reset", f"user={user.id}")
+    flash("Password reset request approved. The student can now set their new password.", "success")
+    return redirect(url_for("admin_student_detail", user_id=user_id))
+
+
+@app.post("/admin/users/<int:user_id>/reject-reset")
+@login_required
+@admin_required
+def admin_reject_password_reset(user_id: int):
+    user = db.session.get(User, user_id)
+    if not user or user.is_admin:
+        flash("Cannot perform this action.", "error")
+        return redirect(url_for("admin_panel"))
+    user.password_reset_status = None
+    db.session.commit()
+    log_activity("admin.user.reject_password_reset", f"user={user.id}")
+    flash("Password reset request cleared.", "success")
+    return redirect(url_for("admin_student_detail", user_id=user_id))
+
+
 @app.post("/admin/users/<int:user_id>/reset-progress")
 @login_required
 @admin_required
@@ -2024,10 +2122,25 @@ def admin_exam_edit(exam_id: int):
         exam.proctoring_enabled = request.form.get("proctoring_enabled") == "on"
         exam.published = request.form.get("published") == "on"
         exam.study_level = request.form.get("study_level", "Beginner").strip()
-        start_time = request.form.get("start_time", "").strip()
-        end_time = request.form.get("end_time", "").strip()
-        exam.start_time = datetime.fromisoformat(start_time) if start_time else None
-        exam.end_time = datetime.fromisoformat(end_time) if end_time else None
+        start_time_raw = request.form.get("start_time", "").strip()
+        end_time_raw = request.form.get("end_time", "").strip()
+        
+        start_time = None
+        if start_time_raw:
+            try:
+                start_time = datetime.fromisoformat(start_time_raw).astimezone(timezone.utc).replace(tzinfo=None)
+            except Exception:
+                pass
+                
+        end_time = None
+        if end_time_raw:
+            try:
+                end_time = datetime.fromisoformat(end_time_raw).astimezone(timezone.utc).replace(tzinfo=None)
+            except Exception:
+                pass
+                
+        exam.start_time = start_time
+        exam.end_time = end_time
         raw_questions = request.form.get("questions_json", "")
         if raw_questions.strip():
             try:
@@ -2250,6 +2363,9 @@ def migrate_schema() -> None:
         if "require_password_change" not in columns:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE users ADD COLUMN require_password_change BOOLEAN DEFAULT 0"))
+        if "password_reset_status" not in columns:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE users ADD COLUMN password_reset_status VARCHAR(30)"))
     if "exams" in inspector.get_table_names():
         columns = {col["name"] for col in inspector.get_columns("exams")}
         if "study_level" not in columns:
