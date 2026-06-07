@@ -14,6 +14,14 @@ import json
 from datetime import UTC, datetime
 from functools import wraps
 
+def to_naive(dt):
+    if dt is None:
+        return None
+    return dt.replace(tzinfo=None) if dt.tzinfo else dt
+
+def utc_now():
+    return datetime.now(UTC).replace(tzinfo=None)
+
 from flask import Flask, flash, jsonify, make_response, redirect, render_template, request, url_for
 from flask_login import (
     LoginManager,
@@ -82,6 +90,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     is_suspended = db.Column(db.Boolean, default=False)
+    require_password_change = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
 
     @property
@@ -509,7 +518,7 @@ def dashboard_context(user_id: int):
 def admin_dashboard_context():
     users_count = User.query.filter_by(is_admin=False).count()
     active_users = ActivityLog.query.filter(
-        ActivityLog.created_at >= datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+        ActivityLog.created_at >= utc_now().replace(hour=0, minute=0, second=0, microsecond=0)
     ).with_entities(ActivityLog.user_id).distinct().count()
     completion_count = UserProgress.query.filter_by(completed=True).count()
     avg_quiz_score = db.session.query(db.func.avg(QuizResult.score)).scalar() or 0
@@ -534,7 +543,7 @@ def admin_dashboard_context():
 
     # --- New analytics ---
     from datetime import timedelta
-    seven_days_ago = datetime.now(UTC) - timedelta(days=7)
+    seven_days_ago = utc_now() - timedelta(days=7)
     recent_registrations = User.query.filter(
         User.is_admin == False, User.created_at >= seven_days_ago
     ).order_by(User.created_at.desc()).all()
@@ -599,7 +608,7 @@ def index():
         sessions=sessions,
         query=query,
         difficulty=difficulty,
-        difficulties=["Beginner", "Intermediate", "Advanced"],
+        difficulties=["Beginner", "Professional"],
     )
 
 
@@ -668,6 +677,16 @@ def logout():
     return redirect(url_for("index"))
 
 
+@app.before_request
+def enforce_password_change():
+    if current_user.is_authenticated and not current_user.is_admin:
+        if getattr(current_user, "require_password_change", False):
+            allowed = ["student_profile", "logout", "static"]
+            if request.endpoint and request.endpoint not in allowed:
+                flash("You are required to change your password before proceeding.", "warning")
+                return redirect(url_for("student_profile"))
+
+
 @app.route("/dashboard")
 @login_required
 def dashboard():
@@ -693,13 +712,13 @@ def resources():
 @login_required
 @student_required
 def exams_dashboard():
-    now = datetime.now(UTC)
+    now = utc_now()
     exams = Exam.query.filter_by(published=True, study_level=current_user.study_level).all()
-    upcoming = [e for e in exams if e.start_time and e.start_time > now]
+    upcoming = [e for e in exams if e.start_time and to_naive(e.start_time) > now]
     available = [
         e
         for e in exams
-        if (not e.start_time or e.start_time <= now) and (not e.end_time or e.end_time >= now)
+        if (not e.start_time or to_naive(e.start_time) <= now) and (not e.end_time or to_naive(e.end_time) >= now)
     ]
     attempts = ExamAttemptRecord.query.filter_by(user_id=current_user.id).order_by(
         ExamAttemptRecord.created_at.desc()
@@ -712,12 +731,17 @@ def exams_dashboard():
 @student_required
 def student_profile():
     if request.method == "POST":
+        new_password = request.form.get("new_password", "").strip()
+        if current_user.require_password_change and not new_password:
+            flash("You must enter a new password to proceed.", "error")
+            return redirect(url_for("student_profile"))
+
         current_user.name = request.form.get("name", current_user.name).strip()
         current_user.avatar = request.form.get("avatar", current_user.avatar).strip() or current_user.avatar
         current_user.study_level = request.form.get("study_level", current_user.study_level)
-        new_password = request.form.get("new_password", "").strip()
         if new_password:
             current_user.password_hash = generate_password_hash(new_password)
+            current_user.require_password_change = False
         db.session.commit()
         log_activity("student.profile.updated")
         flash("Profile updated.", "success")
@@ -733,7 +757,7 @@ def certificate():
     if not ctx["certificate_ready"]:
         flash("Complete all sessions to unlock your certificate.", "error")
         return redirect(url_for("student_dashboard"))
-    return render_template("certificate.html", user=current_user, completed_at=datetime.now(UTC))
+    return render_template("certificate.html", user=current_user, completed_at=utc_now())
 
 
 @app.route("/transcript")
@@ -762,7 +786,7 @@ def transcript():
         quiz_map=quiz_map,
         exams=exams,
         exam_attempts=exam_attempts,
-        completed_at=datetime.now(UTC)
+        completed_at=utc_now()
     )
 
 
@@ -1178,7 +1202,7 @@ def admin_ai_generate_questions():
     topic = payload.get("topic", "").strip()
     num_questions = int(payload.get("num_questions", 5))
     question_types = payload.get("question_types", ["mcq"])
-    difficulty = payload.get("difficulty", "Intermediate")
+    difficulty = payload.get("difficulty", "Professional")
     context_type = payload.get("context_type", "exam")
 
     if not topic:
@@ -1397,7 +1421,7 @@ def admin_ai_toggle():
 def admin_ai_stats():
     from sqlalchemy import func
     total = AIUsageLog.query.count()
-    today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+    today_start = utc_now().replace(hour=0, minute=0, second=0, microsecond=0)
     today_count = AIUsageLog.query.filter(AIUsageLog.created_at >= today_start).count()
     unique_users = db.session.query(func.count(func.distinct(AIUsageLog.user_id))).scalar() or 0
     popular = db.session.query(
@@ -1434,7 +1458,7 @@ def complete_session(slug: str):
         progress = UserProgress(user_id=current_user.id, session_id=session.id)
     progress.completed = True
     progress.progress_percentage = 100
-    progress.completed_at = datetime.now(UTC)
+    progress.completed_at = utc_now()
     db.session.add(progress)
     db.session.commit()
     log_activity("student.session.complete", session.slug)
@@ -1506,11 +1530,11 @@ def exam_take(exam_id: int):
     if exam.study_level != current_user.study_level:
         flash("You can only take examinations mapped to your study level.", "error")
         return redirect(url_for("exams_dashboard"))
-    now = datetime.now(UTC)
-    if exam.start_time and exam.start_time > now:
+    now = utc_now()
+    if exam.start_time and to_naive(exam.start_time) > now:
         flash("Exam has not started yet.", "error")
         return redirect(url_for("exams_dashboard"))
-    if exam.end_time and exam.end_time < now:
+    if exam.end_time and to_naive(exam.end_time) < now:
         flash("Exam window has closed.", "error")
         return redirect(url_for("exams_dashboard"))
 
@@ -1580,10 +1604,10 @@ def exam_take(exam_id: int):
         flash("No active exam attempt found.", "error")
         return redirect(url_for("exams_dashboard"))
 
-    elapsed = (datetime.now(UTC) - attempt.created_at).total_seconds() / 60
+    elapsed = (utc_now() - to_naive(attempt.created_at)).total_seconds() / 60
     if elapsed > exam.duration + 1:
         flash("Exam submission rejected: time limit exceeded.", "error")
-        attempt.submitted_at = datetime.now(UTC)
+        attempt.submitted_at = utc_now()
         attempt.status = "terminated"
         db.session.commit()
         return redirect(url_for("exams_dashboard"))
@@ -1621,7 +1645,7 @@ def exam_take(exam_id: int):
     score = int((correct_total / objective_total) * 100) if objective_total else 0
     passed = score >= exam.passing_score
 
-    attempt.submitted_at = datetime.now(UTC)
+    attempt.submitted_at = utc_now()
     attempt.answers_json = json.dumps({"question_order": ordered_indices, "answers": answers})
     attempt.violation_count = (
         integrity_flags["tab_switches"] + integrity_flags["fullscreen_exits"] + integrity_flags["copy_events"]
@@ -1659,7 +1683,7 @@ def exam_violation(attempt_id: int):
     terminate = attempt.violation_count >= 3
     if terminate:
         attempt.status = "terminated"
-        attempt.submitted_at = datetime.now(UTC)
+        attempt.submitted_at = utc_now()
     db.session.add(
         IntegrityLog(
             user_id=current_user.id,
@@ -1749,7 +1773,7 @@ def admin_session_new():
         if uploaded_note and uploaded_note.filename:
             UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
             safe_name = secure_filename(uploaded_note.filename)
-            stored_name = f"{slug}-{int(datetime.now(UTC).timestamp())}-{safe_name}"
+            stored_name = f"{slug}-{int(utc_now().timestamp())}-{safe_name}"
             destination = UPLOADS_DIR / stored_name
             notes_data = uploaded_note.read()
             uploaded_note.seek(0)
@@ -1810,7 +1834,7 @@ def admin_session_edit(session_id: int):
         if uploaded_note and uploaded_note.filename:
             UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
             safe_name = secure_filename(uploaded_note.filename)
-            stored_name = f"{session_obj.slug}-{int(datetime.now(UTC).timestamp())}-{safe_name}"
+            stored_name = f"{session_obj.slug}-{int(utc_now().timestamp())}-{safe_name}"
             destination = UPLOADS_DIR / stored_name
             session_obj.notes_file_data = uploaded_note.read()
             uploaded_note.seek(0)
@@ -1873,6 +1897,22 @@ def admin_toggle_suspend(user_id: int):
     log_activity("admin.user.suspend_toggle", user.email)
     flash("User status updated.", "success")
     return redirect(url_for("admin_panel"))
+
+
+@app.post("/admin/users/<int:user_id>/require-password-change")
+@login_required
+@admin_required
+def admin_require_password_change(user_id: int):
+    user = db.session.get(User, user_id)
+    if not user or user.is_admin:
+        flash("Cannot require password change for this user.", "error")
+        return redirect(url_for("admin_panel"))
+    user.require_password_change = not user.require_password_change
+    db.session.commit()
+    status = "requested" if user.require_password_change else "cancelled"
+    log_activity("admin.user.require_password_change", f"user={user.id}:status={status}")
+    flash(f"Password change requirement {status} for student.", "success")
+    return redirect(url_for("admin_student_detail", user_id=user_id))
 
 
 @app.post("/admin/users/<int:user_id>/reset-progress")
@@ -2141,12 +2181,12 @@ def admin_attempt_action(attempt_id: int):
     action = request.form.get("action", "").strip()
     if action == "force_submit":
         attempt.status = "submitted"
-        attempt.submitted_at = datetime.now(UTC)
+        attempt.submitted_at = utc_now()
         flash("Exam attempt force-submitted successfully.", "success")
         log_activity("admin.exam.force_submit", f"attempt={attempt_id}")
     elif action == "terminate":
         attempt.status = "terminated"
-        attempt.submitted_at = datetime.now(UTC)
+        attempt.submitted_at = utc_now()
         flash("Exam attempt terminated.", "success")
         log_activity("admin.exam.terminate", f"attempt={attempt_id}")
     elif action == "flag":
@@ -2207,6 +2247,9 @@ def migrate_schema() -> None:
         if "reg_number" not in columns:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE users ADD COLUMN reg_number VARCHAR(100)"))
+        if "require_password_change" not in columns:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE users ADD COLUMN require_password_change BOOLEAN DEFAULT 0"))
     if "exams" in inspector.get_table_names():
         columns = {col["name"] for col in inspector.get_columns("exams")}
         if "study_level" not in columns:

@@ -96,7 +96,7 @@
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
           <label>Session Difficulty</label>
           <select name="difficulty">
-            {% for level in ['Beginner', 'Intermediate', 'Advanced'] %}
+            {% for level in ['Beginner', 'Professional'] %}
               <option value="{{ level }}" {% if session_obj and session_obj.difficulty == level %}selected{% endif %}>{{ level }}</option>
             {% endfor %}
           </select>
@@ -141,8 +141,7 @@
               <label style="font-size: 0.75rem; font-weight: 600;">Difficulty</label>
               <select id="quizAiDifficultyInput" style="padding: 0.5rem; font-size: 0.85rem; border-radius: 6px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: var(--text);">
                 <option value="Beginner">Beginner</option>
-                <option value="Intermediate" selected>Intermediate</option>
-                <option value="Professional">Professional</option>
+                <option value="Professional" selected>Professional</option>
               </select>
             </div>
           </div>

@@ -95,7 +95,7 @@ def test_api_admin_ai_generate_questions_success(client):
                 "topic": "DataFrame operations",
                 "num_questions": 1,
                 "question_types": ["mcq"],
-                "difficulty": "Intermediate",
+                "difficulty": "Professional",
                 "context_type": "exam"
             }
         )
@@ -109,7 +109,7 @@ def test_api_admin_ai_generate_questions_success(client):
             topic="DataFrame operations",
             num_questions=1,
             question_types=["mcq"],
-            difficulty="Intermediate",
+            difficulty="Professional",
             context_type="exam"
         )
 

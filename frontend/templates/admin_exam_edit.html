@@ -45,7 +45,6 @@
           <label>Target Study Level</label>
           <select name="study_level" required>
             <option value="Beginner" {% if exam.study_level == "Beginner" %}selected{% endif %}>Beginner</option>
-            <option value="Intermediate" {% if exam.study_level == "Intermediate" %}selected{% endif %}>Intermediate</option>
             <option value="Professional" {% if exam.study_level == "Professional" %}selected{% endif %}>Professional</option>
           </select>
         </div>
@@ -133,8 +132,7 @@
               <label style="font-size: 0.75rem; font-weight: 600;">Difficulty</label>
               <select id="aiDifficultyInput" style="padding: 0.5rem; font-size: 0.85rem; border-radius: 6px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: var(--text);">
                 <option value="Beginner">Beginner</option>
-                <option value="Intermediate" selected>Intermediate</option>
-                <option value="Professional">Professional</option>
+                <option value="Professional" selected>Professional</option>
               </select>
             </div>
           </div>
