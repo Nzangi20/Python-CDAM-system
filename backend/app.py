@@ -422,6 +422,28 @@ def check_session_access(user, display_order):
 
 
 def seed_sessions() -> None:
+    # Clean up title repetitions/prefixes in existing database sessions
+    import re
+    for session_obj in Session.query.all():
+        title_changed = False
+        if "atory Data Analysis (EDA) atory Data Analysis (EDA)" in session_obj.title:
+            session_obj.title = session_obj.title.replace(
+                "atory Data Analysis (EDA) atory Data Analysis (EDA)",
+                "atory Data Analysis (EDA)"
+            )
+            title_changed = True
+        
+        # Strip redundant prefixes like "Session X: Session X:"
+        cleaned = re.sub(r"^(Session\s+\d+:\s*)+", "", session_obj.title, flags=re.IGNORECASE).strip()
+        new_title = f"Session {session_obj.display_order}: {cleaned}"
+        if session_obj.title != new_title:
+            session_obj.title = new_title
+            title_changed = True
+            
+        if title_changed:
+            db.session.add(session_obj)
+    db.session.commit()
+
     # Only seed initial sessions if they are not already in the database.
     # We do NOT overwrite existing sessions or delete sessions created/edited by admins.
     for idx, item in enumerate(SESSIONS, start=1):
