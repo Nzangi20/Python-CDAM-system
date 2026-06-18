@@ -181,11 +181,11 @@
       block.style.border = "1px solid var(--border)";
       block.style.position = "relative";
       
-      const type = data ? data.questionType : "mcq";
-      const qText = data ? data.questionText : "";
-      const marks = data ? data.marks : 1;
-      const options = data ? data.options : ["", "", "", ""];
-      const correct = data ? data.correctAnswer : "0";
+      const type = (data && data.questionType) ? data.questionType : "mcq";
+      const qText = (data && data.questionText) ? String(data.questionText) : "";
+      const marks = (data && data.marks) ? data.marks : 1;
+      const options = (data && data.options) ? data.options : ["", "", "", ""];
+      const correct = (data && data.correctAnswer !== undefined) ? String(data.correctAnswer) : "0";
 
       block.innerHTML = `
         <button type="button" class="remove-q-btn" style="position: absolute; top: 12px; right: 12px; background: none; border: none; color: var(--red-400); cursor: pointer; font-size: 1rem;"><i class="fa-solid fa-trash-can"></i></button>
@@ -214,7 +214,7 @@
           ${options.map((opt, i) => `
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <input type="radio" name="correct_${qId}" class="q-correct-mcq" value="${i}" ${correct == i ? "checked" : ""} style="width: 16px; height: 16px;" />
-              <input type="text" class="q-opt" value="${opt.replace(/"/g, '&quot;')}" placeholder="Option ${i + 1}" style="padding: 0.4rem 0.75rem; font-size: 0.85rem;" />
+              <input type="text" class="q-opt" value="${String(opt || '').replace(/"/g, '&quot;')}" placeholder="Option ${i + 1}" style="padding: 0.4rem 0.75rem; font-size: 0.85rem;" />
             </div>
           `).join('')}
         </div>
@@ -268,9 +268,13 @@
       const questionsList = [];
 
       qBlocks.forEach((qb) => {
-        const type = qb.querySelector(".q-type").value;
-        const marks = parseInt(qb.querySelector(".q-marks").value) || 1;
-        const text = qb.querySelector(".q-text").value.trim();
+        const typeSelect = qb.querySelector(".q-type");
+        const marksInput = qb.querySelector(".q-marks");
+        const textInput = qb.querySelector(".q-text");
+
+        const type = typeSelect ? typeSelect.value : "mcq";
+        const marks = marksInput ? (parseInt(marksInput.value) || 1) : 1;
+        const text = textInput ? textInput.value.trim() : "";
 
         let options = [];
         let correct = "";
