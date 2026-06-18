@@ -191,17 +191,25 @@
 {% block scripts %}
 <script>
   (() => {
+    window.onerror = function(msg, url, line, col, error) {
+      alert("Browser Error: " + msg + " at " + line + ":" + col);
+      return false;
+    };
+
     const addBtn = document.getElementById("addQuestionBtn");
     const container = document.getElementById("questionsBuilderContainer");
     const form = document.getElementById("examCreationForm");
     const jsonInput = document.getElementById("questionsJsonInput");
     let qCounter = 0;
 
-    addBtn.addEventListener("click", () => {
-      createQuestionBlock();
-    });
+    if (addBtn) {
+      addBtn.addEventListener("click", () => {
+        createQuestionBlock();
+      });
+    }
 
     function createQuestionBlock(data = null) {
+      if (!container) return;
       const qId = qCounter++;
       const block = document.createElement("div");
       block.className = "card question-builder-block";
@@ -266,70 +274,85 @@
       const optContainer = block.querySelector(".options-container");
       const tfContainer = block.querySelector(".tf-container");
 
-      typeSelect.addEventListener("change", (e) => {
-        if (e.target.value === "mcq") {
-          optContainer.style.display = "flex";
-          tfContainer.style.display = "none";
-        } else if (e.target.value === "true_false") {
-          optContainer.style.display = "none";
-          tfContainer.style.display = "flex";
-        } else {
-          optContainer.style.display = "none";
-          tfContainer.style.display = "none";
-        }
-      });
+      if (typeSelect && optContainer && tfContainer) {
+        typeSelect.addEventListener("change", (e) => {
+          if (e.target.value === "mcq") {
+            optContainer.style.display = "flex";
+            tfContainer.style.display = "none";
+          } else if (e.target.value === "true_false") {
+            optContainer.style.display = "none";
+            tfContainer.style.display = "flex";
+          } else {
+            optContainer.style.display = "none";
+            tfContainer.style.display = "none";
+          }
+        });
+      }
 
       // Remove button listener
-      block.querySelector(".remove-q-btn").addEventListener("click", () => {
-        block.remove();
-      });
+      const removeBtn = block.querySelector(".remove-q-btn");
+      if (removeBtn) {
+        removeBtn.addEventListener("click", () => {
+          block.remove();
+        });
+      }
 
       container.appendChild(block);
     }
 
-    form.addEventListener("submit", (e) => {
-      const qBlocks = container.querySelectorAll(".question-builder-block");
-      const questionsList = [];
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        try {
+          if (!container) return;
+          const qBlocks = container.querySelectorAll(".question-builder-block");
+          const questionsList = [];
 
-      qBlocks.forEach((qb) => {
-        const typeSelect = qb.querySelector(".q-type");
-        const marksInput = qb.querySelector(".q-marks");
-        const textInput = qb.querySelector(".q-text");
+          qBlocks.forEach((qb) => {
+            const typeSelect = qb.querySelector(".q-type");
+            const marksInput = qb.querySelector(".q-marks");
+            const textInput = qb.querySelector(".q-text");
 
-        const type = typeSelect ? typeSelect.value : "mcq";
-        const marks = marksInput ? (parseInt(marksInput.value) || 1) : 1;
-        const text = textInput ? textInput.value.trim() : "";
+            const type = typeSelect ? typeSelect.value : "mcq";
+            const marks = marksInput ? (parseInt(marksInput.value) || 1) : 1;
+            const text = textInput ? textInput.value.trim() : "";
 
-        let options = [];
-        let correct = "";
+            let options = [];
+            let correct = "";
 
-        if (type === "mcq") {
-          const optInputs = qb.querySelectorAll(".q-opt");
-          optInputs.forEach((inp) => {
-            options.push(inp.value.trim());
+            if (type === "mcq") {
+              const optInputs = qb.querySelectorAll(".q-opt");
+              optInputs.forEach((inp) => {
+                options.push(inp.value.trim());
+              });
+              const correctRadio = qb.querySelector(".q-correct-mcq:checked");
+              correct = correctRadio ? correctRadio.value : "0";
+            } else if (type === "true_false") {
+              options = ["True", "False"];
+              const correctRadio = qb.querySelector(".q-correct-tf:checked");
+              correct = correctRadio ? correctRadio.value : "True";
+            } else {
+              options = [];
+              correct = "";
+            }
+
+            questionsList.push({
+              questionText: text,
+              questionType: type,
+              options: options,
+              correctAnswer: correct,
+              marks: marks
+            });
           });
-          const correctRadio = qb.querySelector(".q-correct-mcq:checked");
-          correct = correctRadio ? correctRadio.value : "0";
-        } else if (type === "true_false") {
-          options = ["True", "False"];
-          const correctRadio = qb.querySelector(".q-correct-tf:checked");
-          correct = correctRadio ? correctRadio.value : "True";
-        } else {
-          options = [];
-          correct = "";
+
+          if (jsonInput) {
+            jsonInput.value = JSON.stringify(questionsList);
+          }
+        } catch (err) {
+          alert("Submission preparation error: " + err.message);
+          e.preventDefault();
         }
-
-        questionsList.push({
-          questionText: text,
-          questionType: type,
-          options: options,
-          correctAnswer: correct,
-          marks: marks
-        });
       });
-
-      jsonInput.value = JSON.stringify(questionsList);
-    });
+    }
 
     // AI Generator Panel Event Handling
     const toggleAiBtn = document.getElementById("toggleAiPanelBtn");
