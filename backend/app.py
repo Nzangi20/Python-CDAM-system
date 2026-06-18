@@ -422,6 +422,13 @@ def check_session_access(user, display_order):
 
 
 def seed_sessions() -> None:
+    # Explicitly clean Session 2 title to ensure it has no duplicate text
+    s2 = Session.query.filter_by(slug="session-2-data-import-eda").first()
+    if s2:
+        s2.title = "Session 2: Data Import, Cleaning, and Exploratory Data Analysis (EDA)"
+        db.session.add(s2)
+        db.session.commit()
+
     # Clean up title repetitions/prefixes in existing database sessions
     import re
     for session_obj in Session.query.all():
