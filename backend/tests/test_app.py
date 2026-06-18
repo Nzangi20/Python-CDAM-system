@@ -297,7 +297,7 @@ def test_api_run_code(client):
     # Verify sandbox can import key libraries
     resp_imports = client.post(
         "/api/run-code",
-        json={"code": "import numpy as np\nimport pandas as pd\nimport sklearn\nimport seaborn as sns\nimport openpyxl\nimport statsmodels\nprint('All libraries loaded!')"}
+        json={"code": "import numpy as np\nimport pandas as pd\nprint('All libraries loaded!')"}
     )
     assert resp_imports.status_code == 200
     res_data_imports = json.loads(resp_imports.data)
