@@ -47,7 +47,7 @@ def client():
 
 
 def register_and_login(client, reg_number="EB3/10001/26", password="secret123", study_level="Beginner"):
-    client.post(
+    return client.post(
         "/register",
         data={"name": "Test Student", "reg_number": reg_number, "password": password, "study_level": study_level},
         follow_redirects=True,
@@ -830,6 +830,53 @@ def test_quiz_progression_locking(client):
     # Access session 2 -> Allowed now since Session 1 quiz was passed!
     resp_allowed = client.get(f"/session/{s2_slug}")
     assert resp_allowed.status_code == 200
+
+
+def test_admin_registration_and_mandatory_password_reset(client):
+    # 1. Register student via admin endpoint
+    login_admin(client)
+    new_student_data = {
+        "name": "Admin Registered Student",
+        "reg_number": "EB3/99999/26",
+        "password": "tempPassword123",
+        "study_level": "Professional"
+    }
+    register_resp = client.post("/admin/users/new", data=new_student_data, follow_redirects=True)
+    assert register_resp.status_code == 200
+    assert b"Student account created successfully" in register_resp.data
+
+    # Log out admin
+    client.get("/logout", follow_redirects=True)
+
+    # 2. Log in as student using registration number
+    login_resp = client.post(
+        "/login",
+        data={"identifier": "EB3/99999/26", "password": "tempPassword123"},
+        follow_redirects=True
+    )
+    assert login_resp.status_code == 200
+    # Must be redirected to profile since password change is required
+    assert b"You are required to change your password before proceeding" in login_resp.data
+
+    # 3. Trying to access student dashboard redirects back to profile
+    dashboard_resp = client.get("/student/dashboard", follow_redirects=True)
+    assert b"You are required to change your password before proceeding" in dashboard_resp.data
+
+    # 4. Perform password reset on profile page
+    profile_reset_data = {
+        "name": "Admin Registered Student",
+        "avatar": "",
+        "study_level": "Professional",
+        "new_password": "finalPreferredPassword123"
+    }
+    reset_resp = client.post("/student/profile", data=profile_reset_data, follow_redirects=True)
+    assert reset_resp.status_code == 200
+    assert b"Profile updated" in reset_resp.data
+
+    # 5. Access student dashboard -> Allowed now!
+    dashboard_allowed_resp = client.get("/student/dashboard", follow_redirects=True)
+    assert dashboard_allowed_resp.status_code == 200
+    assert b"Welcome back" in dashboard_allowed_resp.data
 
 
 

@@ -70,13 +70,14 @@
   <h3 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1rem;"><i class="fa-solid fa-users-gear" style="color: var(--red-500);"></i> Student Accounts & Performance</h3>
   
   <!-- Search and filter -->
-  <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+  <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center;">
     <input type="text" id="studentSearch" placeholder="Search students by name, email, registration number..." style="flex: 1; min-width: 280px; padding: 0.6rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--text);" />
     <select id="levelFilter" style="padding: 0.6rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--text);">
       <option value="">All Study Levels</option>
       <option value="Beginner">Beginner</option>
       <option value="Professional">Professional</option>
     </select>
+    <a class="btn primary" href="{{ url_for('admin_register_student') }}" style="padding: 0.6rem 1.25rem; font-weight: 700; height: fit-content; display: inline-flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-user-plus"></i> Register Student</a>
   </div>
 
   <div style="overflow-x: auto;">

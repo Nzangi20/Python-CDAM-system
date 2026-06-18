@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Register New Student | CDAM{% endblock %}
+{% block content %}
+<div class="dashboard-header fade-in">
+  <div>
+    <h1 style="font-weight: 800; font-size: 2rem; letter-spacing: -0.02em;">Register New Student</h1>
+    <p class="muted" style="margin-top: 0.25rem;">Create a student account, assign a registration number, and generate a temporary password.</p>
+  </div>
+  <a class="btn" href="{{ url_for('admin_panel') }}"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+</div>
+
+<div class="fade-in" style="max-width: 600px; margin: 2rem auto;">
+  <div class="card" style="padding: 2.5rem;">
+    <h3 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1.5rem; color: var(--text);">
+      <i class="fa-solid fa-user-plus" style="color: var(--red-500); margin-right: 0.5rem;"></i> Student Account Setup
+    </h3>
+
+    <form method="post">
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
+        <label style="font-weight: 600; font-size: 0.9rem;">Full Name</label>
+        <input type="text" name="name" placeholder="e.g. John Doe" required style="padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--text);" />
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
+        <label style="font-weight: 600; font-size: 0.9rem;">Student Registration Number</label>
+        <input type="text" name="reg_number" placeholder="e.g. EB3/12345/24" required style="padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--text);" />
+        <span class="muted" style="font-size: 0.8rem;">Note: This will automatically generate a virtual email address for login.</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
+        <label style="font-weight: 600; font-size: 0.9rem;">Academic Experience Level</label>
+        <select name="study_level" required style="padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--text);">
+          <option value="Beginner">Beginner (Introductory Concepts)</option>
+          <option value="Professional">Professional (ML / Advanced Coding)</option>
+        </select>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem;">
+        <label style="font-weight: 600; font-size: 0.9rem;">Temporary Password</label>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="text" id="temp_password" name="password" placeholder="Enter temporary password" required style="flex: 1; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--text);" />
+          <button type="button" class="btn" onclick="generateTempPassword()" style="padding: 0.8rem 1.25rem; font-weight: 600;"><i class="fa-solid fa-dice"></i> Auto</button>
+        </div>
+        <span class="muted" style="font-size: 0.8rem;">The student will be forced to change this password upon their first successful login.</span>
+      </div>
+
+      <button class="btn primary" type="submit" style="width: 100%; padding: 0.85rem; font-weight: 700; margin-top: 0.5rem;"><i class="fa-solid fa-user-check"></i> Register Student Account</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function generateTempPassword() {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    let password = "";
+    for (let i = 0; i < 10; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById("temp_password").value = password;
+  }
+  
+  // Pre-generate a password on page load
+  document.addEventListener("DOMContentLoaded", () => {
+    generateTempPassword();
+  });
+</script>
+{% endblock %}

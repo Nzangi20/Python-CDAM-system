@@ -151,7 +151,7 @@ class Session(db.Model):
     @property
     def clean_title(self) -> str:
         import re
-        return re.sub(r"^Session\s+\d+:\s*", "", self.title)
+        return re.sub(r"^(Session\s+\d+:\s*)+", "", self.title, flags=re.IGNORECASE).strip()
 
 
 class UserProgress(db.Model):
@@ -639,6 +639,9 @@ def index():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    if not app.config.get("TESTING"):
+        flash("Public registration is disabled. Please contact the system administrator to receive your registration credentials.", "error")
+        return redirect(url_for("login"))
     if request.method == "POST":
         name = request.form.get("name", "").strip()
         reg_number = request.form.get("reg_number", "").strip().upper()
@@ -658,6 +661,7 @@ def register():
             avatar=CDAM_LOGO,
             study_level=study_level,
             is_admin=False,
+            require_password_change=False
         )
         db.session.add(user)
         db.session.commit()
@@ -678,7 +682,8 @@ def login():
             db.or_(
                 User.reg_number == identifier.upper(),
                 User.reg_number == identifier,
-                User.email == identifier.lower()
+                db.func.lower(User.email) == identifier.lower(),
+                User.email == identifier
             )
         ).first()
         if not user or not check_password_hash(user.password_hash, password):
@@ -2061,6 +2066,43 @@ def admin_reorder_sessions():
     log_activity("admin.session.reorder")
     flash("Session order updated.", "success")
     return redirect(url_for("admin_panel"))
+
+
+@app.route("/admin/users/new", methods=["GET", "POST"])
+@login_required
+@admin_required
+def admin_register_student():
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        reg_number = request.form.get("reg_number", "").strip().upper()
+        password = request.form.get("password", "")
+        study_level = request.form.get("study_level", "Beginner").strip() or "Beginner"
+        
+        if not all([name, reg_number, password]):
+            flash("All fields are required.", "error")
+            return redirect(url_for("admin_register_student"))
+            
+        if User.query.filter_by(reg_number=reg_number).first():
+            flash("An account with this registration number already exists.", "error")
+            return redirect(url_for("admin_register_student"))
+            
+        user = User(
+            name=name,
+            email=f"{reg_number.replace('/', '_')}@cdam.local",
+            reg_number=reg_number,
+            password_hash=generate_password_hash(password),
+            avatar=CDAM_LOGO,
+            study_level=study_level,
+            is_admin=False,
+            require_password_change=True,
+        )
+        db.session.add(user)
+        db.session.commit()
+        log_activity("admin.user.create", f"Reg={reg_number}, level={study_level}")
+        flash(f"Student account created successfully. Email: {user.email}", "success")
+        return redirect(url_for("admin_panel"))
+        
+    return render_template("admin_student_new.html")
 
 
 @app.post("/admin/users/<int:user_id>/suspend")

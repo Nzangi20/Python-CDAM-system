@@ -145,6 +145,9 @@
         </div>
 
         <input type="hidden" name="questions_json" id="questionsJsonInput" value="[]" />
+        <script id="existingQuestionsData" type="application/json">
+          {{ questions_json | safe }}
+        </script>
       </div>
 
       <button class="btn primary" type="submit" style="width: 100%; margin-top: 2rem; padding: 0.85rem; font-weight: 700;"><i class="fa-solid fa-save"></i> Update Assessment Plan</button>
@@ -162,7 +165,7 @@
     const jsonInput = document.getElementById("questionsJsonInput");
     
     // Parse the preloaded questions JSON injected from backend
-    const existingQuestions = JSON.parse('{{ questions_json | safe }}' || '[]');
+    const existingQuestions = JSON.parse(document.getElementById("existingQuestionsData").textContent || '[]');
     let qCounter = 0;
 
     addBtn.addEventListener("click", () => {
