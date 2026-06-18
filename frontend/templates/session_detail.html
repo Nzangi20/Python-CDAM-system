@@ -33,9 +33,7 @@
     <button class="tab" data-tab="expected-outcomes"><i class="fa-solid fa-circle-check"></i> Expected Outcomes</button>
     <button class="tab" data-tab="resources"><i class="fa-solid fa-folder-open"></i> Resources</button>
     <button class="tab" data-tab="code"><i class="fa-solid fa-laptop-code"></i> Code Simulation</button>
-    {% if quiz %}
-      <button class="tab" data-tab="quiz-tab"><i class="fa-solid fa-circle-question"></i> Quiz</button>
-    {% endif %}
+    <button class="tab" data-tab="quiz-tab"><i class="fa-solid fa-graduation-cap"></i> Exams & Quizzes</button>
   </div>
 
   <div style="margin-bottom: 3rem;">
@@ -174,9 +172,11 @@
             <i class="fa-solid fa-laptop-code" style="color: var(--red-500);"></i> 1. Interactive Code Simulator
           </h3>
           
-          <div style="display: flex; gap: 0.75rem;">
-            <button class="btn primary" id="btnRunCode" style="padding: 0.6rem 1.25rem; flex: 1;"><i class="fa-solid fa-play"></i> Run Code</button>
-            <button class="btn ghost" id="btnResetCode" style="padding: 0.6rem 1.25rem;"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="btn primary" id="btnRunCode" style="padding: 0.6rem 1.25rem; flex: 2; min-width: 130px;"><i class="fa-solid fa-play"></i> Run Code</button>
+            <button class="btn secondary" id="btnDownloadNotebook" style="padding: 0.6rem 1rem; flex: 1; min-width: 130px; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;" title="Download as Jupyter Notebook (.ipynb)"><i class="fa-solid fa-download"></i> Notebook (.ipynb)</button>
+            <button class="btn secondary" id="btnDownloadPy" style="padding: 0.6rem 1rem; flex: 1; min-width: 130px; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;" title="Download as Python Script (.py)"><i class="fa-solid fa-file-arrow-down"></i> Script (.py)</button>
+            <button class="btn ghost" id="btnResetCode" style="padding: 0.6rem 1rem;" title="Reset Editor"><i class="fa-solid fa-rotate-left"></i> Reset</button>
           </div>
 
           <div class="editor-wrapper" style="position: relative; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 320px;">
@@ -230,71 +230,222 @@
         </div>
       </div>
       <div class="tab-navigation">
-        {% if quiz %}
-          <button class="btn primary" id="btnGoToQuiz" onclick="switchTab('quiz-tab')">Take Session Quiz <i class="fa-solid fa-chevron-right"></i></button>
-        {% else %}
-          <button class="btn primary" onclick="document.querySelector('.comments-list').scrollIntoView({behavior: 'smooth'})">Proceed to Comments & Q&A <i class="fa-solid fa-chevron-down"></i></button>
-        {% endif %}
+        <button class="btn primary" id="btnGoToQuiz" onclick="switchTab('quiz-tab')">Proceed to Exams & Quizzes <i class="fa-solid fa-chevron-right"></i></button>
       </div>
     </section>
 
-    {% if quiz %}
     <section class="tab-panel card" id="quiz-tab">
-      <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 1.5rem; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-        <i class="fa-solid fa-circle-question" style="color: var(--red-500);"></i> Session Quiz
-      </h3>
-      
-      {% if quiz_result %}
-        <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
-          <div style="width: 64px; height: 64px; border-radius: 50%; background: {% if quiz_result.score >= 60 %}#10b981{% else %}#ef4444{% endif %}; color: white; display: grid; place-items: center; font-size: 1.5rem; font-weight: 800;">
-            {{ quiz_result.score }}%
-          </div>
-          <div>
-            <h4 style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.25rem;">
-              {% if quiz_result.score >= 60 %}
-                Congratulations, you passed!
-              {% else %}
-                You did not meet the passing score.
+      {% if quiz %}
+        <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 1.5rem; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-circle-question" style="color: var(--red-500);"></i> Session Quiz
+        </h3>
+        
+        {% if quiz_result %}
+          <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: {% if quiz_result.score >= 60 %}#10b981{% else %}#ef4444{% endif %}; color: white; display: grid; place-items: center; font-size: 1.5rem; font-weight: 800;">
+              {{ quiz_result.score }}%
+            </div>
+            <div>
+              <h4 style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.25rem;">
+                {% if quiz_result.score >= 60 %}
+                  Congratulations, you passed!
+                {% else %}
+                  You did not meet the passing score.
+                {% endif %}
+              </h4>
+              <p class="muted" style="font-size: 0.9rem; margin: 0 0 0.5rem 0;">
+                Passing mark: 60%. Your score: {{ quiz_result.score }}%.
+                {% if quiz_result.score >= 60 %}
+                  You have unlocked the next session!
+                {% else %}
+                  Please review the session materials and retake the quiz.
+                {% endif %}
+              </p>
+              {% if quiz_result.score < 60 %}
+                <form method="post" action="{{ url_for('reset_quiz', slug=session.slug) }}" style="margin: 0.5rem 0 0 0;">
+                  <button type="submit" class="btn primary" style="padding: 0.4rem 1rem; font-size: 0.85rem;"><i class="fa-solid fa-rotate-left"></i> Retake Quiz</button>
+                </form>
               {% endif %}
-            </h4>
-            <p class="muted" style="font-size: 0.9rem; margin: 0;">
-              Passing mark: 60%. Your score: {{ quiz_result.score }}%.
-              {% if quiz_result.score >= 60 %}
-                You have unlocked the next session!
-              {% else %}
-                Please review the session materials and retake the quiz.
-              {% endif %}
-            </p>
-          </div>
-        </div>
-      {% endif %}
-
-      <form method="post" action="{{ url_for('submit_quiz', slug=session.slug) }}" style="display: flex; flex-direction: column; gap: 1.5rem;">
-        {% for q in quiz %}
-          {% set q_idx = loop.index0 %}
-          <div class="card" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); border-radius: 8px;">
-            <p style="font-weight: 700; font-size: 1rem; margin-bottom: 1rem; color: var(--text);">
-              Q{{ loop.index }}: {{ q.question }}
-            </p>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-              {% for opt in q.options %}
-                {% set opt_idx = loop.index0 %}
-                <label style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.95rem; color: var(--text-muted); cursor: pointer; padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid transparent; transition: all 0.2s;" class="quiz-option-label">
-                  <input type="radio" name="q_{{ q_idx }}" value="{{ opt_idx }}" required style="accent-color: var(--red-500);"
-                         {% if quiz_answers and quiz_answers.get('q_' ~ q_idx) | string == opt_idx | string %}checked{% endif %}>
-                  <span>{{ opt }}</span>
-                </label>
-              {% endfor %}
             </div>
           </div>
-        {% endfor %}
-        <div style="display: flex; gap: 1rem; align-items: center;">
-          <button class="btn primary" type="submit" style="padding: 0.75rem 1.5rem; font-weight: 700;"><i class="fa-solid fa-paper-plane"></i> Submit Quiz</button>
-          <button class="btn secondary" type="button" onclick="document.querySelector('.comments-list').scrollIntoView({behavior: 'smooth'})" style="padding: 0.75rem 1.5rem;"><i class="fa-regular fa-comments"></i> Proceed to Q&A Discussion</button>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('submit_quiz', slug=session.slug) }}" style="display: flex; flex-direction: column; gap: 1.5rem;">
+          {% for q in quiz %}
+            {% set q_idx = loop.index0 %}
+            <div class="card" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); border-radius: 8px;">
+              <p style="font-weight: 700; font-size: 1rem; margin-bottom: 1rem; color: var(--text);">
+                Q{{ loop.index }}: {{ q.question }}
+              </p>
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                {% for opt in q.options %}
+                  {% set opt_idx = loop.index0 %}
+                  {% set is_selected = quiz_answers and quiz_answers.get('q_' ~ q_idx) | string == opt_idx | string %}
+                  {% set is_correct = opt_idx == q.correct %}
+                  <label style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.95rem; cursor: pointer; padding: 0.5rem 0.75rem; border-radius: 6px; transition: all 0.2s;
+                         {% if quiz_result %}
+                           {% if is_correct %}
+                             background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981;
+                           {% elif is_selected %}
+                             background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444;
+                           {% else %}
+                             background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); color: var(--text-muted); opacity: 0.6;
+                           {% endif %}
+                         {% else %}
+                           background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); color: var(--text-muted);
+                         {% endif %}" class="quiz-option-label">
+                    <input type="radio" name="q_{{ q_idx }}" value="{{ opt_idx }}" required style="accent-color: var(--red-500);"
+                           {% if is_selected %}checked{% endif %}
+                           {% if quiz_result %}disabled{% endif %}>
+                    <span>{{ opt }}</span>
+                    {% if quiz_result %}
+                      {% if is_correct %}
+                        <i class="fa-solid fa-circle-check" style="margin-left: auto; color: #10b981;"></i>
+                      {% elif is_selected %}
+                        <i class="fa-solid fa-circle-xmark" style="margin-left: auto; color: #ef4444;"></i>
+                      {% endif %}
+                    {% endif %}
+                  </label>
+                {% endfor %}
+              </div>
+              {% if quiz_result %}
+                {% set user_choice = quiz_answers.get('q_' ~ q_idx) if quiz_answers else None %}
+                <div style="margin-top: 1rem; padding: 0.85rem; border-radius: 6px; font-size: 0.9rem;
+                            {% if user_choice | string == q.correct | string %}
+                              background: rgba(16, 185, 129, 0.03); border-left: 4px solid #10b981; color: var(--text);
+                            {% else %}
+                              background: rgba(239, 68, 68, 0.03); border-left: 4px solid #ef4444; color: var(--text);
+                            {% endif %}">
+                  {% if user_choice | string == q.correct | string %}
+                    <strong style="color: #10b981;"><i class="fa-solid fa-check"></i> Correct Choice:</strong> 
+                    Why your choice of <em>"{{ q.options[q.correct] }}"</em> is correct: 
+                    {{ q.explanation if q.explanation else "This option correctly answers the question based on standard Python implementation guidelines." }}
+                  {% else %}
+                    <strong style="color: #ef4444;"><i class="fa-solid fa-xmark"></i> Incorrect:</strong> 
+                    You chose <em>"{{ q.options[user_choice | int] if user_choice is not none else 'None' }}"</em>. 
+                    The correct answer is <strong style="color: #10b981;">"{{ q.options[q.correct] }}"</strong>.
+                    <br><br>
+                    <strong>Explanation:</strong> 
+                    {{ q.explanation if q.explanation else "This choice is correct because it aligns with standard Python practices and execution behaviors for this topic." }}
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
+            {% if not quiz_result %}
+              <button class="btn primary" type="submit" style="padding: 0.75rem 1.5rem; font-weight: 700;"><i class="fa-solid fa-paper-plane"></i> Submit Quiz</button>
+            {% endif %}
+            <button class="btn secondary" type="button" onclick="document.querySelector('.comments-list').scrollIntoView({behavior: 'smooth'})" style="padding: 0.75rem 1.5rem;"><i class="fa-regular fa-comments"></i> Proceed to Q&A Discussion</button>
+          </div>
+        </form>
+        <hr style="margin: 3rem 0; border: 0; border-top: 1px solid var(--border);" />
+      {% endif %}
+
+      <!-- Assessment Panel -->
+      {% if not current_user.is_admin %}
+      <div class="exams-section-wrapper" style="margin-top: 1rem;">
+        <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 1.5rem; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-file-invoice" style="color: var(--red-500);"></i> Available Assessments
+        </h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+          {% for exam in available %}
+            <article class="card hover-scale" style="display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border); background: rgba(255, 255, 255, 0.01);">
+              <div>
+                <div class="card-top" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                  <span class="badge" style="background: rgba(225, 29, 72, 0.1); color: var(--red-400); border-color: rgba(225,29,72,0.2);"><i class="fa-solid fa-tag"></i> {{ exam.exam_type }}</span>
+                  <span class="muted" style="font-size: 0.85rem; font-weight: 600;"><i class="fa-regular fa-clock"></i> {{ exam.duration }} Min</span>
+                </div>
+                <h4 style="font-weight: 800; font-size: 1.2rem; margin-bottom: 0.5rem;">{{ exam.title }}</h4>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">{{ exam.description }}</p>
+                
+                <ul class="feature-list" style="margin-bottom: 1.5rem; list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.875rem;">
+                  <li><i class="fa-solid fa-circle-check" style="color: var(--red-500); margin-right: 0.5rem;"></i> Passing Score: <strong>{{ exam.passing_score }}%</strong></li>
+                  <li><i class="fa-solid fa-circle-check" style="color: var(--red-500); margin-right: 0.5rem;"></i> Max Attempts Allowed: <strong>{{ exam.attempt_limit }}</strong></li>
+                  {% if exam.proctoring_enabled %}
+                    <li style="color: var(--red-400);"><i class="fa-solid fa-shield-halved"></i> Automated Integrity Proctoring Enabled</li>
+                  {% endif %}
+                  {% if exam.one_device_only %}
+                    <li><i class="fa-solid fa-mobile-screen"></i> Single-Device Lock active</li>
+                  {% endif %}
+                </ul>
+              </div>
+              <a class="btn primary" href="{{ url_for('exam_take', exam_id=exam.id) }}" style="width: 100%; text-align: center;"><i class="fa-solid fa-circle-play"></i> Start Assessment</a>
+            </article>
+          {% else %}
+            <p class="muted" style="grid-column: 1 / -1; text-align: center; padding: 2rem 0;">No assessments are currently active for your study level.</p>
+          {% endfor %}
         </div>
-      </form>
+
+        {% if upcoming %}
+          <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 1.5rem; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-regular fa-calendar-days" style="color: var(--red-500);"></i> Upcoming Scheduled Assessments
+          </h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+            {% for exam in upcoming %}
+              <article class="card" style="opacity: 0.75; border: 1px solid var(--border); background: rgba(255, 255, 255, 0.01);">
+                <div class="card-top" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                  <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #fbbf24; border-color: rgba(245,158,11,0.2);"><i class="fa-solid fa-clock"></i> Scheduled</span>
+                  <span class="muted" style="font-size: 0.85rem; font-weight: 600;">{{ exam.duration }} Min</span>
+                </div>
+                <h4 style="font-weight: 800; font-size: 1.2rem; margin-bottom: 0.5rem;">{{ exam.title }}</h4>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">{{ exam.description }}</p>
+                <p style="font-size: 0.85rem; font-weight: 700; color: var(--red-400);">Starts: {{ exam.start_time.strftime('%b %d, %Y at %H:%M EAT') }}</p>
+              </article>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 1.5rem; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-history" style="color: var(--red-500);"></i> Assessment History & Credentials
+        </h3>
+        {% if exam_attempts %}
+          <div style="overflow-x: auto;">
+            <table class="admin-table" style="width: 100%; text-align: left; border-collapse: collapse;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--border);">
+                  <th style="padding: 0.75rem;">Assessment Name</th>
+                  <th style="padding: 0.75rem;">Attempt #</th>
+                  <th style="padding: 0.75rem;">Final Score</th>
+                  <th style="padding: 0.75rem;">Status</th>
+                  <th style="padding: 0.75rem;">Violations Flagged</th>
+                  <th style="padding: 0.75rem;">Completed Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for att in exam_attempts %}
+                  <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="font-weight: 700; padding: 0.75rem;">{{ att.exam.title }}</td>
+                    <td style="padding: 0.75rem;">{{ att.attempt_number }}</td>
+                    <td style="font-weight: 800; font-size: 1.05rem; color: var(--red-400); padding: 0.75rem;">{{ att.score }}%</td>
+                    <td style="padding: 0.75rem;">
+                      {% if att.score >= att.exam.passing_score %}
+                        <span class="badge success" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.2);"><i class="fa-solid fa-circle-check"></i> Passed</span>
+                      {% else %}
+                        <span class="badge" style="background: rgba(220, 38, 38, 0.1); color: var(--red-400); border-color: rgba(220,38,38,0.2);"><i class="fa-solid fa-circle-xmark"></i> Failed</span>
+                      {% endif %}
+                    </td>
+                    <td style="padding: 0.75rem;">
+                      {% if att.violation_count > 0 %}
+                        <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #fbbf24; border-color: rgba(245,158,11,0.2);">
+                          <i class="fa-solid fa-triangle-exclamation"></i> {{ att.violation_count }} flags
+                        </span>
+                      {% else %}
+                        <span class="badge success" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.2); padding: 0.2rem 0.5rem;"><i class="fa-solid fa-shield"></i> Clean</span>
+                      {% endif %}
+                    </td>
+                    <td class="muted" style="padding: 0.75rem;">{{ att.completed_at.strftime('%Y-%m-%d %H:%M EAT') if att.completed_at else 'In Progress' }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="muted" style="text-align: center; padding: 2rem 0;">You have not taken any assessments yet.</p>
+        {% endif %}
+      </div>
+      {% endif %}
     </section>
-    {% endif %}
   </div>
 
   <!-- Discussion Section -->

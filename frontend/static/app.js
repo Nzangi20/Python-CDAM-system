@@ -165,6 +165,8 @@ function initCodeBlocks() {
   const output = document.getElementById("runOutput");
   const outputText = document.getElementById("runOutputText");
   const btnReset = document.getElementById("btnResetCode");
+  const btnDownloadNotebook = document.getElementById("btnDownloadNotebook");
+  const btnDownloadPy = document.getElementById("btnDownloadPy");
 
   if (btnRun && codeEditor && output && outputText) {
     const originalCode = codeEditor.value;
@@ -200,6 +202,73 @@ function initCodeBlocks() {
         btnRun.innerHTML = '<i class="fa-solid fa-play"></i> Run Code';
       }
     });
+
+    if (btnDownloadNotebook) {
+      btnDownloadNotebook.addEventListener("click", () => {
+        const code = codeEditor.value;
+        const out = outputText.textContent || "";
+        
+        const outputLines = out.split("\n").map(line => line + "\n");
+        const sourceLines = code.split("\n").map(line => line + "\n");
+        
+        const notebook = {
+          cells: [
+            {
+              cell_type: "code",
+              execution_count: 1,
+              metadata: {},
+              outputs: out ? [
+                {
+                  name: "stdout",
+                  output_type: "stream",
+                  text: outputLines
+                }
+              ] : [],
+              source: sourceLines
+            }
+          ],
+          metadata: {
+            kernelspec: {
+              display_name: "Python 3",
+              language: "python",
+              name: "python3"
+            },
+            language_info: {
+              name: "python"
+            }
+          },
+          nbformat: 4,
+          nbformat_minor: 2
+        };
+        
+        const blob = new Blob([JSON.stringify(notebook, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "sandbox_code.ipynb";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast("Jupyter Notebook (.ipynb) downloaded.", "success");
+      });
+    }
+
+    if (btnDownloadPy) {
+      btnDownloadPy.addEventListener("click", () => {
+        const code = codeEditor.value;
+        const blob = new Blob([code], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "sandbox_code.py";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast("Python script (.py) downloaded.", "success");
+      });
+    }
 
     if (btnReset) {
       btnReset.addEventListener("click", () => {

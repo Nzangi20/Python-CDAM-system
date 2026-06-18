@@ -182,26 +182,38 @@
 
   <div class="grid">
     {% for session in sessions %}
-      {% set has_access = not current_user.is_authenticated or check_session_access(current_user, session.display_order) %}
-      {# Only show sessions the user can access — admins see all, guests see all, students see only their level #}
-      {% if not current_user.is_authenticated or current_user.is_admin or has_access %}
-      <article class="card hover-scale">
-        <div class="card-top">
-          <span class="badge">{{ session.difficulty }}</span>
-          <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;"><i class="fa-regular fa-clock"></i> {{ session.duration }}</span>
-        </div>
-        <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 0.75rem;">Session {{ session.display_order }}: {{ session.clean_title }}</h3>
-        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; height: 4.5rem;">{{ session.description }}</p>
-        {% if current_user.is_authenticated %}
-          {% if current_user.is_admin %}
-            <a class="btn primary" href="{{ url_for('session_detail', slug=session.slug) }}" style="width: 100%;"><i class="fa-solid fa-eye"></i> Preview Session</a>
-          {% else %}
-            <a class="btn primary" href="{{ url_for('session_detail', slug=session.slug) }}" style="width: 100%;"><i class="fa-solid fa-book-open-reader"></i> Learn Session</a>
+      {% set is_guest = not current_user.is_authenticated %}
+      {% set is_admin = current_user.is_authenticated and current_user.is_admin %}
+      {% set is_level_match = is_guest or is_admin or (session.difficulty == current_user.study_level) %}
+      
+      {% if is_level_match %}
+        {% set has_access = is_guest or is_admin or check_session_access(current_user, session.display_order) %}
+        <article class="card hover-scale {% if not has_access %}locked-session{% endif %}" style="{% if not has_access %}opacity: 0.65; position: relative;{% endif %}">
+          {% if not has_access %}
+            <div style="position: absolute; top: 12px; right: 12px; font-size: 1.25rem; color: var(--red-400); z-index: 10;">
+              <i class="fa-solid fa-lock"></i>
+            </div>
           {% endif %}
-        {% else %}
-          <a class="btn" href="{{ url_for('register') }}" style="width: 100%;"><i class="fa-solid fa-user-plus"></i> Enroll to Access</a>
-        {% endif %}
-      </article>
+          <div class="card-top">
+            <span class="badge">{{ session.difficulty }}</span>
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;"><i class="fa-regular fa-clock"></i> {{ session.duration }}</span>
+          </div>
+          <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 0.75rem;">Session {{ session.display_order }}: {{ session.clean_title }}</h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; height: 4.5rem;">{{ session.description }}</p>
+          {% if current_user.is_authenticated %}
+            {% if current_user.is_admin %}
+              <a class="btn primary" href="{{ url_for('session_detail', slug=session.slug) }}" style="width: 100%;"><i class="fa-solid fa-eye"></i> Preview Session</a>
+            {% else %}
+              {% if has_access %}
+                <a class="btn primary" href="{{ url_for('session_detail', slug=session.slug) }}" style="width: 100%;"><i class="fa-solid fa-book-open-reader"></i> Learn Session</a>
+              {% else %}
+                <button class="btn" disabled style="width: 100%; cursor: not-allowed; background: rgba(0,0,0,0.08); border-color: rgba(255,255,255,0.05); color: var(--text-muted);"><i class="fa-solid fa-lock"></i> Locked (Pass prior quizzes)</button>
+              {% endif %}
+            {% endif %}
+          {% else %}
+            <a class="btn" href="{{ url_for('register') }}" style="width: 100%;"><i class="fa-solid fa-user-plus"></i> Enroll to Access</a>
+          {% endif %}
+        </article>
       {% endif %}
     {% else %}
       <p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted); padding: 3rem 0;">No sessions found matching your criteria.</p>

@@ -258,8 +258,6 @@
     // Populate existing questions
     if (existingQuestions && existingQuestions.length > 0) {
       existingQuestions.forEach(q => createQuestionBlock(q));
-    } else {
-      createQuestionBlock();
     }
 
     form.addEventListener("submit", (e) => {

@@ -11,8 +11,9 @@ load_dotenv(BASE_DIR.parent / ".env")
 import csv
 import io
 import json
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime, timezone, timedelta
 from functools import wraps
+EAT = timezone(timedelta(hours=3))
 
 def to_naive(dt):
     if dt is None:
@@ -20,7 +21,7 @@ def to_naive(dt):
     return dt.replace(tzinfo=None) if dt.tzinfo else dt
 
 def utc_now():
-    return datetime.now(UTC).replace(tzinfo=None)
+    return datetime.now(EAT).replace(tzinfo=None)
 
 from flask import Flask, flash, jsonify, make_response, redirect, render_template, request, url_for
 from flask_login import (
@@ -92,7 +93,7 @@ class User(UserMixin, db.Model):
     is_suspended = db.Column(db.Boolean, default=False)
     require_password_change = db.Column(db.Boolean, default=False, nullable=False)
     password_reset_status = db.Column(db.String(30), nullable=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    created_at = db.Column(db.DateTime, default=utc_now)
 
     @property
     def role(self) -> str:
@@ -107,7 +108,7 @@ class UserSandboxFile(db.Model):
     file_data = db.Column(db.LargeBinary, nullable=False)
     file_size = db.Column(db.Integer, nullable=False)
     is_global = db.Column(db.Boolean, default=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    created_at = db.Column(db.DateTime, default=utc_now)
 
     __table_args__ = (
         db.UniqueConstraint("user_id", "filename", name="uq_user_sandbox_filename"),
@@ -121,7 +122,7 @@ class AIChatMessage(db.Model):
     session_id = db.Column(db.Integer, db.ForeignKey("sessions.id"), nullable=False, index=True)
     role = db.Column(db.String(50), nullable=False) # 'user' or 'assistant'
     content = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    created_at = db.Column(db.DateTime, default=utc_now)
 
 
 class Session(db.Model):
@@ -170,7 +171,7 @@ class QuizResult(db.Model):
     session_id = db.Column(db.Integer, db.ForeignKey("sessions.id"), nullable=False, index=True)
     score = db.Column(db.Integer, nullable=False)
     answers = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    created_at = db.Column(db.DateTime, default=utc_now)
 
 
 class Bookmark(db.Model):
@@ -178,7 +179,7 @@ class Bookmark(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
     session_id = db.Column(db.Integer, db.ForeignKey("sessions.id"), nullable=False, index=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    created_at = db.Column(db.DateTime, default=utc_now)
 
 
 class LessonView(db.Model):
@@ -186,7 +187,7 @@ class LessonView(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
     session_id = db.Column(db.Integer, db.ForeignKey("sessions.id"), nullable=False, index=True)
-    viewed_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    viewed_at = db.Column(db.DateTime, default=utc_now)
 
 
 class ActivityLog(db.Model):
@@ -196,7 +197,7 @@ class ActivityLog(db.Model):
     role = db.Column(db.String(30), nullable=True)
     action = db.Column(db.String(255), nullable=False)
     details = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    created_at = db.Column(db.DateTime, default=utc_now)
 
 
 class Notification(db.Model):
@@ -206,7 +207,7 @@ class Notification(db.Model):
     title = db.Column(db.String(255), nullable=False)
     message = db.Column(db.Text, nullable=False)
     created_by_admin_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    created_at = db.Column(db.DateTime, default=utc_now)
 
 
 class DiscussionComment(db.Model):
@@ -217,7 +218,7 @@ class DiscussionComment(db.Model):
     content = db.Column(db.Text, nullable=False)
     approved = db.Column(db.Boolean, default=True)
     likes = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    created_at = db.Column(db.DateTime, default=utc_now)
 
 
 class ExamAttempt(db.Model):
@@ -225,7 +226,7 @@ class ExamAttempt(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
     session_id = db.Column(db.Integer, db.ForeignKey("sessions.id"), nullable=False, index=True)
-    started_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    started_at = db.Column(db.DateTime, default=utc_now)
     submitted_at = db.Column(db.DateTime, nullable=True)
     score = db.Column(db.Integer, default=0)
     passed = db.Column(db.Boolean, default=False)
@@ -252,7 +253,7 @@ class Exam(db.Model):
     proctoring_enabled = db.Column(db.Boolean, default=False)
     published = db.Column(db.Boolean, default=False)
     study_level = db.Column(db.String(30), default="Beginner", nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    created_at = db.Column(db.DateTime, default=utc_now)
 
 
 class Question(db.Model):
@@ -279,7 +280,7 @@ class ExamAttemptRecord(db.Model):
     status = db.Column(db.String(30), default="in_progress")
     ip_address = db.Column(db.String(100), nullable=True)
     user_agent = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    created_at = db.Column(db.DateTime, default=utc_now)
 
     exam = db.relationship("Exam", backref="attempt_records")
 
@@ -308,7 +309,7 @@ class IntegrityLog(db.Model):
     violation_type = db.Column(db.String(100), nullable=False)
     severity = db.Column(db.String(30), default="warning")
     details = db.Column(db.Text, default="")
-    timestamp = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    timestamp = db.Column(db.DateTime, default=utc_now)
 
 
 class AIUsageLog(db.Model):
@@ -318,7 +319,7 @@ class AIUsageLog(db.Model):
     session_id = db.Column(db.Integer, nullable=True)
     action = db.Column(db.String(50), nullable=False)
     tokens_used = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    created_at = db.Column(db.DateTime, default=utc_now)
 
 
 class PlatformSetting(db.Model):
@@ -332,8 +333,7 @@ def to_local_datetime_str(dt):
     if not dt:
         return ''
     try:
-        local_dt = dt.replace(tzinfo=timezone.utc).astimezone(None).replace(tzinfo=None)
-        return local_dt.strftime('%Y-%m-%dT%H:%M')
+        return dt.strftime('%Y-%m-%dT%H:%M')
     except Exception:
         return dt.strftime('%Y-%m-%dT%H:%M')
 
@@ -925,6 +925,18 @@ def session_detail(slug: str):
         if ext in {".pdf", ".txt", ".md", ".png", ".jpg", ".jpeg", ".gif", ".svg"}:
             is_viewable = True
             
+    now = utc_now()
+    exams = Exam.query.filter_by(published=True, study_level=current_user.study_level).all()
+    upcoming = [e for e in exams if e.start_time and to_naive(e.start_time) > now]
+    available = [
+        e
+        for e in exams
+        if (not e.start_time or to_naive(e.start_time) <= now) and (not e.end_time or to_naive(e.end_time) >= now)
+    ]
+    exam_attempts = ExamAttemptRecord.query.filter_by(user_id=current_user.id).order_by(
+        ExamAttemptRecord.created_at.desc()
+    ).all()
+
     return render_template(
         "session_detail.html",
         session=session,
@@ -940,6 +952,9 @@ def session_detail(slug: str):
         notes_exist=notes_exist,
         is_viewable=is_viewable,
         notes_filename=notes_filename,
+        upcoming=upcoming,
+        available=available,
+        exam_attempts=exam_attempts,
     )
 
 
@@ -989,18 +1004,25 @@ def run_code():
     
     # Dynamically restore missing sandbox files from database
     try:
-        private_files = UserSandboxFile.query.filter_by(user_id=current_user.id, is_global=False).all()
-        global_files = UserSandboxFile.query.filter_by(is_global=True).all()
+        from sqlalchemy.orm import defer
+        global_files = UserSandboxFile.query.options(defer(UserSandboxFile.file_data)).filter_by(is_global=True).all()
+        private_files = UserSandboxFile.query.options(defer(UserSandboxFile.file_data)).filter_by(user_id=current_user.id, is_global=False).all()
+        
         for db_file in global_files:
             local_path = os.path.join(workspace_dir, db_file.filename)
             if not os.path.exists(local_path):
-                with open(local_path, "wb") as lf:
-                    lf.write(db_file.file_data)
+                full_file = UserSandboxFile.query.filter_by(id=db_file.id).first()
+                if full_file:
+                    with open(local_path, "wb") as lf:
+                        lf.write(full_file.file_data)
+                        
         for db_file in private_files:
             local_path = os.path.join(workspace_dir, db_file.filename)
             if not os.path.exists(local_path):
-                with open(local_path, "wb") as lf:
-                    lf.write(db_file.file_data)
+                full_file = UserSandboxFile.query.filter_by(id=db_file.id).first()
+                if full_file:
+                    with open(local_path, "wb") as lf:
+                        lf.write(full_file.file_data)
     except Exception:
         pass
     
@@ -1624,6 +1646,17 @@ def submit_quiz(slug: str):
     return redirect(url_for("session_detail", slug=slug) + "?tab=quiz-tab")
 
 
+@app.post("/session/<slug>/quiz/reset")
+@login_required
+@student_required
+def reset_quiz(slug: str):
+    session = Session.query.filter_by(slug=slug, published=True).first_or_404()
+    QuizResult.query.filter_by(user_id=current_user.id, session_id=session.id).delete()
+    db.session.commit()
+    flash("Quiz reset successfully. You can now retake the quiz.", "success")
+    return redirect(url_for("session_detail", slug=slug) + "?tab=quiz-tab")
+
+
 @app.post("/session/<slug>/comment")
 @login_required
 @student_required
@@ -1852,14 +1885,14 @@ def admin_exams():
         start_time = None
         if start_time_raw:
             try:
-                start_time = datetime.fromisoformat(start_time_raw).astimezone(timezone.utc).replace(tzinfo=None)
+                start_time = datetime.fromisoformat(start_time_raw)
             except Exception:
                 pass
                 
         end_time = None
         if end_time_raw:
             try:
-                end_time = datetime.fromisoformat(end_time_raw).astimezone(timezone.utc).replace(tzinfo=None)
+                end_time = datetime.fromisoformat(end_time_raw)
             except Exception:
                 pass
         
@@ -2206,14 +2239,14 @@ def admin_exam_edit(exam_id: int):
         start_time = None
         if start_time_raw:
             try:
-                start_time = datetime.fromisoformat(start_time_raw).astimezone(timezone.utc).replace(tzinfo=None)
+                start_time = datetime.fromisoformat(start_time_raw)
             except Exception:
                 pass
                 
         end_time = None
         if end_time_raw:
             try:
-                end_time = datetime.fromisoformat(end_time_raw).astimezone(timezone.utc).replace(tzinfo=None)
+                end_time = datetime.fromisoformat(end_time_raw)
             except Exception:
                 pass
                 
@@ -2222,17 +2255,45 @@ def admin_exam_edit(exam_id: int):
         raw_questions = request.form.get("questions_json", "")
         if raw_questions.strip():
             try:
-                questions = json.loads(raw_questions)
-                Question.query.filter_by(exam_id=exam.id).delete()
-                for q in questions:
-                    db.session.add(Question(
-                        exam_id=exam.id,
-                        question_text=q.get("questionText", ""),
-                        question_type=q.get("questionType", "mcq"),
-                        options=json.dumps(q.get("options", [])),
-                        correct_answer=str(q.get("correctAnswer", "")),
-                        marks=int(q.get("marks", 1)),
-                    ))
+                new_questions = json.loads(raw_questions)
+                existing_questions = Question.query.filter_by(exam_id=exam.id).order_by(Question.id).all()
+                changed = len(new_questions) != len(existing_questions)
+                if not changed:
+                    for i, eq in enumerate(existing_questions):
+                        nq = new_questions[i]
+                        nq_text = nq.get("questionText", "")
+                        nq_type = nq.get("questionType", "mcq")
+                        nq_options = json.dumps(nq.get("options", []))
+                        nq_correct = str(nq.get("correctAnswer", ""))
+                        nq_marks = int(nq.get("marks", 1))
+                        
+                        try:
+                            eq_options_norm = json.dumps(json.loads(eq.options or "[]"))
+                        except Exception:
+                            eq_options_norm = "[]"
+                        try:
+                            nq_options_norm = json.dumps(json.loads(nq_options))
+                        except Exception:
+                            nq_options_norm = "[]"
+                        
+                        if (eq.question_text != nq_text or
+                            eq.question_type != nq_type or
+                            eq_options_norm != nq_options_norm or
+                            eq.correct_answer != nq_correct or
+                            eq.marks != nq_marks):
+                            changed = True
+                            break
+                if changed:
+                    Question.query.filter_by(exam_id=exam.id).delete()
+                    for q in new_questions:
+                        db.session.add(Question(
+                            exam_id=exam.id,
+                            question_text=q.get("questionText", ""),
+                            question_type=q.get("questionType", "mcq"),
+                            options=json.dumps(q.get("options", [])),
+                            correct_answer=str(q.get("correctAnswer", "")),
+                            marks=int(q.get("marks", 1)),
+                        ))
             except json.JSONDecodeError:
                 pass
         db.session.commit()

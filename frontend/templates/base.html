@@ -47,11 +47,22 @@
           <button class="dropbtn"><i class="fa-solid fa-book-open"></i> Sessions <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></button>
           <div class="dropdown-content">
             {% for s in nav_sessions %}
-              {% set has_access = not current_user.is_authenticated or check_session_access(current_user, s.display_order) %}
-              {% if not current_user.is_authenticated or has_access %}
-              <a href="{{ url_for('session_detail', slug=s.slug) if current_user.is_authenticated else url_for('login') }}" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-                <span>Session {{ s.display_order }}: {{ s.clean_title }}</span>
-              </a>
+              {% set is_guest = not current_user.is_authenticated %}
+              {% set is_admin = current_user.is_authenticated and current_user.is_admin %}
+              {% set is_level_match = is_guest or is_admin or (s.difficulty == current_user.study_level) %}
+              
+              {% if is_level_match %}
+                {% set has_access = is_guest or is_admin or check_session_access(current_user, s.display_order) %}
+                <a href="{{ url_for('session_detail', slug=s.slug) if (is_guest or has_access) else '#' }}" 
+                   style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; {% if not has_access %}opacity: 0.6; cursor: not-allowed;{% endif %}"
+                   {% if not has_access %}onclick="alert('This session is locked. Please pass the quizzes of prior sessions first.'); return false;"{% endif %}>
+                  <span>
+                    {% if not has_access %}
+                      <i class="fa-solid fa-lock" style="font-size: 0.85rem; color: var(--red-400); margin-right: 0.35rem;"></i>
+                    {% endif %}
+                    Session {{ s.display_order }}: {{ s.clean_title }}
+                  </span>
+                </a>
               {% endif %}
             {% endfor %}
           </div>
@@ -60,7 +71,6 @@
         
         {% if current_user.is_authenticated %}
           {% if not current_user.is_admin %}
-            <a href="{{ url_for('exams_dashboard') }}"><i class="fa-solid fa-graduation-cap"></i> Exams & Quizzes</a>
             <a href="{{ url_for('dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
           {% endif %}
           {% if current_user.is_admin %}

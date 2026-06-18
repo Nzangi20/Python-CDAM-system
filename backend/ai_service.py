@@ -300,7 +300,8 @@ Each question object in the JSON array must follow this structure exactly:
     "Option 3",
     "Option 4"
   ],
-  "correct": 0
+  "correct": 0,
+  "explanation": "A brief, clear explanation of why the correct option is correct and why other choices are incorrect."
 }}
 Where "correct" is the 0-indexed integer (0, 1, 2, or 3) representing the index of the correct option.
 """

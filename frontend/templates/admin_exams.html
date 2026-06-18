@@ -404,8 +404,7 @@
       });
     }
 
-    // Seed default first question to begin editing easily
-    createQuestionBlock();
+    // Don't auto-seed default empty question to prevent empty questions when using AI generator.
   })();
 </script>
 {% endblock %}
