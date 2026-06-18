@@ -60,7 +60,7 @@
 {% block scripts %}
 <script>
   (() => {
-    const startedAt = new Date("{{ attempt.created_at.replace(tzinfo=None).isoformat() }}+03:00").getTime();
+    const startedAt = {{ started_at_ms }};
     const limitMs = {{ time_limit }} * 60 * 1000;
     const serverTimeMs = {{ server_time_ms }};
     const clientTimeMs = Date.now();

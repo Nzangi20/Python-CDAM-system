@@ -1798,6 +1798,7 @@ def exam_take(exam_id: int):
             time_limit=exam.duration,
             pass_mark=exam.passing_score,
             server_time_ms=int(utc_now().timestamp() * 1000),
+            started_at_ms=int(to_naive(attempt.created_at).timestamp() * 1000),
         )
 
     # POST submit
