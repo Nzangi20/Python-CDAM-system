@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_DIR))
 
-from app import app, db, User, Session, Exam, Question, ExamAttemptRecord, IntegrityLog, UserProgress, UPLOADS_DIR  # noqa: E402
+from app import app, db, User, Session, Exam, Question, ExamAttemptRecord, IntegrityLog, UserProgress, QuizResult, UPLOADS_DIR  # noqa: E402
 from seed_data import SESSIONS  # noqa: E402
 from sqlalchemy.pool import StaticPool
 
@@ -82,9 +82,15 @@ def test_session_progress_tracking(client):
     detail = client.get(f"/session/{slug}")
     assert detail.status_code == 200
 
+    # Submit passing quiz answers first
+    quiz_resp = client.post(f"/session/{slug}/quiz", data={"q_0": "0", "q_1": "0", "q_2": "0"}, follow_redirects=True)
+    assert quiz_resp.status_code == 200
+    assert b"passed the quiz" in quiz_resp.data
+
     complete = client.post(f"/session/{slug}/complete", follow_redirects=True)
     assert complete.status_code == 200
     assert b"completed" in complete.data.lower()
+
 
 
 def test_admin_access_denied_for_students(client):
@@ -242,6 +248,14 @@ def test_study_level_access_control(client):
         db.session.add(s11)
         db.session.commit()
         s11_id = s11.id
+
+        # Insert QuizResults for sessions with display_order < 6 so they are not progression-locked
+        user = User.query.filter_by(reg_number="EB3/11111/26").first()
+        for o in range(1, 6):
+            s = Session.query.filter_by(display_order=o).first()
+            if s:
+                db.session.add(QuizResult(user_id=user.id, session_id=s.id, score=100, answers="{}"))
+        db.session.commit()
     
     # Try to access Session 1 (display_order 1) -> Allowed (200)
     resp_s1 = client.get(f"/session/{s1_slug}")
@@ -788,6 +802,35 @@ def test_groq_provider_initialization():
     # Cleanup env
     os.environ.pop("GROQ_API_KEY", None)
     ai_service._ai_service_instance = None
+
+
+def test_quiz_progression_locking(client):
+    # Register and login student
+    register_and_login(client, reg_number="EB3/12345/26")
+    
+    with app.app_context():
+        # Get slug of session 2
+        s2 = Session.query.filter_by(display_order=2).first()
+        s2_slug = s2.slug
+        s1 = Session.query.filter_by(display_order=1).first()
+        s1_slug = s1.slug
+        
+    # Access session 2 without passing session 1 quiz -> Redirected (progression locked)
+    resp = client.get(f"/session/{s2_slug}")
+    assert resp.status_code == 302
+    
+    # Try to mark session 1 as complete without taking quiz -> Redirected
+    resp_complete = client.post(f"/session/{s1_slug}/complete", follow_redirects=True)
+    assert b"must take and pass the quiz" in resp_complete.data
+    
+    # Submit passing quiz for Session 1
+    resp_quiz = client.post(f"/session/{s1_slug}/quiz", data={"q_0": "0", "q_1": "0", "q_2": "0"}, follow_redirects=True)
+    assert b"passed the quiz" in resp_quiz.data
+    
+    # Access session 2 -> Allowed now since Session 1 quiz was passed!
+    resp_allowed = client.get(f"/session/{s2_slug}")
+    assert resp_allowed.status_code == 200
+
 
 
 

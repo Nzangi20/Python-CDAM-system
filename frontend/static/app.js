@@ -13,6 +13,12 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("pre code").forEach((block) => hljs.highlightElement(block));
   }
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const tabParam = urlParams.get("tab");
+  if (tabParam) {
+    switchTab(tabParam);
+  }
+
   // Event delegation for AI code block action buttons (Copy, Export, Run)
   document.addEventListener("click", async (e) => {
     const btn = e.target.closest(".ai-code-copy-btn, .ai-code-export-btn, .ai-code-run-btn");

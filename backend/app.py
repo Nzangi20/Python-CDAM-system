@@ -394,16 +394,30 @@ def student_required(view):
     return wrapped
 
 
-def check_session_access(user, display_order):
+def check_session_access_with_reason(user, display_order):
     if not user or not hasattr(user, "is_authenticated") or not user.is_authenticated:
-        return False
+        return False, "not_authenticated"
     if user.is_admin:
-        return True
+        return True, ""
     level = getattr(user, "study_level", "Beginner")
-    if display_order <= 10:
-        return True
-    else:
-        return level == "Professional"
+    if display_order > 10 and level != "Professional":
+        return False, "restricted_level"
+        
+    prev_sessions = Session.query.filter(Session.display_order < display_order, Session.published == True).all()
+    for s in prev_sessions:
+        quiz_questions = parse_quiz(s.quiz_json)
+        if not quiz_questions:
+            continue
+        res = QuizResult.query.filter_by(user_id=user.id, session_id=s.id).first()
+        if not res or res.score < 60:
+            return False, f"locked_quiz:{s.display_order}:{s.title}"
+            
+    return True, ""
+
+
+def check_session_access(user, display_order):
+    access, _ = check_session_access_with_reason(user, display_order)
+    return access
 
 
 
@@ -766,7 +780,7 @@ def resources():
 @student_required
 def exams_dashboard():
     now = utc_now()
-    exams = Exam.query.filter_by(published=True).all()
+    exams = Exam.query.filter_by(published=True, study_level=current_user.study_level).all()
     upcoming = [e for e in exams if e.start_time and to_naive(e.start_time) > now]
     available = [
         e
@@ -869,9 +883,15 @@ def ensure_notes_file_exists(session) -> bool:
 @login_required
 def session_detail(slug: str):
     session = Session.query.filter_by(slug=slug, published=True).first_or_404()
-    if not check_session_access(current_user, session.display_order):
-        required_level = "Professional"
-        flash(f"Session '{session.title}' notes and materials are restricted to {required_level} level students. Please upgrade your profile level to access.", "error")
+    access, reason = check_session_access_with_reason(current_user, session.display_order)
+    if not access:
+        if reason == "restricted_level":
+            flash(f"Session '{session.title}' notes and materials are restricted to Professional level students. Please upgrade your profile level to access.", "error")
+        elif reason.startswith("locked_quiz:"):
+            _, prev_order, prev_title = reason.split(":", 2)
+            flash(f"You must take and pass the quiz for Session {prev_order} ('{prev_title}') with at least 60% to unlock Session {session.display_order}.", "error")
+        else:
+            flash("You do not have access to this session.", "error")
         return redirect(url_for("student_dashboard"))
         
     progress = UserProgress.query.filter_by(user_id=current_user.id, session_id=session.id).first()
@@ -879,6 +899,14 @@ def session_detail(slug: str):
     bookmark = Bookmark.query.filter_by(user_id=current_user.id, session_id=session.id).first()
     quiz = parse_quiz(session.quiz_json)
     quiz_result = QuizResult.query.filter_by(user_id=current_user.id, session_id=session.id).first()
+    
+    quiz_answers = {}
+    if quiz_result and quiz_result.answers:
+        try:
+            quiz_answers = json.loads(quiz_result.answers)
+        except Exception:
+            pass
+            
     comments = DiscussionComment.query.filter_by(session_id=session.id, approved=True).order_by(
         DiscussionComment.created_at.desc()
     ).all()
@@ -904,6 +932,7 @@ def session_detail(slug: str):
         bookmarked=bool(bookmark),
         quiz=quiz,
         quiz_result=quiz_result,
+        quiz_answers=quiz_answers,
         comments=comments,
         latest_exam_attempt=None,
         show_quiz=False,
@@ -1509,6 +1538,14 @@ def admin_ai_stats():
 @student_required
 def complete_session(slug: str):
     session = Session.query.filter_by(slug=slug, published=True).first_or_404()
+    
+    quiz_questions = parse_quiz(session.quiz_json)
+    if quiz_questions:
+        res = QuizResult.query.filter_by(user_id=current_user.id, session_id=session.id).first()
+        if not res or res.score < 60:
+            flash("You must take and pass the quiz for this session with at least 60% before marking it as completed.", "error")
+            return redirect(url_for("session_detail", slug=slug) + "?tab=quiz-tab")
+            
     progress = UserProgress.query.filter_by(user_id=current_user.id, session_id=session.id).first()
     if not progress:
         progress = UserProgress(user_id=current_user.id, session_id=session.id)
@@ -1543,8 +1580,48 @@ def toggle_bookmark(slug: str):
 @login_required
 @student_required
 def submit_quiz(slug: str):
-    flash("Quizzes are now under the Exams & Quizzes module.", "error")
-    return redirect(url_for("exams_dashboard"))
+    session = Session.query.filter_by(slug=slug, published=True).first_or_404()
+    quiz_questions = parse_quiz(session.quiz_json)
+    if not quiz_questions:
+        flash("This session does not have a quiz configured.", "error")
+        return redirect(url_for("session_detail", slug=slug))
+        
+    user_answers = {}
+    correct_count = 0
+    total_questions = len(quiz_questions)
+    
+    for idx, q in enumerate(quiz_questions):
+        key = f"q_{idx}"
+        val = request.form.get(key)
+        user_answers[key] = val
+        if val is not None:
+            try:
+                val_int = int(val)
+                correct_idx = q.get("correct")
+                if val_int == correct_idx:
+                    correct_count += 1
+            except (ValueError, TypeError):
+                pass
+                
+    score = int((correct_count / total_questions) * 100) if total_questions else 0
+    
+    quiz_result = QuizResult.query.filter_by(user_id=current_user.id, session_id=session.id).first()
+    if not quiz_result:
+        quiz_result = QuizResult(user_id=current_user.id, session_id=session.id)
+    quiz_result.score = score
+    quiz_result.answers = json.dumps(user_answers)
+    quiz_result.created_at = utc_now()
+    db.session.add(quiz_result)
+    db.session.commit()
+    
+    log_activity("student.session.quiz_submit", session.slug)
+    
+    if score >= 60:
+        flash(f"You passed the quiz with a score of {score}%! You can now mark the session as completed and proceed.", "success")
+    else:
+        flash(f"You scored {score}%. You need at least 60% to pass and unlock the next session. Please try again.", "error")
+        
+    return redirect(url_for("session_detail", slug=slug) + "?tab=quiz-tab")
 
 
 @app.post("/session/<slug>/comment")
@@ -1582,6 +1659,9 @@ def exam_take(exam_id: int):
     exam = db.session.get(Exam, exam_id)
     if not exam or not exam.published:
         flash("Exam not available.", "error")
+        return redirect(url_for("exams_dashboard"))
+    if exam.study_level != current_user.study_level:
+        flash("You do not have access to this exam.", "error")
         return redirect(url_for("exams_dashboard"))
     now = utc_now()
     if exam.start_time and to_naive(exam.start_time) > now:
@@ -1650,6 +1730,7 @@ def exam_take(exam_id: int):
             exam_questions=ordered_questions,
             time_limit=exam.duration,
             pass_mark=exam.passing_score,
+            server_time_ms=int(utc_now().timestamp() * 1000),
         )
 
     # POST submit

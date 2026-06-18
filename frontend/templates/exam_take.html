@@ -60,8 +60,12 @@
 {% block scripts %}
 <script>
   (() => {
-    const startedAt = new Date("{{ attempt.created_at.isoformat() }}").getTime();
+    const startedAt = new Date("{{ attempt.created_at.replace(tzinfo=None).isoformat() }}Z").getTime();
     const limitMs = {{ time_limit }} * 60 * 1000;
+    const serverTimeMs = {{ server_time_ms }};
+    const clientTimeMs = Date.now();
+    const clientServerOffset = serverTimeMs - clientTimeMs;
+
     const timerEl = document.getElementById("examTimer");
     const form = document.getElementById("examForm");
     const enterFullscreenBtn = document.getElementById("enterFullscreenBtn");
@@ -128,7 +132,7 @@
 
     function updateTimer() {
       if (!examStarted) return;
-      const now = Date.now();
+      const now = Date.now() + clientServerOffset;
       const remaining = Math.max(0, limitMs - (now - startedAt));
       const mins = Math.floor(remaining / 60000);
       const secs = Math.floor((remaining % 60000) / 1000);
