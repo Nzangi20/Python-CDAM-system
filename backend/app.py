@@ -405,12 +405,17 @@ def check_session_access_with_reason(user, display_order):
         
     prev_sessions = Session.query.filter(Session.display_order < display_order, Session.published == True).all()
     for s in prev_sessions:
+        # Verify the session has been marked as completed
+        progress = UserProgress.query.filter_by(user_id=user.id, session_id=s.id).first()
+        if not progress or not progress.completed:
+            return False, f"locked_session:{s.display_order}:{s.title}"
+            
+        # Verify the quiz has been passed, if a quiz is configured
         quiz_questions = parse_quiz(s.quiz_json)
-        if not quiz_questions:
-            continue
-        res = QuizResult.query.filter_by(user_id=user.id, session_id=s.id).first()
-        if not res or res.score < 60:
-            return False, f"locked_quiz:{s.display_order}:{s.title}"
+        if quiz_questions:
+            res = QuizResult.query.filter_by(user_id=user.id, session_id=s.id).first()
+            if not res or res.score < 60:
+                return False, f"locked_quiz:{s.display_order}:{s.title}"
             
     return True, ""
 
@@ -921,6 +926,9 @@ def session_detail(slug: str):
     if not access:
         if reason == "restricted_level":
             flash(f"Session '{session.title}' notes and materials are restricted to Professional level students. Please upgrade your profile level to access.", "error")
+        elif reason.startswith("locked_session:"):
+            _, prev_order, prev_title = reason.split(":", 2)
+            flash(f"You must complete Session {prev_order} ('{prev_title}') to unlock Session {session.display_order}.", "error")
         elif reason.startswith("locked_quiz:"):
             _, prev_order, prev_title = reason.split(":", 2)
             flash(f"You must take and pass the quiz for Session {prev_order} ('{prev_title}') with at least 60% to unlock Session {session.display_order}.", "error")

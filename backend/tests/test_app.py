@@ -249,12 +249,13 @@ def test_study_level_access_control(client):
         db.session.commit()
         s11_id = s11.id
 
-        # Insert QuizResults for sessions with display_order < 6 so they are not progression-locked
+        # Insert QuizResults and UserProgress for sessions with display_order < 6 so they are not progression-locked
         user = User.query.filter_by(reg_number="EB3/11111/26").first()
         for o in range(1, 6):
             s = Session.query.filter_by(display_order=o).first()
             if s:
                 db.session.add(QuizResult(user_id=user.id, session_id=s.id, score=100, answers="{}"))
+                db.session.add(UserProgress(user_id=user.id, session_id=s.id, completed=True))
         db.session.commit()
     
     # Try to access Session 1 (display_order 1) -> Allowed (200)
@@ -827,7 +828,15 @@ def test_quiz_progression_locking(client):
     resp_quiz = client.post(f"/session/{s1_slug}/quiz", data={"q_0": "0", "q_1": "0", "q_2": "0"}, follow_redirects=True)
     assert b"passed the quiz" in resp_quiz.data
     
-    # Access session 2 -> Allowed now since Session 1 quiz was passed!
+    # Try to access Session 2 before marking Session 1 as complete -> Redirected (progression locked)
+    resp_still_locked = client.get(f"/session/{s2_slug}")
+    assert resp_still_locked.status_code == 302
+
+    # Now mark Session 1 as complete -> Allowed since quiz is passed
+    resp_complete_ok = client.post(f"/session/{s1_slug}/complete", follow_redirects=True)
+    assert b"congratulations" in resp_complete_ok.data.lower() or b"completed" in resp_complete_ok.data.lower()
+
+    # Access session 2 -> Allowed now since Session 1 is completed!
     resp_allowed = client.get(f"/session/{s2_slug}")
     assert resp_allowed.status_code == 200
 
