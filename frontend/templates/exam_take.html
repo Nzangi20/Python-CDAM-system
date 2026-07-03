@@ -38,11 +38,11 @@
         
         <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; width: 100%;">
           {% if question.type == "essay" %}
-            <textarea name="q{{ q_index }}" rows="5" placeholder="Type your detailed answer here..." required style="resize: vertical; width: 100%;"></textarea>
+            <textarea name="q{{ q_index }}" rows="5" placeholder="Type your detailed answer here..." style="resize: vertical; width: 100%;"></textarea>
           {% else %}
             {% for option in question.options %}
               <label class="quiz-option" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: var(--transition);">
-                <input type="radio" name="q{{ q_index }}" value="{{ loop.index0 }}" required style="width: 18px; height: 18px; accent-color: var(--red-600);" />
+                <input type="radio" name="q{{ q_index }}" value="{{ loop.index0 }}" style="width: 18px; height: 18px; accent-color: var(--red-600);" />
                 <span style="font-size: 0.95rem;">{{ option }}</span>
               </label>
             {% endfor %}
