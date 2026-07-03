@@ -667,12 +667,43 @@ def index():
         sessions_q = sessions_q.filter(Session.difficulty == difficulty)
 
     sessions = sessions_q.order_by(Session.display_order).all()
+
+    # Pre-compute session access to avoid N+1 queries in the template
+    session_access_map = {}
+    if current_user.is_authenticated and not current_user.is_admin:
+        all_published = Session.query.filter_by(published=True).order_by(Session.display_order).all()
+        user_progress = {p.session_id: p for p in UserProgress.query.filter_by(user_id=current_user.id).all()}
+        user_quizzes = {q.session_id: q for q in QuizResult.query.filter_by(user_id=current_user.id).all()}
+        level = getattr(current_user, "study_level", "Beginner")
+
+        for s in all_published:
+            if s.display_order > 10 and level != "Professional":
+                session_access_map[s.display_order] = False
+                continue
+            # Check all previous sessions are completed
+            access = True
+            for prev in all_published:
+                if prev.display_order >= s.display_order:
+                    break
+                prog = user_progress.get(prev.id)
+                if not prog or not prog.completed:
+                    access = False
+                    break
+                quiz_questions = parse_quiz(prev.quiz_json)
+                if quiz_questions:
+                    qr = user_quizzes.get(prev.id)
+                    if not qr or qr.score < 60:
+                        access = False
+                        break
+            session_access_map[s.display_order] = access
+
     return render_template(
         "index.html",
         sessions=sessions,
         query=query,
         difficulty=difficulty,
         difficulties=["Beginner", "Professional"],
+        session_access_map=session_access_map,
     )
 
 
