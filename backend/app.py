@@ -61,14 +61,23 @@ app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Automatically apply secure SSL settings when deploying to cloud providers
-if "aivencloud.com" in db_url or "railway" in db_url or "supabase" in db_url:
-    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "connect_args": {
-            "ssl": {
-                "ssl_mode": "REQUIRED"
+if os.environ.get("DISABLE_DB_SSL", "").lower() != "true":
+    if "aivencloud.com" in db_url or "railway" in db_url or "supabase" in db_url:
+        if db_url.startswith("mysql"):
+            # For Aiven MySQL, SSL is required. For Railway MySQL, SSL should not be forced as it causes WRONG_VERSION_NUMBER errors.
+            if "aivencloud.com" in db_url:
+                app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+                    "connect_args": {
+                        "ssl": {}
+                    }
+                }
+        else:
+            # PostgreSQL SSL settings
+            app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+                "connect_args": {
+                    "sslmode": "require"
+                }
             }
-        }
-    }
 app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024
 
 db = SQLAlchemy(app)
