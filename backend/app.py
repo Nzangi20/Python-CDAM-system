@@ -57,6 +57,10 @@ app = Flask(
 )
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "change-this-in-production")
 db_url = os.environ.get("DATABASE_URL", "mysql+pymysql://root:@localhost:3306/cdam_lms").strip()
+if db_url.startswith("mysql://"):
+    db_url = db_url.replace("mysql://", "mysql+pymysql://", 1)
+elif db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -2718,7 +2722,10 @@ def initialize():
 
 
 # Automatically initialize and seed the database on server startup/import
-initialize()
+try:
+    initialize()
+except Exception as e:
+    print(f"CRITICAL ERROR: Database initialization failed during startup: {e}")
 
 if __name__ == "__main__":
     app.run(debug=False)
