@@ -57,31 +57,18 @@ app = Flask(
 )
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "change-this-in-production")
 db_url = os.environ.get("DATABASE_URL", "mysql+pymysql://root:@localhost:3306/cdam_lms").strip()
-if db_url.startswith("mysql://"):
-    db_url = db_url.replace("mysql://", "mysql+pymysql://", 1)
-elif db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql://", 1)
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Automatically apply secure SSL settings when deploying to cloud providers
-if os.environ.get("DISABLE_DB_SSL", "").lower() != "true":
-    if "aivencloud.com" in db_url or "railway" in db_url or "supabase" in db_url:
-        if db_url.startswith("mysql"):
-            # For Aiven MySQL, SSL is required. For Railway MySQL, SSL should not be forced as it causes WRONG_VERSION_NUMBER errors.
-            if "aivencloud.com" in db_url:
-                app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-                    "connect_args": {
-                        "ssl": {}
-                    }
-                }
-        else:
-            # PostgreSQL SSL settings
-            app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-                "connect_args": {
-                    "sslmode": "require"
-                }
+if "aivencloud.com" in db_url or "railway" in db_url or "supabase" in db_url:
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "connect_args": {
+            "ssl": {
+                "ssl_mode": "REQUIRED"
             }
+        }
+    }
 app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024
 
 db = SQLAlchemy(app)
@@ -2722,10 +2709,7 @@ def initialize():
 
 
 # Automatically initialize and seed the database on server startup/import
-try:
-    initialize()
-except Exception as e:
-    print(f"CRITICAL ERROR: Database initialization failed during startup: {e}")
+initialize()
 
 if __name__ == "__main__":
     app.run(debug=False)
