@@ -79,6 +79,16 @@ def test_register_login_and_dashboard(client):
 def test_session_progress_tracking(client):
     register_and_login(client)
     slug = SESSIONS[0]["slug"]
+    
+    with app.app_context():
+        s1 = Session.query.filter_by(slug=slug).first()
+        s1.quiz_json = json.dumps([
+            {"question": "Q1", "options": ["A", "B"], "correct": 0},
+            {"question": "Q2", "options": ["A", "B"], "correct": 0},
+            {"question": "Q3", "options": ["A", "B"], "correct": 0}
+        ])
+        db.session.commit()
+
     detail = client.get(f"/session/{slug}")
     assert detail.status_code == 200
 
@@ -815,6 +825,13 @@ def test_quiz_progression_locking(client):
         s2_slug = s2.slug
         s1 = Session.query.filter_by(display_order=1).first()
         s1_slug = s1.slug
+        # Seed quiz for session 1 explicitly
+        s1.quiz_json = json.dumps([
+            {"question": "Q1", "options": ["A", "B"], "correct": 0},
+            {"question": "Q2", "options": ["A", "B"], "correct": 0},
+            {"question": "Q3", "options": ["A", "B"], "correct": 0}
+        ])
+        db.session.commit()
         
     # Access session 2 without passing session 1 quiz -> Redirected (progression locked)
     resp = client.get(f"/session/{s2_slug}")

@@ -472,7 +472,7 @@ def seed_sessions() -> None:
                 instructions=item.get("instructions", ""),
                 code_examples=item["code_examples"],
                 resources=item["resources"],
-                quiz_json=json.dumps(item.get("quiz", [])),
+                quiz_json="[]",
                 duration=item["duration"],
                 difficulty=item["difficulty"],
                 display_order=idx,

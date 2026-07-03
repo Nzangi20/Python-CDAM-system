@@ -182,6 +182,12 @@
     });
 
     function createQuizQuestionBlock(data = null) {
+      // Remove placeholder if present
+      const placeholder = container.querySelector(".quiz-empty-placeholder");
+      if (placeholder) {
+        placeholder.remove();
+      }
+
       const qId = qCounter++;
       const block = document.createElement("div");
       block.className = "card quiz-question-builder-block";
@@ -215,16 +221,44 @@
 
       block.querySelector(".remove-q-btn").addEventListener("click", () => {
         block.remove();
+        updatePlaceholder();
       });
 
       container.appendChild(block);
+    }
+
+    function updatePlaceholder() {
+      const existingBlocks = container.querySelectorAll(".quiz-question-builder-block");
+      let placeholder = container.querySelector(".quiz-empty-placeholder");
+      if (existingBlocks.length === 0) {
+        if (!placeholder) {
+          placeholder = document.createElement("div");
+          placeholder.className = "quiz-empty-placeholder card";
+          placeholder.style.padding = "1.5rem";
+          placeholder.style.textAlign = "center";
+          placeholder.style.background = "rgba(255, 255, 255, 0.02)";
+          placeholder.style.border = "1px dashed var(--border)";
+          placeholder.style.borderRadius = "10px";
+          placeholder.innerHTML = `
+            <p class="muted" style="margin: 0; font-size: 0.9rem;">
+              <i class="fa-solid fa-circle-question" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block; opacity: 0.5;"></i>
+              No practice quiz questions configured. This session will have no practice quiz unless questions are added.
+            </p>
+          `;
+          container.appendChild(placeholder);
+        }
+      } else {
+        if (placeholder) {
+          placeholder.remove();
+        }
+      }
     }
 
     // Populate existing quiz questions
     if (existingQuiz && existingQuiz.length > 0) {
       existingQuiz.forEach(q => createQuizQuestionBlock(q));
     } else {
-      createQuizQuestionBlock();
+      updatePlaceholder();
     }
 
     form.addEventListener("submit", (e) => {
