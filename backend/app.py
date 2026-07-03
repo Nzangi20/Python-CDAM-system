@@ -61,7 +61,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Automatically apply secure SSL settings when deploying to cloud providers
-if "aivencloud.com" in db_url or "railway" in db_url or "supabase" in db_url:
+if "aivencloud.com" in db_url or "supabase" in db_url:
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
         "connect_args": {
             "ssl": {
