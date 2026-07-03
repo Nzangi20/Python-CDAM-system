@@ -1895,8 +1895,76 @@ def exam_violation(attempt_id: int):
             details=f"count={attempt.violation_count}",
         )
     )
-    db.session.commit()
     return jsonify({"ok": True, "terminate": terminate, "count": attempt.violation_count})
+
+
+@app.post("/exams/check-answer")
+@login_required
+@student_required
+def check_exam_question_answer():
+    question_id = request.form.get("question_id", type=int)
+    selected_option = request.form.get("selected_option", "").strip()
+
+    question = db.session.get(Question, question_id)
+    if not question:
+        return jsonify({"ok": False, "error": "Question not found"}), 404
+
+    options = json.loads(question.options or "[]")
+    correct_idx_str = str(question.correct_answer or "")
+
+    is_correct = (selected_option == correct_idx_str)
+
+    # Get the option texts
+    correct_option_text = ""
+    try:
+        correct_idx = int(correct_idx_str)
+        if 0 <= correct_idx < len(options):
+            correct_option_text = options[correct_idx]
+    except ValueError:
+        correct_option_text = correct_idx_str
+
+    selected_option_text = ""
+    try:
+        selected_idx = int(selected_option)
+        if 0 <= selected_idx < len(options):
+            selected_option_text = options[selected_idx]
+    except ValueError:
+        selected_option_text = selected_option
+
+    # Generate short explanation using AI
+    ai_service = get_ai_service()
+
+    prompt = f"""You are a Python for Data Science tutor. A student is taking a quiz/exam.
+Question: {question.question_text}
+Options:
+{chr(10).join([f'- Index {i}: {opt}' for i, opt in enumerate(options)])}
+Correct Option Index: {correct_idx_str} ({correct_option_text})
+Student Selected Option Index: {selected_option} ({selected_option_text})
+
+Please provide a short explanation (1-3 sentences) explaining why the student's answer is {"correct" if is_correct else "incorrect"}, and explain the correct choice clearly. Keep it very concise (under 80 words) and helpful."""
+
+    explanation = "AI explanation is not configured."
+    if ai_service.is_configured:
+        if ai_service.check_rate_limit(current_user.id):
+            explanation = ai_service._call(prompt, max_tokens=150)
+            db.session.add(AIUsageLog(user_id=current_user.id, action="exam_check_answer"))
+            db.session.commit()
+        else:
+            explanation = "You are sending requests too quickly. Please wait a moment."
+    else:
+        if is_correct:
+            explanation = f"Correct! '{correct_option_text}' is the right answer."
+        else:
+            explanation = f"Incorrect. The correct answer is '{correct_option_text}'."
+
+    return jsonify({
+        "ok": True,
+        "correct": is_correct,
+        "correct_option_index": correct_idx_str,
+        "correct_option_text": correct_option_text,
+        "explanation": explanation
+    })
+
 
 
 

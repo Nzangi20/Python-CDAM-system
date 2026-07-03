@@ -879,6 +879,56 @@ def test_admin_registration_and_mandatory_password_reset(client):
     assert b"Welcome back" in dashboard_allowed_resp.data
 
 
+def test_check_exam_question_answer(client):
+    from app import Exam, Question
+    register_and_login(client)
+    
+    with app.app_context():
+        # Create an exam and a question
+        exam = Exam(title="AI Checking Test Exam", description="...", duration=15, passing_score=50)
+        db.session.add(exam)
+        db.session.commit()
+        
+        question = Question(
+            exam_id=exam.id,
+            question_text="What is the result of 2 + 2 in Python?",
+            question_type="mcq",
+            options='["3", "4", "5"]',
+            correct_answer="1"  # "4" is at index 1
+        )
+        db.session.add(question)
+        db.session.commit()
+        
+        question_id = question.id
+
+    # Post correct answer to /exams/check-answer
+    resp = client.post("/exams/check-answer", data={
+        "question_id": question_id,
+        "selected_option": "1"
+    })
+    assert resp.status_code == 200
+    data = json.loads(resp.data.decode("utf-8"))
+    assert data["ok"] is True
+    assert data["correct"] is True
+    assert data["correct_option_index"] == "1"
+    assert data["correct_option_text"] == "4"
+    assert "correct" in data["explanation"].lower() or "answer" in data["explanation"].lower()
+
+    # Post incorrect answer to /exams/check-answer
+    resp_wrong = client.post("/exams/check-answer", data={
+        "question_id": question_id,
+        "selected_option": "0"
+    })
+    assert resp_wrong.status_code == 200
+    data_wrong = json.loads(resp_wrong.data.decode("utf-8"))
+    assert data_wrong["ok"] is True
+    assert data_wrong["correct"] is False
+    assert data_wrong["correct_option_index"] == "1"
+    assert data_wrong["correct_option_text"] == "4"
+    assert "incorrect" in data_wrong["explanation"].lower() or "correct answer" in data_wrong["explanation"].lower()
+
+
+
 
 
 
