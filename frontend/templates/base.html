@@ -49,7 +49,7 @@
             {% for s in nav_sessions %}
               {% set is_guest = not current_user.is_authenticated %}
               {% set is_admin = current_user.is_authenticated and current_user.is_admin %}
-              {% set is_level_match = is_guest or is_admin or (s.difficulty == current_user.study_level) %}
+              {% set is_level_match = is_guest or is_admin or (current_user.study_level == 'Professional') or (s.difficulty == current_user.study_level) %}
               
               {% if is_level_match %}
                 {% set has_access = is_guest or is_admin or check_session_access(current_user, s.display_order) %}

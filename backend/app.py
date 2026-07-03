@@ -643,6 +643,7 @@ def admin_dashboard_context():
         "recent_registrations": recent_registrations,
         "exam_pass_rate": exam_pass_rate,
         "exam_results": exam_results,
+        "reset_requests": User.query.filter(User.password_reset_status == "requested").all(),
         "total_sessions": total_sessions,
         "ai_enabled": (PlatformSetting.query.filter_by(key="ai_enabled").first() or PlatformSetting(value="true")).value == "true",
         "ai_total_requests": AIUsageLog.query.count(),
@@ -738,7 +739,7 @@ def forgot_password():
         email = request.form.get("email", "").strip().lower()
         reg_number = request.form.get("reg_number", "").strip().upper()
         
-        user = User.query.filter_by(email=email, reg_number=reg_number).first()
+        user = User.query.filter(db.func.lower(User.email) == email, User.reg_number == reg_number).first()
         if not user:
             flash("No user found with the provided email and registration number.", "error")
             return redirect(url_for("forgot_password"))
@@ -2254,7 +2255,10 @@ def admin_approve_password_reset(user_id: int):
     db.session.commit()
     log_activity("admin.user.approve_password_reset", f"user={user.id}")
     flash("Password reset request approved. The student can now set their new password.", "success")
-    return redirect(url_for("admin_student_detail", user_id=user_id))
+    ref = request.referrer or ""
+    if "admin/student/" in ref or "user_id=" in ref:
+        return redirect(url_for("admin_student_detail", user_id=user_id))
+    return redirect(url_for("admin_panel"))
 
 
 @app.post("/admin/users/<int:user_id>/reject-reset")
@@ -2269,7 +2273,10 @@ def admin_reject_password_reset(user_id: int):
     db.session.commit()
     log_activity("admin.user.reject_password_reset", f"user={user.id}")
     flash("Password reset request cleared.", "success")
-    return redirect(url_for("admin_student_detail", user_id=user_id))
+    ref = request.referrer or ""
+    if "admin/student/" in ref or "user_id=" in ref:
+        return redirect(url_for("admin_student_detail", user_id=user_id))
+    return redirect(url_for("admin_panel"))
 
 
 @app.post("/admin/users/<int:user_id>/reset-progress")

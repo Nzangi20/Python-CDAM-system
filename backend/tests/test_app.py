@@ -954,6 +954,67 @@ def test_check_exam_question_answer(client):
     assert "incorrect" in data_wrong["explanation"].lower() or "correct answer" in data_wrong["explanation"].lower()
 
 
+def test_professional_student_sees_all_sessions(client):
+    # Register and login a Professional student
+    register_and_login(client, reg_number="EB3/22222/26", password="myprefpassword", study_level="Professional")
+    
+    # Access the home page /
+    resp = client.get("/")
+    assert resp.status_code == 200
+    # A professional student should see both beginner and professional sessions
+    assert b"Session 1:" in resp.data
+    assert b"Session 11:" in resp.data
+
+
+def test_admin_password_reset_approval_and_rejection(client):
+    # 1. Register a student
+    register_and_login(client, reg_number="EB3/33333/26", password="studpassword", study_level="Beginner")
+    client.get("/logout")
+    
+    # 2. Request a password reset
+    # GET forgot password page
+    resp_forgot = client.get("/forgot-password")
+    assert resp_forgot.status_code == 200
+    
+    # POST to request reset
+    resp_req = client.post("/forgot-password", data={
+        "email": "EB3_33333_26@cdam.local",
+        "reg_number": "EB3/33333/26"
+    })
+    assert resp_req.status_code == 200
+    assert b"Password reset request submitted successfully" in resp_req.data
+    
+    # 3. Log in as Admin and check admin panel
+    login_admin(client)
+    resp_admin = client.get("/admin")
+    assert resp_admin.status_code == 200
+    assert b"EB3/33333/26" in resp_admin.data
+    
+    # Get the user ID
+    student = User.query.filter_by(reg_number="EB3/33333/26").first()
+    assert student is not None
+    assert student.password_reset_status == "requested"
+    
+    # Approve reset
+    resp_approve = client.post(f"/admin/users/{student.id}/approve-reset", follow_redirects=True)
+    assert resp_approve.status_code == 200
+    student = User.query.filter_by(id=student.id).first()
+    assert student.password_reset_status == "approved"
+    assert b"Password reset request approved" in resp_approve.data
+    
+    # Reject/Clear reset
+    # Request reset again first
+    student.password_reset_status = "requested"
+    db.session.commit()
+    
+    resp_reject = client.post(f"/admin/users/{student.id}/reject-reset", follow_redirects=True)
+    assert resp_reject.status_code == 200
+    student = User.query.filter_by(id=student.id).first()
+    assert student.password_reset_status is None
+    assert b"Password reset request cleared" in resp_reject.data
+
+
+
 
 
 

@@ -63,6 +63,7 @@
   <button class="tab" data-tab="discussions"><i class="fa-solid fa-comments"></i> Discussions Moderation</button>
   <button class="tab" data-tab="comms"><i class="fa-solid fa-envelope-open-text"></i> System Notifications</button>
   <button class="tab" data-tab="ai-management"><i class="fa-solid fa-robot"></i> AI Management</button>
+  <button class="tab" data-tab="password-resets"><i class="fa-solid fa-key"></i> Password Resets</button>
 </div>
 
 <!-- Student Roster Panel -->
@@ -461,6 +462,51 @@
     </div>
   </div>
 </section>
+
+<!-- Password Resets Panel -->
+<section class="tab-panel card" id="password-resets">
+  <h3 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1rem;"><i class="fa-solid fa-key" style="color: var(--red-500);"></i> Password Reset Requests</h3>
+  <p class="muted" style="font-size: 0.9rem; margin-bottom: 1.5rem;">Below are the pending password reset requests from students. Approve them so they can set a new password on the forgot password page.</p>
+  
+  <div style="overflow-x: auto;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Student Name</th>
+          <th>Reg Number</th>
+          <th>Email Address</th>
+          <th>Request Status</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reset_user in reset_requests %}
+          <tr>
+            <td style="font-weight: 700;">{{ reset_user.name }}</td>
+            <td><code>{{ reset_user.reg_number or 'N/A' }}</code></td>
+            <td>{{ reset_user.email }}</td>
+            <td>
+              <span class="badge warning" style="text-transform: uppercase; background: rgba(245, 158, 11, 0.12); color: #fbbf24; border-color: rgba(245,158,11,0.25);">
+                {{ reset_user.password_reset_status }}
+              </span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;">
+              <form method="post" action="{{ url_for('admin_approve_password_reset', user_id=reset_user.id) }}" style="display: inline; margin: 0;">
+                <button type="submit" class="btn success" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16, 185, 129, 0.3);"><i class="fa-solid fa-check"></i> Approve Reset</button>
+              </form>
+              <form method="post" action="{{ url_for('admin_reject_password_reset', user_id=reset_user.id) }}" style="display: inline; margin: 0;">
+                <button type="submit" class="btn" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: var(--red-500); color: var(--red-400); background: none;"><i class="fa-solid fa-xmark"></i> Reject / Clear</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="muted" style="text-align: center; padding: 2rem 0;">No pending password reset requests.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
 {% endblock %}
 
 {% block scripts %}

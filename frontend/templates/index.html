@@ -16,7 +16,7 @@
       <span class="badge pulse"><i class="fa-solid fa-fire"></i> CDAM Intake Ongoing!</span>
       <h1>Master Python for Data Science</h1>
       <p>
-        Unlock your potential with CDAM's professional masterclass in Python, analytics,
+        Unlock your potential with a professional masterclass in Python, analytics,
         machine learning, and AI — inspired by the Center for Data Analytics & Modelling at Chuka University.
       </p>
       <div class="hero-actions">
@@ -184,7 +184,7 @@
     {% for session in sessions %}
       {% set is_guest = not current_user.is_authenticated %}
       {% set is_admin = current_user.is_authenticated and current_user.is_admin %}
-      {% set is_level_match = is_guest or is_admin or (session.difficulty == current_user.study_level) %}
+      {% set is_level_match = is_guest or is_admin or (current_user.study_level == 'Professional') or (session.difficulty == current_user.study_level) %}
       
       {% if is_level_match %}
         {% set has_access = is_guest or is_admin or check_session_access(current_user, session.display_order) %}
