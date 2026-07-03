@@ -2678,6 +2678,16 @@ def migrate_schema() -> None:
 
 def initialize():
     with app.app_context():
+        from sqlalchemy import inspect
+        try:
+            inspector = inspect(db.engine)
+            if "sessions" in inspector.get_table_names():
+                if Session.query.first() is not None:
+                    # Database is already seeded. Skip to avoid concurrent lock deadlocks.
+                    return
+        except Exception as e:
+            print(f"Database check skipped during startup: {e}")
+
         db.create_all()
         migrate_schema()
         seed_sessions()
