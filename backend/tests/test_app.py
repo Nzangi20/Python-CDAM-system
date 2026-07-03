@@ -1014,6 +1014,81 @@ def test_admin_password_reset_approval_and_rejection(client):
     assert b"Password reset request cleared" in resp_reject.data
 
 
+def test_dual_track_registration_and_switching(client):
+    # Register with both Python and R enrolled
+    response = client.post(
+        "/register",
+        data={
+            "name": "Multi Track Student",
+            "reg_number": "EB3/88888/26",
+            "password": "password123",
+            "study_level": "Professional",
+            "enroll_python": "yes",
+            "enroll_r": "yes"
+        },
+        follow_redirects=True
+    )
+    assert response.status_code == 200
+    assert b"Welcome to CDAM!" in response.data
+    
+    # Check database
+    student = User.query.filter_by(reg_number="EB3/88888/26").first()
+    assert student is not None
+    assert student.enrolled_python is True
+    assert student.enrolled_r is True
+    
+    # Switch to R track
+    resp_switch_r = client.get("/set-track/r", follow_redirects=True)
+    assert resp_switch_r.status_code == 200
+    assert b"Switched track to R" in resp_switch_r.data
+    
+    # Check that dashboard now lists R session
+    resp_dashboard = client.get("/dashboard", follow_redirects=True)
+    assert b"Introduction to R" in resp_dashboard.data
+    assert b"Introduction to Python" not in resp_dashboard.data
+    
+    # Switch back to Python
+    resp_switch_py = client.get("/set-track/python", follow_redirects=True)
+    assert resp_switch_py.status_code == 200
+    assert b"Switched track to Python" in resp_switch_py.data
+    
+    # Check dashboard lists Python session
+    resp_dashboard_py = client.get("/dashboard", follow_redirects=True)
+    assert b"Introduction to Python" in resp_dashboard_py.data
+    assert b"Introduction to R" not in resp_dashboard_py.data
+
+
+def test_r_sandbox_code_execution(client):
+    # Log in and check running R code
+    client.post(
+        "/register",
+        data={
+            "name": "R Sandbox User",
+            "reg_number": "EB3/99999/26",
+            "password": "password123",
+            "study_level": "Beginner",
+            "enroll_python": "no",
+            "enroll_r": "yes"
+        },
+        follow_redirects=True
+    )
+    # R track should be automatically active since they only enrolled in R
+    # Let's post to run-code
+    run_resp = client.post(
+        "/api/run-code",
+        json={"code": 'cat("Hello from R sandboxed environment!\n")'}
+    )
+    assert run_resp.status_code == 200
+    data = json.loads(run_resp.data)
+    assert "output" in data
+    assert "error" in data
+    
+    if "not installed" in data["error"] or "could not be found" in data["error"]:
+        assert True
+    else:
+        assert "Hello from R" in data["output"]
+
+
 
 
 

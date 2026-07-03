@@ -40,6 +40,26 @@
       </button>
 
       <nav class="nav-links" id="navLinks">
+        {% if current_user.is_authenticated and not current_user.is_admin %}
+          {% if current_user.enrolled_python and current_user.enrolled_r %}
+            <div class="track-switcher" style="display: inline-flex; align-items: center; background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 2px; margin-right: 0.5rem; vertical-align: middle; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+              <a href="{{ url_for('set_track', track='python') }}" class="track-btn {% if active_track == 'python' %}active{% endif %}" style="padding: 0.25rem 0.75rem; border-radius: 18px; font-size: 0.8rem; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 0.35rem; color: {% if active_track == 'python' %}white{% else %}var(--text){% endif %}; background: {% if active_track == 'python' %}var(--red-500){% else %}transparent{% endif %};">
+                <i class="fa-brands fa-python"></i> Python
+              </a>
+              <a href="{{ url_for('set_track', track='r') }}" class="track-btn {% if active_track == 'r' %}active{% endif %}" style="padding: 0.25rem 0.75rem; border-radius: 18px; font-size: 0.8rem; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 0.35rem; color: {% if active_track == 'r' %}white{% else %}var(--text){% endif %}; background: {% if active_track == 'r' %}var(--red-500){% else %}transparent{% endif %};">
+                <i class="fa-solid fa-registered"></i> R
+              </a>
+            </div>
+          {% else %}
+            <span class="track-badge" style="display: inline-flex; align-items: center; gap: 0.35rem; background: var(--bg-hover); border: 1px solid var(--border); border-radius: 20px; padding: 0.25rem 0.75rem; font-size: 0.8rem; font-weight: 600; margin-right: 0.5rem; vertical-align: middle; color: var(--text);">
+              {% if active_track == 'python' %}
+                <i class="fa-brands fa-python" style="color: #3776AB;"></i> Python Track
+              {% else %}
+                <i class="fa-solid fa-registered" style="color: #276C11;"></i> R Track
+              {% endif %}
+            </span>
+          {% endif %}
+        {% endif %}
         <a href="{{ url_for('index') }}"><i class="fa-solid fa-house"></i> Home</a>
         
         {% if not current_user.is_authenticated or not current_user.is_admin %}

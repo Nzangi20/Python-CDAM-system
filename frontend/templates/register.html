@@ -19,11 +19,23 @@
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-      <label><i class="fa-solid fa-graduation-cap"></i> Current Python Experience Level</label>
+      <label><i class="fa-solid fa-graduation-cap"></i> Experience Level</label>
       <select name="study_level" required style="padding: 0.8rem 1rem;">
         <option value="Beginner">Beginner (No coding experience)</option>
         <option value="Professional">Professional (Advanced libraries / ML practitioner)</option>
       </select>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <label><i class="fa-solid fa-book"></i> Enrolled Tracks</label>
+      <div style="display: flex; gap: 1.5rem; margin: 0.25rem 0;">
+        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+          <input type="checkbox" name="enroll_python" value="yes" checked style="width: auto; height: auto; margin: 0;" id="enroll_python" /> Python Programming
+        </label>
+        <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+          <input type="checkbox" name="enroll_r" value="yes" style="width: auto; height: auto; margin: 0;" id="enroll_r" /> R Programming
+        </label>
+      </div>
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 0.5rem;">
@@ -33,6 +45,17 @@
 
     <button class="btn primary" type="submit" style="width: 100%; font-weight: 700; margin-top: 0.5rem; padding: 0.85rem;"><i class="fa-solid fa-user-plus"></i> Create Account</button>
   </form>
+
+  <script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+      const py = document.getElementById('enroll_python').checked;
+      const r = document.getElementById('enroll_r').checked;
+      if (!py && !r) {
+        e.preventDefault();
+        alert('Please select at least one track to enroll.');
+      }
+    });
+  </script>
 
   <p class="muted center" style="margin-top: 2rem; font-size: 0.9rem;">
     Already registered? <a href="{{ url_for('login') }}" style="color: var(--red-400); font-weight: 600; text-decoration: none;">Sign In</a>

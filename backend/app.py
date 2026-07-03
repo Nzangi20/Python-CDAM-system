@@ -23,7 +23,20 @@ def to_naive(dt):
 def utc_now():
     return datetime.now(EAT).replace(tzinfo=None)
 
-from flask import Flask, flash, jsonify, make_response, redirect, render_template, request, url_for
+def get_active_track():
+    if not current_user.is_authenticated:
+        return "python"
+    if current_user.enrolled_python and not current_user.enrolled_r:
+        return "python"
+    if current_user.enrolled_r and not current_user.enrolled_python:
+        return "r"
+    active = session.get("active_track")
+    if active not in ["python", "r"]:
+        active = "python"
+        session["active_track"] = active
+    return active
+
+from flask import Flask, flash, jsonify, make_response, redirect, render_template, request, url_for, session
 from flask_login import (
     LoginManager,
     UserMixin,
@@ -36,7 +49,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
-from seed_data import SESSIONS
+from seed_data import SESSIONS, R_SESSIONS
 from utils import compute_streak, parse_quiz, render_markdown, slugify
 from ai_service import get_ai_service
 
@@ -97,6 +110,8 @@ class User(UserMixin, db.Model):
     is_suspended = db.Column(db.Boolean, default=False)
     require_password_change = db.Column(db.Boolean, default=False, nullable=False)
     password_reset_status = db.Column(db.String(30), nullable=True)
+    enrolled_python = db.Column(db.Boolean, default=True, nullable=False)
+    enrolled_r = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=utc_now)
 
     @property
@@ -150,6 +165,7 @@ class Session(db.Model):
     duration = db.Column(db.String(50), nullable=False)
     difficulty = db.Column(db.String(50), nullable=False)
     display_order = db.Column(db.Integer, nullable=False)
+    course_type = db.Column(db.String(30), default="python", nullable=False)
     published = db.Column(db.Boolean, default=True)
 
     @property
@@ -257,6 +273,7 @@ class Exam(db.Model):
     proctoring_enabled = db.Column(db.Boolean, default=False)
     published = db.Column(db.Boolean, default=False)
     study_level = db.Column(db.String(30), default="Beginner", nullable=False)
+    course_type = db.Column(db.String(30), default="python", nullable=False)
     created_at = db.Column(db.DateTime, default=utc_now)
 
 
@@ -343,7 +360,8 @@ def to_local_datetime_str(dt):
 
 @app.context_processor
 def inject_globals():
-    sessions = Session.query.filter_by(published=True).order_by(Session.display_order).all()
+    active_track = get_active_track()
+    sessions = Session.query.filter_by(published=True, course_type=active_track).order_by(Session.display_order).all()
     return {
         "cdam_logo": url_for("static", filename=CDAM_LOGO),
         "chuka_logo": url_for("static", filename=CHUKA_LOGO),
@@ -351,6 +369,8 @@ def inject_globals():
         "render_markdown": render_markdown,
         "check_session_access": check_session_access,
         "to_local_datetime_str": to_local_datetime_str,
+        "active_track": active_track,
+        "get_active_track": get_active_track,
     }
 
 
@@ -398,7 +418,7 @@ def student_required(view):
     return wrapped
 
 
-def check_session_access_with_reason(user, display_order):
+def check_session_access_with_reason(user, display_order, course_type=None):
     if not user or not hasattr(user, "is_authenticated") or not user.is_authenticated:
         return False, "not_authenticated"
     if user.is_admin:
@@ -407,7 +427,10 @@ def check_session_access_with_reason(user, display_order):
     if display_order > 10 and level != "Professional":
         return False, "restricted_level"
         
-    prev_sessions = Session.query.filter(Session.display_order < display_order, Session.published == True).all()
+    if course_type is None:
+        course_type = get_active_track()
+        
+    prev_sessions = Session.query.filter(Session.display_order < display_order, Session.published == True, Session.course_type == course_type).all()
     for s in prev_sessions:
         # Verify the session has been marked as completed
         progress = UserProgress.query.filter_by(user_id=user.id, session_id=s.id).first()
@@ -424,8 +447,8 @@ def check_session_access_with_reason(user, display_order):
     return True, ""
 
 
-def check_session_access(user, display_order):
-    access, _ = check_session_access_with_reason(user, display_order)
+def check_session_access(user, display_order, course_type=None):
+    access, _ = check_session_access_with_reason(user, display_order, course_type)
     return access
 
 
@@ -476,11 +499,35 @@ def seed_sessions() -> None:
                 instructions=item.get("instructions", ""),
                 code_examples=item["code_examples"],
                 resources=item["resources"],
-                quiz_json="[]",
+                quiz_json=json.dumps(item.get("quiz", [])),
                 duration=item["duration"],
                 difficulty=item["difficulty"],
                 display_order=idx,
                 published=True,
+                course_type="python",
+            )
+            db.session.add(session_obj)
+            
+    for idx, item in enumerate(R_SESSIONS, start=1):
+        session_obj = Session.query.filter_by(slug=item["slug"]).first()
+        if not session_obj:
+            session_obj = Session(
+                title=item["title"],
+                slug=item["slug"],
+                description=item["description"],
+                content=item["content"],
+                objectives=item["objectives"],
+                expected_outcomes=item.get("expected_outcomes", ""),
+                learning_notes=item.get("learning_notes", ""),
+                instructions=item.get("instructions", ""),
+                code_examples=item["code_examples"],
+                resources=item["resources"],
+                quiz_json=json.dumps(item.get("quiz", [])),
+                duration=item["duration"],
+                difficulty=item["difficulty"],
+                display_order=idx,
+                published=True,
+                course_type="r",
             )
             db.session.add(session_obj)
     db.session.commit()
@@ -497,7 +544,8 @@ def track_lesson_view(user_id: int, session_id: int) -> None:
 
 
 def dashboard_context(user_id: int):
-    sessions = Session.query.filter_by(published=True).order_by(Session.display_order).all()
+    active_track = get_active_track()
+    sessions = Session.query.filter_by(published=True, course_type=active_track).order_by(Session.display_order).all()
     progress_map = get_user_progress_map(user_id)
     
     user = db.session.get(User, user_id)
@@ -720,6 +768,11 @@ def register():
         if not all([name, reg_number, password]):
             flash("All fields are required.", "error")
             return redirect(url_for("register"))
+        enroll_python = request.form.get("enroll_python") == "yes"
+        enroll_r = request.form.get("enroll_r") == "yes"
+        if not enroll_python and not enroll_r:
+            enroll_python = True
+            
         if User.query.filter_by(reg_number=reg_number).first():
             flash("An account with this registration number already exists.", "error")
             return redirect(url_for("register"))
@@ -730,13 +783,15 @@ def register():
             password_hash=generate_password_hash(password),
             avatar=CDAM_LOGO,
             study_level=study_level,
+            enrolled_python=enroll_python,
+            enrolled_r=enroll_r,
             is_admin=False,
             require_password_change=False
         )
         db.session.add(user)
         db.session.commit()
         login_user(user)
-        log_activity("student.register", f"Reg={reg_number}, level={study_level}")
+        log_activity("student.register", f"Reg={reg_number}, level={study_level}, python={enroll_python}, r={enroll_r}")
         flash("Welcome to CDAM! Your learning journey starts now.", "success")
         return redirect(url_for("student_dashboard"))
     return render_template("register.html")
@@ -843,10 +898,28 @@ def student_dashboard():
     return render_template("dashboard.html", **ctx)
 
 
+@app.route("/set-track/<track>")
+@login_required
+def set_track(track):
+    if track not in ["python", "r"]:
+        flash("Invalid track selected.", "error")
+        return redirect(request.referrer or url_for("student_dashboard"))
+    if track == "python" and not current_user.enrolled_python:
+        flash("You are not enrolled in the Python track.", "error")
+        return redirect(request.referrer or url_for("student_dashboard"))
+    if track == "r" and not current_user.enrolled_r:
+        flash("You are not enrolled in the R track.", "error")
+        return redirect(request.referrer or url_for("student_dashboard"))
+    session["active_track"] = track
+    flash(f"Switched track to {track.capitalize()}.", "success")
+    return redirect(request.referrer or url_for("student_dashboard"))
+
+
 @app.route("/resources")
 @login_required
 def resources():
-    sessions = Session.query.filter_by(published=True).order_by(Session.display_order).all()
+    active_track = get_active_track()
+    sessions = Session.query.filter_by(published=True, course_type=active_track).order_by(Session.display_order).all()
     return render_template("resources.html", sessions=sessions)
 
 
@@ -855,7 +928,8 @@ def resources():
 @student_required
 def exams_dashboard():
     now = utc_now()
-    exams = Exam.query.filter_by(published=True, study_level=current_user.study_level).all()
+    active_track = get_active_track()
+    exams = Exam.query.filter_by(published=True, study_level=current_user.study_level, course_type=active_track).all()
     upcoming = [e for e in exams if e.start_time and to_naive(e.start_time) > now]
     available = [
         e
@@ -958,7 +1032,7 @@ def ensure_notes_file_exists(session) -> bool:
 @login_required
 def session_detail(slug: str):
     session = Session.query.filter_by(slug=slug, published=True).first_or_404()
-    access, reason = check_session_access_with_reason(current_user, session.display_order)
+    access, reason = check_session_access_with_reason(current_user, session.display_order, course_type=session.course_type)
     if not access:
         if reason == "restricted_level":
             flash(f"Session '{session.title}' notes and materials are restricted to Professional level students. Please upgrade your profile level to access.", "error")
@@ -1104,26 +1178,67 @@ def run_code():
     except Exception:
         pass
     
+    active_track = get_active_track()
+    temp_script_path = None
+    if active_track == "r":
+        temp_script_path = os.path.join(workspace_dir, f"script_{current_user.id}.R")
+        with open(temp_script_path, "w", encoding="utf-8") as f:
+            f.write(code)
+        cmd = ["Rscript", temp_script_path]
+    else:
+        cmd = [sys.executable, "-c", code]
+
     try:
         # Run code in a subprocess inside the user's workspace directory
         process = subprocess.run(
-            [sys.executable, "-c", code],
+            cmd,
             capture_output=True,
             text=True,
             timeout=15.0,
             cwd=workspace_dir
         )
+        if temp_script_path and os.path.exists(temp_script_path):
+            try:
+                os.remove(temp_script_path)
+            except Exception:
+                pass
         return jsonify({
             "output": process.stdout,
             "error": process.stderr,
             "exit_code": process.returncode
         })
     except subprocess.TimeoutExpired:
+        if temp_script_path and os.path.exists(temp_script_path):
+            try:
+                os.remove(temp_script_path)
+            except Exception:
+                pass
         return jsonify({
             "output": "",
             "error": "Execution timed out (15 seconds limit)."
         })
+    except FileNotFoundError as e:
+        if temp_script_path and os.path.exists(temp_script_path):
+            try:
+                os.remove(temp_script_path)
+            except Exception:
+                pass
+        if active_track == "r":
+            return jsonify({
+                "output": "",
+                "error": "R runtime ('Rscript') is not installed or could not be found on this system. Please contact the administrator."
+            })
+        else:
+            return jsonify({
+                "output": "",
+                "error": f"Executable not found: {str(e)}"
+            })
     except Exception as e:
+        if temp_script_path and os.path.exists(temp_script_path):
+            try:
+                os.remove(temp_script_path)
+            except Exception:
+                pass
         return jsonify({
             "output": "",
             "error": f"Internal execution error: {str(e)}"
@@ -2678,6 +2793,9 @@ def migrate_schema() -> None:
             with db.engine.begin() as conn:
                 db_type = "LONGBLOB" if "mysql" in str(db.engine.url) else "BLOB"
                 conn.execute(text(f"ALTER TABLE sessions ADD COLUMN notes_file_data {db_type}"))
+        if "course_type" not in columns:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE sessions ADD COLUMN course_type VARCHAR(30) DEFAULT 'python'"))
     if "users" in inspector.get_table_names():
         columns = {col["name"] for col in inspector.get_columns("users")}
         if "study_level" not in columns:
@@ -2695,11 +2813,20 @@ def migrate_schema() -> None:
         if "password_reset_status" not in columns:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE users ADD COLUMN password_reset_status VARCHAR(30)"))
+        if "enrolled_python" not in columns:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE users ADD COLUMN enrolled_python BOOLEAN DEFAULT 1"))
+        if "enrolled_r" not in columns:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE users ADD COLUMN enrolled_r BOOLEAN DEFAULT 0"))
     if "exams" in inspector.get_table_names():
         columns = {col["name"] for col in inspector.get_columns("exams")}
         if "study_level" not in columns:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE exams ADD COLUMN study_level VARCHAR(30) DEFAULT 'Beginner'"))
+        if "course_type" not in columns:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE exams ADD COLUMN course_type VARCHAR(30) DEFAULT 'python'"))
     if "user_sandbox_files" in inspector.get_table_names():
         columns = {col["name"] for col in inspector.get_columns("user_sandbox_files")}
         if "is_global" not in columns:

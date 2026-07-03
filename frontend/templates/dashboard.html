@@ -124,7 +124,13 @@
           <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
             <div>
               <h4 style="font-weight: 700; font-size: 1.15rem; margin-bottom: 0.25rem; color: #fff;">Begin the Curriculum</h4>
-              <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.8); margin: 0;">Start with Session 1: Introduction to Python</p>
+              <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.8); margin: 0;">
+                {% if active_track == 'r' %}
+                  Start with Session 1: Introduction to R
+                {% else %}
+                  Start with Session 1: Introduction to Python
+                {% endif %}
+              </p>
             </div>
             <a class="btn primary" href="{{ url_for('index') }}#curriculum" style="background: var(--red-500); border: none; box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);"><i class="fa-solid fa-arrow-right"></i> Browse Sessions</a>
           </div>
