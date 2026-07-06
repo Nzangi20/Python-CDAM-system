@@ -2195,6 +2195,7 @@ def admin_exams():
             proctoring_enabled=request.form.get("proctoring_enabled") == "on",
             published=True,
             study_level=request.form.get("study_level", "Beginner").strip(),
+            course_type=request.form.get("course_type", "python").strip(),
             start_time=start_time,
             end_time=end_time,
         )
@@ -2262,6 +2263,7 @@ def admin_session_new():
             video_url=request.form.get("video_url", "").strip() or None,
             duration=request.form.get("duration", "60 min"),
             difficulty=request.form.get("difficulty", "Beginner"),
+            course_type=request.form.get("course_type", "python").strip(),
             display_order=int(request.form.get("display_order", Session.query.count() + 1)),
             published=request.form.get("published") == "on",
             quiz_json=request.form.get("quiz_json", "[]"),
@@ -2308,6 +2310,7 @@ def admin_session_edit(session_id: int):
             session_obj.notes_file_name = safe_name
         session_obj.duration = request.form.get("duration", "60 min")
         session_obj.difficulty = request.form.get("difficulty", "Beginner")
+        session_obj.course_type = request.form.get("course_type", "python").strip()
         session_obj.display_order = int(request.form.get("display_order", session_obj.display_order))
         session_obj.published = request.form.get("published") == "on"
         session_obj.quiz_json = request.form.get("quiz_json", "[]")
@@ -2367,6 +2370,16 @@ def admin_register_student():
             flash("An account with this registration number already exists.", "error")
             return redirect(url_for("admin_register_student"))
             
+        if "enroll_python" not in request.form and "enroll_r" not in request.form:
+            enroll_python = True
+            enroll_r = False
+        else:
+            enroll_python = request.form.get("enroll_python") == "yes"
+            enroll_r = request.form.get("enroll_r") == "yes"
+            if not enroll_python and not enroll_r:
+                flash("Student must be enrolled in at least one track.", "error")
+                return redirect(url_for("admin_register_student"))
+            
         user = User(
             name=name,
             email=f"{reg_number.replace('/', '_')}@cdam.local",
@@ -2376,6 +2389,8 @@ def admin_register_student():
             study_level=study_level,
             is_admin=False,
             require_password_change=True,
+            enrolled_python=enroll_python,
+            enrolled_r=enroll_r,
         )
         db.session.add(user)
         db.session.commit()
@@ -2384,6 +2399,27 @@ def admin_register_student():
         return redirect(url_for("admin_panel"))
         
     return render_template("admin_student_new.html")
+
+
+@app.route("/admin/users/<int:user_id>/update-enrollments", methods=["POST"])
+@login_required
+@admin_required
+def admin_update_enrollments(user_id: int):
+    user = db.session.get(User, user_id)
+    if not user or user.is_admin:
+        flash("User not found.", "error")
+        return redirect(url_for("admin_panel"))
+    enroll_python = request.form.get("enroll_python") == "yes"
+    enroll_r = request.form.get("enroll_r") == "yes"
+    if not enroll_python and not enroll_r:
+        flash("Student must be enrolled in at least one track.", "error")
+        return redirect(url_for("admin_student_detail", user_id=user_id))
+    user.enrolled_python = enroll_python
+    user.enrolled_r = enroll_r
+    db.session.commit()
+    log_activity("admin.user.update_enrollments", f"user={user.id}:py={enroll_python}:r={enroll_r}")
+    flash("Enrollment updated successfully.", "success")
+    return redirect(url_for("admin_student_detail", user_id=user_id))
 
 
 @app.post("/admin/users/<int:user_id>/suspend")
@@ -2562,6 +2598,7 @@ def admin_exam_edit(exam_id: int):
         exam.proctoring_enabled = request.form.get("proctoring_enabled") == "on"
         exam.published = request.form.get("published") == "on"
         exam.study_level = request.form.get("study_level", "Beginner").strip()
+        exam.course_type = request.form.get("course_type", "python").strip()
         start_time_raw = request.form.get("start_time", "").strip()
         end_time_raw = request.form.get("end_time", "").strip()
         

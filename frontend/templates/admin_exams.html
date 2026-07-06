@@ -51,6 +51,13 @@
           </select>
         </div>
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Course Track</label>
+          <select name="course_type" required>
+            <option value="python">Python Programming</option>
+            <option value="r">R Programming</option>
+          </select>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
           <label>Max Attempts Allowed</label>
           <input type="number" name="attempt_limit" value="1" min="1" max="10" required />
         </div>
@@ -160,6 +167,9 @@
             <div style="display: flex; gap: 0.5rem; align-items: center;">
               <span class="badge">{{ exam.exam_type }}</span>
               <span class="badge" style="background: rgba(86, 0, 126, 0.12); color: var(--purple-brand); border-color: rgba(86, 0, 126, 0.25);"><i class="fa-solid fa-graduation-cap"></i> {{ exam.study_level }}</span>
+              <span class="badge" style="background: {% if exam.course_type == 'python' %}rgba(239, 68, 68, 0.12){% else %}rgba(86, 0, 126, 0.12){% endif %}; color: {% if exam.course_type == 'python' %}var(--red-400){% else %}var(--purple-brand){% endif %}; border-color: {% if exam.course_type == 'python' %}rgba(239, 68, 68, 0.25){% else %}rgba(86, 0, 126, 0.25){% endif %};">
+                <i class="fa-solid {% if exam.course_type == 'python' %}fa-brands fa-python{% else %}fa-registered{% endif %}"></i> {{ exam.course_type | capitalize }}
+              </span>
               <span class="badge {% if exam.published %}success{% endif %}">{{ "Active" if exam.published else "Draft" }}</span>
             </div>
             <h3 style="font-weight: 800; font-size: 1.2rem; margin-top: 0.5rem; margin-bottom: 0.25rem;">{{ exam.title }}</h3>

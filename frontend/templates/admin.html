@@ -89,6 +89,7 @@
           <th>Reg Number</th>
           <th>Email Address</th>
           <th>Auth Mode</th>
+          <th>Enrolled Tracks</th>
           <th>Account Level</th>
           <th>Status</th>
           <th style="text-align: right;">Roster Actions</th>
@@ -106,6 +107,14 @@
             <td><code>{{ user.reg_number or 'N/A' }}</code></td>
             <td>{{ user.email }}</td>
             <td style="text-transform: capitalize; font-size: 0.9rem;"><i class="fa-solid fa-key" style="font-size: 0.75rem; color: var(--text-muted);"></i> {{ user.auth_provider }}</td>
+            <td style="white-space: nowrap;">
+              {% if user.enrolled_python %}
+                <span class="badge" style="background: rgba(239, 68, 68, 0.12); color: var(--red-400); border-color: rgba(239, 68, 68, 0.25); font-size: 0.7rem; padding: 0.15rem 0.4rem;"><i class="fa-brands fa-python"></i> Python</span>
+              {% endif %}
+              {% if user.enrolled_r %}
+                <span class="badge" style="background: rgba(86, 0, 126, 0.12); color: var(--purple-brand); border-color: rgba(86, 0, 126, 0.25); font-size: 0.7rem; padding: 0.15rem 0.4rem;"><i class="fa-solid fa-registered"></i> R</span>
+              {% endif %}
+            </td>
             <td>
               <span class="badge" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;">{{ user.study_level }}</span>
             </td>
@@ -161,6 +170,7 @@
       <thead>
         <tr>
           <th>Order</th>
+          <th>Track</th>
           <th>Session Title</th>
           <th>Slug</th>
           <th>Difficulty</th>
@@ -173,6 +183,11 @@
         {% for s in sessions %}
           <tr>
             <td style="font-weight: 800; color: var(--red-400);">#{{ s.display_order }}</td>
+            <td>
+              <span class="badge" style="background: {% if s.course_type == 'python' %}rgba(239, 68, 68, 0.12){% else %}rgba(86, 0, 126, 0.12){% endif %}; color: {% if s.course_type == 'python' %}var(--red-400){% else %}var(--purple-brand){% endif %}; border-color: {% if s.course_type == 'python' %}rgba(239, 68, 68, 0.25){% else %}rgba(86, 0, 126, 0.25){% endif %}; font-size: 0.75rem;">
+                <i class="fa-solid {% if s.course_type == 'python' %}fa-brands fa-python{% else %}fa-registered{% endif %}"></i> {{ s.course_type | capitalize }}
+              </span>
+            </td>
             <td style="font-weight: 700;">{{ s.clean_title }}</td>
             <td><code>{{ s.slug }}</code></td>
             <td><span class="badge">{{ s.difficulty }}</span></td>
@@ -199,7 +214,7 @@
             </td>
           </tr>
         {% else %}
-          <tr><td colspan="7" class="muted" style="text-align: center; padding: 2rem 0;">No sessions created yet.</td></tr>
+          <tr><td colspan="8" class="muted" style="text-align: center; padding: 2rem 0;">No sessions created yet.</td></tr>
         {% endfor %}
       </tbody>
     </table>

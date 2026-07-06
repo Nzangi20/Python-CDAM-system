@@ -101,6 +101,13 @@
             {% endfor %}
           </select>
         </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Course Track</label>
+          <select name="course_type">
+            <option value="python" {% if session_obj and session_obj.course_type == 'python' %}selected{% endif %}>Python Programming</option>
+            <option value="r" {% if session_obj and session_obj.course_type == 'r' %}selected{% endif %}>R Programming</option>
+          </select>
+        </div>
       </div>
 
       <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">

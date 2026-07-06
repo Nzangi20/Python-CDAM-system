@@ -35,6 +35,18 @@
         </select>
       </div>
 
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
+        <label style="font-weight: 600; font-size: 0.9rem;">Track Enrollment</label>
+        <div style="display: flex; gap: 1.5rem; align-items: center; padding: 0.25rem 0;">
+          <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.95rem; color: var(--text);">
+            <input type="checkbox" name="enroll_python" value="yes" checked /> Python Track
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.95rem; color: var(--text);">
+            <input type="checkbox" name="enroll_r" value="yes" /> R Track
+          </label>
+        </div>
+      </div>
+
       <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem;">
         <label style="font-weight: 600; font-size: 0.9rem;">Temporary Password</label>
         <div style="display: flex; gap: 0.5rem;">
@@ -62,6 +74,18 @@
   // Pre-generate a password on page load
   document.addEventListener("DOMContentLoaded", () => {
     generateTempPassword();
+    
+    const form = document.querySelector("form");
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        const enrollPy = form.querySelector('input[name="enroll_python"]').checked;
+        const enrollR = form.querySelector('input[name="enroll_r"]').checked;
+        if (!enrollPy && !enrollR) {
+          alert("The student must be enrolled in at least one course track.");
+          e.preventDefault();
+        }
+      });
+    }
   });
 </script>
 {% endblock %}

@@ -1091,6 +1091,149 @@ def test_r_sandbox_code_execution(client):
         assert "Hello from R" in data["output"]
 
 
+def test_admin_track_awareness(client):
+    login_admin(client)
+    
+    # 1. Test Session Creation with course_type='r'
+    res_session = client.post(
+        "/admin/session/new",
+        data={
+            "title": "New Session For R Track",
+            "description": "desc",
+            "content": "content",
+            "objectives": "objectives",
+            "expected_outcomes": "outcomes",
+            "learning_notes": "notes",
+            "instructions": "instructions",
+            "code_examples": "print()",
+            "quiz_json": "[]",
+            "duration": "30 min",
+            "difficulty": "Beginner",
+            "course_type": "r",
+            "published": "on"
+        },
+        follow_redirects=True
+    )
+    assert res_session.status_code == 200
+    with app.app_context():
+        sess = Session.query.filter_by(title="New Session For R Track").first()
+        assert sess is not None
+        assert sess.course_type == "r"
+        sess_id = sess.id
+
+    # 2. Test Session Edit updating course_type to 'python'
+    res_session_edit = client.post(
+        f"/admin/session/{sess_id}/edit",
+        data={
+            "title": "New Session For Python Track",
+            "description": "desc",
+            "content": "content",
+            "objectives": "objectives",
+            "expected_outcomes": "outcomes",
+            "learning_notes": "notes",
+            "instructions": "instructions",
+            "code_examples": "print()",
+            "quiz_json": "[]",
+            "duration": "30 min",
+            "difficulty": "Beginner",
+            "course_type": "python",
+            "published": "on"
+        },
+        follow_redirects=True
+    )
+    assert res_session_edit.status_code == 200
+    with app.app_context():
+        sess = db.session.get(Session, sess_id)
+        assert sess is not None
+        assert sess.course_type == "python"
+
+    # 3. Test Exam Creation with course_type='r'
+    res_exam = client.post(
+        "/admin/exams",
+        data={
+            "title": "New Exam For R Track",
+            "description": "Basics of R",
+            "duration": "15",
+            "passing_score": "60",
+            "exam_type": "multiple_choice",
+            "attempt_limit": "2",
+            "questions_json": "[]",
+            "proctoring_enabled": "on",
+            "published": "on",
+            "study_level": "Beginner",
+            "course_type": "r"
+        },
+        follow_redirects=True
+    )
+    assert res_exam.status_code == 200
+    with app.app_context():
+        exam = Exam.query.filter_by(title="New Exam For R Track").first()
+        assert exam is not None
+        assert exam.course_type == "r"
+        exam_id = exam.id
+
+    # 4. Test Exam Edit updating course_type to 'python'
+    res_exam_edit = client.post(
+        f"/admin/exams/{exam_id}/edit",
+        data={
+            "title": "New Exam For Python Track",
+            "description": "Basics of Python",
+            "duration": "20",
+            "passing_score": "70",
+            "exam_type": "multiple_choice",
+            "attempt_limit": "3",
+            "questions_json": "[]",
+            "proctoring_enabled": "on",
+            "published": "on",
+            "study_level": "Professional",
+            "course_type": "python"
+        },
+        follow_redirects=True
+    )
+    assert res_exam_edit.status_code == 200
+    with app.app_context():
+        exam = db.session.get(Exam, exam_id)
+        assert exam is not None
+        assert exam.course_type == "python"
+
+    # 5. Test Registering student with dual enrollment from admin panel
+    res_reg = client.post(
+        "/admin/users/new",
+        data={
+            "name": "Admin Registered Student",
+            "reg_number": "EB3/98765/26",
+            "study_level": "Professional",
+            "password": "tempPassword123!",
+            "enroll_python": "yes",
+            "enroll_r": "yes"
+        },
+        follow_redirects=True
+    )
+    assert res_reg.status_code == 200
+    with app.app_context():
+        student = User.query.filter_by(reg_number="EB3/98765/26").first()
+        assert student is not None
+        assert student.enrolled_python is True
+        assert student.enrolled_r is True
+        student_id = student.id
+
+    # 6. Test Updating enrollments from the new route
+    res_update_enroll = client.post(
+        f"/admin/users/{student_id}/update-enrollments",
+        data={
+            "enroll_python": "no",
+            "enroll_r": "yes"
+        },
+        follow_redirects=True
+    )
+    assert res_update_enroll.status_code == 200
+    with app.app_context():
+        student = db.session.get(User, student_id)
+        assert student.enrolled_python is False
+        assert student.enrolled_r is True
+
+
+
 
 
 

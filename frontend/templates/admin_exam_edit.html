@@ -49,6 +49,13 @@
           </select>
         </div>
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Course Track</label>
+          <select name="course_type" required>
+            <option value="python" {% if exam.course_type == "python" %}selected{% endif %}>Python Programming</option>
+            <option value="r" {% if exam.course_type == "r" %}selected{% endif %}>R Programming</option>
+          </select>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
           <label>Max Attempts Allowed</label>
           <input type="number" name="attempt_limit" value="{{ exam.attempt_limit }}" min="1" max="10" required />
         </div>

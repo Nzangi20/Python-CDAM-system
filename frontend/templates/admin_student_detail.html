@@ -22,14 +22,22 @@
       <p class="muted" style="font-size: 0.9rem; margin-bottom: 1rem;">{{ student.email }}</p>
       
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-        <div>
-          <span class="badge" style="font-size: 0.8rem; padding: 0.25rem 0.75rem;">{{ student.study_level }} Level</span>
-          {% if student.is_suspended %}
-            <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: var(--red-500); border-color: rgba(239,68,68,0.25);">Suspended</span>
-          {% else %}
-            <span class="badge success">Active</span>
-          {% endif %}
-        </div>
+          <div>
+            <span class="badge" style="font-size: 0.8rem; padding: 0.25rem 0.75rem;">{{ student.study_level }} Level</span>
+            {% if student.is_suspended %}
+              <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: var(--red-500); border-color: rgba(239,68,68,0.25);">Suspended</span>
+            {% else %}
+              <span class="badge success">Active</span>
+            {% endif %}
+          </div>
+          <div style="display: flex; gap: 0.35rem; margin-top: 0.25rem; justify-content: center;">
+            {% if student.enrolled_python %}
+              <span class="badge" style="background: rgba(239, 68, 68, 0.12); color: var(--red-400); border-color: rgba(239, 68, 68, 0.25); font-size: 0.75rem;"><i class="fa-brands fa-python"></i> Python</span>
+            {% endif %}
+            {% if student.enrolled_r %}
+              <span class="badge" style="background: rgba(86, 0, 126, 0.12); color: var(--purple-brand); border-color: rgba(86, 0, 126, 0.25); font-size: 0.75rem;"><i class="fa-solid fa-registered"></i> R</span>
+            {% endif %}
+          </div>
         {% if student.require_password_change %}
           <div>
             <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245,158,11,0.25);"><i class="fa-solid fa-key"></i> Password Change Pending</span>
@@ -89,8 +97,37 @@
             <i class="fa-regular fa-trash-can" style="margin-right: 0.5rem;"></i> Delete Student Account
           </button>
         </form>
+        
+        <form method="post" action="{{ url_for('admin_update_enrollments', user_id=student.id) }}" style="width: 100%; border-top: 1px solid var(--border); padding-top: 0.75rem; margin-top: 0.5rem;" id="enrollmentToggleForm">
+          <label style="font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.5rem; color: var(--text);">Manage Enrollments</label>
+          <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.75rem;">
+            <label style="font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.35rem; color: var(--text);">
+              <input type="checkbox" name="enroll_python" value="yes" {% if student.enrolled_python %}checked{% endif %} /> Python Track
+            </label>
+            <label style="font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.35rem; color: var(--text);">
+              <input type="checkbox" name="enroll_r" value="yes" {% if student.enrolled_r %}checked{% endif %} /> R Track
+            </label>
+          </div>
+          <button class="btn primary" type="submit" style="width: 100%; padding: 0.5rem; font-size: 0.8rem; font-weight: 700;"><i class="fa-solid fa-save"></i> Save Tracks</button>
+        </form>
       </div>
     </div>
+    
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const toggleForm = document.getElementById("enrollmentToggleForm");
+        if (toggleForm) {
+          toggleForm.addEventListener("submit", (e) => {
+            const py = toggleForm.querySelector('input[name="enroll_python"]').checked;
+            const r = toggleForm.querySelector('input[name="enroll_r"]').checked;
+            if (!py && !r) {
+              alert("The student must be enrolled in at least one track.");
+              e.preventDefault();
+            }
+          });
+        }
+      });
+    </script>
   </aside>
 
   <!-- Right Side: Analytics, Exam attempts & Activities -->
@@ -98,40 +135,81 @@
     
     <!-- Curriculum Coverage -->
     <div class="card" style="padding: 1.5rem;">
-      <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem;"><i class="fa-solid fa-graduation-cap" style="color: var(--red-500);"></i> Curriculum Progress</h3>
+      <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1.5rem;"><i class="fa-solid fa-graduation-cap" style="color: var(--red-500);"></i> Curriculum Progress</h3>
       
-      <!-- Progress Bar -->
-      {% set total = 18 %}
-      {% set completed_count = completed_sessions | length %}
-      {% set pct = (completed_count / total * 100) | round(0) | int if total > 0 else 0 %}
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-        <span class="muted" style="font-size: 0.9rem;">Course completion status</span>
-        <strong style="color: var(--purple-brand);">{{ completed_count }} / {{ total }} Units ({{ pct }}%)</strong>
-      </div>
-      <div style="width: 100%; height: 10px; background: var(--lavender-brand); border-radius: 5px; overflow: hidden; margin-bottom: 1.5rem;">
-        <div style="width: {{ pct }}%; height: 100%; background: var(--purple-brand); transition: width 0.3s ease;"></div>
-      </div>
-
-      <!-- Grid list of sessions -->
-      <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.75rem;">Units Completed:</h4>
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 0.5rem;">
-        {% for idx in range(1, 19) %}
-          {% set is_done = false %}
-          {# Look up session object matching display_order = idx #}
-          {% for s_id, s in sessions_map.items() %}
-            {% if s.display_order == idx and s.id in completed_sessions %}
-              {% set is_done = true %}
+      {% if student.enrolled_python %}
+      <!-- Python Progress -->
+      <div style="margin-bottom: 2rem;">
+        {% set py_ns = namespace(total=0, completed=0) %}
+        {% for s in sessions_map.values() %}
+          {% if s.course_type == 'python' %}
+            {% set py_ns.total = py_ns.total + 1 %}
+            {% if s.id in completed_sessions %}
+              {% set py_ns.completed = py_ns.completed + 1 %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+        {% set py_pct = (py_ns.completed / py_ns.total * 100) | round(0) | int if py_ns.total > 0 else 0 %}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+          <span style="font-size: 0.9rem; font-weight: 700; color: var(--red-400);"><i class="fa-brands fa-python"></i> Python Track Progress</span>
+          <strong style="color: var(--red-400);">{{ py_ns.completed }} / {{ py_ns.total }} ({{ py_pct }}%)</strong>
+        </div>
+        <div style="width: 100%; height: 8px; background: rgba(239, 68, 68, 0.1); border-radius: 4px; overflow: hidden; margin-bottom: 0.75rem;">
+          <div style="width: {{ py_pct }}%; height: 100%; background: var(--red-500); transition: width 0.3s ease;"></div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 0.35rem;">
+          {% for s in sessions_map.values() | sort(attribute='display_order') %}
+            {% if s.course_type == 'python' %}
+              {% set is_done = s.id in completed_sessions %}
+              <div style="height: 32px; border-radius: 6px; display: grid; place-items: center; font-weight: 700; font-size: 0.8rem; 
+                          background: {% if is_done %}rgba(16, 185, 129, 0.15){% else %}var(--lavender-brand){% endif %};
+                          color: {% if is_done %}#10b981{% else %}var(--text-muted){% endif %};
+                          border: 1px solid {% if is_done %}rgba(16, 185, 129, 0.3){% else %}var(--border){% endif %};"
+                   title="Session {{ s.display_order }}: {{ s.clean_title }} - {% if is_done %}Completed{% else %}Incomplete{% endif %}">
+                {{ s.display_order }}
+              </div>
             {% endif %}
           {% endfor %}
-          <div style="height: 40px; border-radius: 8px; display: grid; place-items: center; font-weight: 700; font-size: 0.85rem; 
-                      background: {% if is_done %}rgba(16, 185, 129, 0.15){% else %}var(--lavender-brand){% endif %};
-                      color: {% if is_done %}#10b981{% else %}var(--text-muted){% endif %};
-                      border: 1px solid {% if is_done %}rgba(16, 185, 129, 0.3){% else %}var(--border){% endif %};"
-               title="Unit {{ idx }} - {% if is_done %}Completed{% else %}Incomplete{% endif %}">
-            {{ idx }}
-          </div>
-        {% endfor %}
+        </div>
       </div>
+      {% endif %}
+
+      {% if student.enrolled_r %}
+      <!-- R Progress -->
+      <div>
+        {% set r_ns = namespace(total=0, completed=0) %}
+        {% for s in sessions_map.values() %}
+          {% if s.course_type == 'r' %}
+            {% set r_ns.total = r_ns.total + 1 %}
+            {% if s.id in completed_sessions %}
+              {% set r_ns.completed = r_ns.completed + 1 %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+        {% set r_pct = (r_ns.completed / r_ns.total * 100) | round(0) | int if r_ns.total > 0 else 0 %}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+          <span style="font-size: 0.9rem; font-weight: 700; color: var(--purple-brand);"><i class="fa-solid fa-registered"></i> R Track Progress</span>
+          <strong style="color: var(--purple-brand);">{{ r_ns.completed }} / {{ r_ns.total }} ({{ r_pct }}%)</strong>
+        </div>
+        <div style="width: 100%; height: 8px; background: rgba(86, 0, 126, 0.1); border-radius: 4px; overflow: hidden; margin-bottom: 0.75rem;">
+          <div style="width: {{ r_pct }}%; height: 100%; background: var(--purple-brand); transition: width 0.3s ease;"></div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 0.35rem;">
+          {% for s in sessions_map.values() | sort(attribute='display_order') %}
+            {% if s.course_type == 'r' %}
+              {% set is_done = s.id in completed_sessions %}
+              <div style="height: 32px; border-radius: 6px; display: grid; place-items: center; font-weight: 700; font-size: 0.8rem; 
+                          background: {% if is_done %}rgba(16, 185, 129, 0.15){% else %}var(--lavender-brand){% endif %};
+                          color: {% if is_done %}#10b981{% else %}var(--text-muted){% endif %};
+                          border: 1px solid {% if is_done %}rgba(16, 185, 129, 0.3){% else %}var(--border){% endif %};"
+                   title="Session {{ s.display_order }}: {{ s.clean_title }} - {% if is_done %}Completed{% else %}Incomplete{% endif %}">
+                {{ s.display_order }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
     </div>
 
     <!-- Exam Attempt History -->
