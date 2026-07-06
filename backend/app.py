@@ -2888,6 +2888,11 @@ def migrate_schema() -> None:
         if "course_type" not in columns:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE exams ADD COLUMN course_type VARCHAR(30) DEFAULT 'python'"))
+    if "activity_logs" in inspector.get_table_names():
+        columns = {col["name"] for col in inspector.get_columns("activity_logs")}
+        if "role" not in columns:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE activity_logs ADD COLUMN role VARCHAR(30)"))
     if "user_sandbox_files" in inspector.get_table_names():
         columns = {col["name"] for col in inspector.get_columns("user_sandbox_files")}
         if "is_global" not in columns:
