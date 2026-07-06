@@ -2902,6 +2902,13 @@ def migrate_schema() -> None:
 
 def initialize():
     with app.app_context():
+        # Unconditionally run create_all and migrate_schema to ensure schema is up-to-date
+        db.create_all()
+        try:
+            migrate_schema()
+        except Exception as e:
+            print(f"Database migration skipped/failed during startup: {e}")
+
         from sqlalchemy import inspect
         try:
             inspector = inspect(db.engine)
@@ -2912,8 +2919,6 @@ def initialize():
         except Exception as e:
             print(f"Database check skipped during startup: {e}")
 
-        db.create_all()
-        migrate_schema()
         seed_sessions()
         try:
             for e in Exam.query.all():
