@@ -427,12 +427,18 @@ def check_session_access_with_reason(user, display_order, course_type=None):
         return False, "not_authenticated"
     if user.is_admin:
         return True, ""
-    level = getattr(user, "study_level", "Beginner")
-    if display_order > 10 and level != "Professional":
-        return False, "restricted_level"
         
     if course_type is None:
         course_type = get_active_track()
+
+    if course_type == "python" and not getattr(user, "enrolled_python", False):
+        return False, "not_enrolled"
+    if course_type == "r" and not getattr(user, "enrolled_r", False):
+        return False, "not_enrolled"
+
+    level = getattr(user, "study_level", "Beginner")
+    if display_order > 10 and level != "Professional":
+        return False, "restricted_level"
         
     prev_sessions = Session.query.filter(Session.display_order < display_order, Session.published == True, Session.course_type == course_type).all()
     for s in prev_sessions:
@@ -1120,8 +1126,12 @@ def download_notes(session_id: int):
     if not session or not ensure_notes_file_exists(session):
         flash("Notes file not found.", "error")
         return redirect(request.referrer or url_for("student_dashboard"))
-    if not check_session_access(current_user, session.display_order):
-        flash("Access to this note/revision material is restricted for your experience level.", "error")
+    access, reason = check_session_access_with_reason(current_user, session.display_order, course_type=session.course_type)
+    if not access:
+        if reason == "not_enrolled":
+            flash("You are not enrolled in this course track.", "error")
+        else:
+            flash("Access to this note/revision material is restricted for your experience level.", "error")
         return redirect(request.referrer or url_for("student_dashboard"))
     
     filename = session.notes_file_path.split("/")[-1]
@@ -1135,8 +1145,12 @@ def view_notes(session_id: int):
     if not session or not ensure_notes_file_exists(session):
         flash("Notes file not found.", "error")
         return redirect(request.referrer or url_for("student_dashboard"))
-    if not check_session_access(current_user, session.display_order):
-        flash("Access to this note/revision material is restricted for your experience level.", "error")
+    access, reason = check_session_access_with_reason(current_user, session.display_order, course_type=session.course_type)
+    if not access:
+        if reason == "not_enrolled":
+            flash("You are not enrolled in this course track.", "error")
+        else:
+            flash("Access to this note/revision material is restricted for your experience level.", "error")
         return redirect(request.referrer or url_for("student_dashboard"))
     return render_template("view_notes.html", session=session)
 
@@ -1905,6 +1919,12 @@ def exam_take(exam_id: int):
         flash("Exam not available.", "error")
         return redirect(url_for("exams_dashboard"))
     if exam.study_level != current_user.study_level:
+        flash("You do not have access to this exam.", "error")
+        return redirect(url_for("exams_dashboard"))
+    if exam.course_type == "python" and not current_user.enrolled_python:
+        flash("You do not have access to this exam.", "error")
+        return redirect(url_for("exams_dashboard"))
+    if exam.course_type == "r" and not current_user.enrolled_r:
         flash("You do not have access to this exam.", "error")
         return redirect(url_for("exams_dashboard"))
     now = utc_now()

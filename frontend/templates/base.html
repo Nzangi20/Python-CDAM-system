@@ -66,7 +66,11 @@
         <div class="dropdown">
           <button class="dropbtn"><i class="fa-solid fa-book-open"></i> Sessions <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></button>
           <div class="dropdown-content" style="min-width: 280px; padding: 0.5rem;">
+            {% set show_python = not current_user.is_authenticated or current_user.is_admin or current_user.enrolled_python %}
+            {% set show_r = not current_user.is_authenticated or current_user.is_admin or current_user.enrolled_r %}
+
             <!-- Track Selector Tabs inside Dropdown -->
+            {% if show_python and show_r %}
             <div class="dropdown-tabs" style="display: flex; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.5rem; gap: 0.25rem;">
               <button type="button" class="dropdown-tab-btn" data-target="python" onclick="switchDropdownTrack('python', event)" style="flex: 1; text-align: center; background: transparent; border: none; font-weight: 800; cursor: pointer; font-size: 0.85rem; padding: 0.5rem; transition: all 0.2s;">
                 <i class="fa-brands fa-python"></i> Python
@@ -75,8 +79,10 @@
                 <i class="fa-solid fa-registered"></i> R
               </button>
             </div>
+            {% endif %}
 
             <!-- Python Track List -->
+            {% if show_python %}
             <div id="dropdown-python-list" class="dropdown-track-list">
               {% for s in nav_python_sessions %}
                 {% set is_guest = not current_user.is_authenticated %}
@@ -98,9 +104,11 @@
                 {% endif %}
               {% endfor %}
             </div>
+            {% endif %}
 
             <!-- R Track List -->
-            <div id="dropdown-r-list" class="dropdown-track-list" style="display: none;">
+            {% if show_r %}
+            <div id="dropdown-r-list" class="dropdown-track-list" style="{% if show_python %}display: none;{% endif %}">
               {% for s in nav_r_sessions %}
                 {% set is_guest = not current_user.is_authenticated %}
                 {% set is_admin = current_user.is_authenticated and current_user.is_admin %}
@@ -121,6 +129,7 @@
                 {% endif %}
               {% endfor %}
             </div>
+            {% endif %}
           </div>
         </div>
         {% endif %}
