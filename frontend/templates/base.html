@@ -65,26 +65,62 @@
         {% if not current_user.is_authenticated or not current_user.is_admin %}
         <div class="dropdown">
           <button class="dropbtn"><i class="fa-solid fa-book-open"></i> Sessions <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i></button>
-          <div class="dropdown-content">
-            {% for s in nav_sessions %}
-              {% set is_guest = not current_user.is_authenticated %}
-              {% set is_admin = current_user.is_authenticated and current_user.is_admin %}
-              {% set is_level_match = is_guest or is_admin or (current_user.study_level == 'Professional') or (s.difficulty == current_user.study_level) %}
-              
-              {% if is_level_match %}
-                {% set has_access = is_guest or is_admin or check_session_access(current_user, s.display_order) %}
-                <a href="{{ url_for('session_detail', slug=s.slug) if (is_guest or has_access) else '#' }}" 
-                   style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; {% if not has_access %}opacity: 0.6; cursor: not-allowed;{% endif %}"
-                   {% if not has_access %}onclick="alert('This session is locked. Please pass the quizzes of prior sessions first.'); return false;"{% endif %}>
-                  <span>
-                    {% if not has_access %}
-                      <i class="fa-solid fa-lock" style="font-size: 0.85rem; color: var(--red-400); margin-right: 0.35rem;"></i>
-                    {% endif %}
-                    Session {{ s.display_order }}: {{ s.clean_title }}
-                  </span>
-                </a>
-              {% endif %}
-            {% endfor %}
+          <div class="dropdown-content" style="min-width: 280px; padding: 0.5rem;">
+            <!-- Track Selector Tabs inside Dropdown -->
+            <div class="dropdown-tabs" style="display: flex; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.5rem; gap: 0.25rem;">
+              <button type="button" class="dropdown-tab-btn" data-target="python" onclick="switchDropdownTrack('python', event)" style="flex: 1; text-align: center; background: transparent; border: none; font-weight: 800; cursor: pointer; font-size: 0.85rem; padding: 0.5rem; transition: all 0.2s;">
+                <i class="fa-brands fa-python"></i> Python
+              </button>
+              <button type="button" class="dropdown-tab-btn" data-target="r" onclick="switchDropdownTrack('r', event)" style="flex: 1; text-align: center; background: transparent; border: none; font-weight: 800; cursor: pointer; font-size: 0.85rem; padding: 0.5rem; transition: all 0.2s;">
+                <i class="fa-solid fa-registered"></i> R
+              </button>
+            </div>
+
+            <!-- Python Track List -->
+            <div id="dropdown-python-list" class="dropdown-track-list">
+              {% for s in nav_python_sessions %}
+                {% set is_guest = not current_user.is_authenticated %}
+                {% set is_admin = current_user.is_authenticated and current_user.is_admin %}
+                {% set is_level_match = is_guest or is_admin or (current_user.study_level == 'Professional') or (s.difficulty == current_user.study_level) %}
+                
+                {% if is_level_match %}
+                  {% set has_access = is_guest or is_admin or check_session_access(current_user, s.display_order, 'python') %}
+                  <a href="{{ url_for('session_detail', slug=s.slug) if (is_guest or has_access) else '#' }}" 
+                     style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; {% if not has_access %}opacity: 0.6; cursor: not-allowed;{% endif %}"
+                     {% if not has_access %}onclick="alert('This session is locked. Please pass the quizzes of prior sessions first.'); return false;"{% endif %}>
+                    <span>
+                      {% if not has_access %}
+                        <i class="fa-solid fa-lock" style="font-size: 0.85rem; color: var(--red-400); margin-right: 0.35rem;"></i>
+                      {% endif %}
+                      Session {{ s.display_order }}: {{ s.clean_title }}
+                    </span>
+                  </a>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <!-- R Track List -->
+            <div id="dropdown-r-list" class="dropdown-track-list" style="display: none;">
+              {% for s in nav_r_sessions %}
+                {% set is_guest = not current_user.is_authenticated %}
+                {% set is_admin = current_user.is_authenticated and current_user.is_admin %}
+                {% set is_level_match = is_guest or is_admin or (current_user.study_level == 'Professional') or (s.difficulty == current_user.study_level) %}
+                
+                {% if is_level_match %}
+                  {% set has_access = is_guest or is_admin or check_session_access(current_user, s.display_order, 'r') %}
+                  <a href="{{ url_for('session_detail', slug=s.slug) if (is_guest or has_access) else '#' }}" 
+                     style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; {% if not has_access %}opacity: 0.6; cursor: not-allowed;{% endif %}"
+                     {% if not has_access %}onclick="alert('This session is locked. Please pass the quizzes of prior sessions first.'); return false;"{% endif %}>
+                    <span>
+                      {% if not has_access %}
+                        <i class="fa-solid fa-lock" style="font-size: 0.85rem; color: var(--red-400); margin-right: 0.35rem;"></i>
+                      {% endif %}
+                      Session {{ s.display_order }}: {{ s.clean_title }}
+                    </span>
+                  </a>
+                {% endif %}
+              {% endfor %}
+            </div>
           </div>
         </div>
         {% endif %}
@@ -140,6 +176,47 @@
   </footer>
 
 
+
+  <script>
+    function switchDropdownTrack(track, event) {
+      if (event) {
+        event.stopPropagation();
+      }
+      
+      const buttons = document.querySelectorAll('.dropdown-tab-btn');
+      buttons.forEach(btn => {
+        if (btn.getAttribute('data-target') === track) {
+          btn.classList.add('active');
+          btn.style.color = 'var(--red-500)';
+          btn.style.borderBottomColor = 'var(--red-500)';
+        } else {
+          btn.classList.remove('active');
+          btn.style.color = 'var(--text-muted)';
+          btn.style.borderBottomColor = 'transparent';
+        }
+      });
+      
+      const pythonList = document.getElementById('dropdown-python-list');
+      const rList = document.getElementById('dropdown-r-list');
+      
+      if (track === 'python') {
+        if (pythonList) pythonList.style.display = 'block';
+        if (rList) rList.style.display = 'none';
+      } else {
+        if (pythonList) pythonList.style.display = 'none';
+        if (rList) rList.style.display = 'block';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Default switch based on active track from Flask context
+      {% if active_track == 'r' %}
+        switchDropdownTrack('r');
+      {% else %}
+        switchDropdownTrack('python');
+      {% endif %}
+    });
+  </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>

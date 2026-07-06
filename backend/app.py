@@ -362,10 +362,14 @@ def to_local_datetime_str(dt):
 def inject_globals():
     active_track = get_active_track()
     sessions = Session.query.filter_by(published=True, course_type=active_track).order_by(Session.display_order).all()
+    python_sessions = Session.query.filter_by(published=True, course_type="python").order_by(Session.display_order).all()
+    r_sessions = Session.query.filter_by(published=True, course_type="r").order_by(Session.display_order).all()
     return {
         "cdam_logo": url_for("static", filename=CDAM_LOGO),
         "chuka_logo": url_for("static", filename=CHUKA_LOGO),
         "nav_sessions": sessions,
+        "nav_python_sessions": python_sessions,
+        "nav_r_sessions": r_sessions,
         "render_markdown": render_markdown,
         "check_session_access": check_session_access,
         "to_local_datetime_str": to_local_datetime_str,
@@ -726,11 +730,13 @@ def index():
 
         for s in all_published:
             if s.display_order > 10 and level != "Professional":
-                session_access_map[s.display_order] = False
+                session_access_map[s.id] = False
                 continue
-            # Check all previous sessions are completed
+            # Check all previous sessions of the same course_type are completed
             access = True
             for prev in all_published:
+                if prev.course_type != s.course_type:
+                    continue
                 if prev.display_order >= s.display_order:
                     break
                 prog = user_progress.get(prev.id)
@@ -743,7 +749,7 @@ def index():
                     if not qr or qr.score < 60:
                         access = False
                         break
-            session_access_map[s.display_order] = access
+            session_access_map[s.id] = access
 
     return render_template(
         "index.html",

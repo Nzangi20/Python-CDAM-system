@@ -180,44 +180,129 @@
     </form>
   </div>
 
-  <div class="grid">
-    {% for session in sessions %}
-      {% set is_guest = not current_user.is_authenticated %}
-      {% set is_admin = current_user.is_authenticated and current_user.is_admin %}
-      {% set is_level_match = is_guest or is_admin or (current_user.study_level == 'Professional') or (session.difficulty == current_user.study_level) %}
+  {% set python_sessions = sessions | selectattr('course_type', 'equalto', 'python') | list %}
+  {% set r_sessions = sessions | selectattr('course_type', 'equalto', 'r') | list %}
+
+  <div class="curriculum-tracks" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 2.5rem; align-items: start;">
+    <!-- Python Column -->
+    <div class="curriculum-track-column" style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; border-bottom: 2px solid var(--red-500); padding-bottom: 0.75rem; margin-bottom: 0.5rem;">
+        <span style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 12px; background: rgba(185, 28, 28, 0.08); color: var(--red-500); font-size: 1.5rem;">
+          <i class="fa-brands fa-python"></i>
+        </span>
+        <div>
+          <h3 style="font-size: 1.5rem; font-weight: 800; margin: 0;">Python Curriculum</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; font-weight: 600;">Data Science, Analytics & Machine Learning</p>
+        </div>
+      </div>
       
-      {% if is_level_match %}
-        {% set has_access = is_guest or is_admin or session_access_map.get(session.display_order, false) %}
-        <article class="card hover-scale {% if not has_access %}locked-session{% endif %}" style="{% if not has_access %}opacity: 0.65; position: relative;{% endif %}">
-          {% if not has_access %}
-            <div style="position: absolute; top: 12px; right: 12px; font-size: 1.25rem; color: var(--red-400); z-index: 10;">
-              <i class="fa-solid fa-lock"></i>
-            </div>
-          {% endif %}
-          <div class="card-top">
-            <span class="badge">{{ session.difficulty }}</span>
-            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;"><i class="fa-regular fa-clock"></i> {{ session.duration }}</span>
-          </div>
-          <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 0.75rem;">Session {{ session.display_order }}: {{ session.clean_title }}</h3>
-          <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; height: 4.5rem;">{{ session.description }}</p>
-          {% if current_user.is_authenticated %}
-            {% if current_user.is_admin %}
-              <a class="btn primary" href="{{ url_for('session_detail', slug=session.slug) }}" style="width: 100%;"><i class="fa-solid fa-eye"></i> Preview Session</a>
-            {% else %}
-              {% if has_access %}
-                <a class="btn primary" href="{{ url_for('session_detail', slug=session.slug) }}" style="width: 100%;"><i class="fa-solid fa-book-open-reader"></i> Learn Session</a>
-              {% else %}
-                <button class="btn" disabled style="width: 100%; cursor: not-allowed; background: rgba(0,0,0,0.08); border-color: rgba(255,255,255,0.05); color: var(--text-muted);"><i class="fa-solid fa-lock"></i> Locked (Pass prior quizzes)</button>
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        {% for session in python_sessions %}
+          {% set is_guest = not current_user.is_authenticated %}
+          {% set is_admin = current_user.is_authenticated and current_user.is_admin %}
+          {% set is_level_match = is_guest or is_admin or (current_user.study_level == 'Professional') or (session.difficulty == current_user.study_level) %}
+          
+          {% if is_level_match %}
+            {% set has_access = is_guest or is_admin or session_access_map.get(session.id, false) %}
+            <article class="card hover-scale {% if not has_access %}locked-session{% endif %}" style="{% if not has_access %}opacity: 0.65; position: relative;{% endif %} flex: 1;">
+              {% if not has_access %}
+                <div style="position: absolute; top: 12px; right: 12px; font-size: 1.25rem; color: var(--red-400); z-index: 10;">
+                  <i class="fa-solid fa-lock"></i>
+                </div>
               {% endif %}
-            {% endif %}
-          {% else %}
-            <a class="btn" href="{{ url_for('register') }}" style="width: 100%;"><i class="fa-solid fa-user-plus"></i> Enroll to Access</a>
+              <div class="card-top">
+                <span class="badge">{{ session.difficulty }}</span>
+                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;"><i class="fa-regular fa-clock"></i> {{ session.duration }}</span>
+              </div>
+              <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 0.75rem;">Session {{ session.display_order }}: {{ session.clean_title }}</h3>
+              <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; height: 4.5rem;">{{ session.description }}</p>
+              
+              <!-- Features / Checkmarks List -->
+              <ul style="list-style: none; padding: 0; margin: 0 0 1.25rem 0; font-size: 0.9rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.35rem;">
+                <li style="display: flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-circle-check" style="color: var(--red-500); font-size: 0.95rem;"></i> Comprehensive Python training</li>
+                <li style="display: flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-circle-check" style="color: var(--red-500); font-size: 0.95rem;"></i> Hands-on code examples</li>
+              </ul>
+
+              {% if current_user.is_authenticated %}
+                {% if current_user.is_admin %}
+                  <a class="btn primary" href="{{ url_for('session_detail', slug=session.slug) }}" style="width: 100%;"><i class="fa-solid fa-eye"></i> Preview Session</a>
+                {% else %}
+                  {% if has_access %}
+                    <a class="btn primary" href="{{ url_for('session_detail', slug=session.slug) }}" style="width: 100%;"><i class="fa-solid fa-book-open-reader"></i> Learn Session</a>
+                  {% else %}
+                    <button class="btn" disabled style="width: 100%; cursor: not-allowed; background: rgba(0,0,0,0.08); border-color: rgba(255,255,255,0.05); color: var(--text-muted);"><i class="fa-solid fa-lock"></i> Locked (Pass prior quizzes)</button>
+                  {% endif %}
+                {% endif %}
+              {% else %}
+                <a class="btn" href="{{ url_for('register') }}" style="width: 100%;"><i class="fa-solid fa-user-plus"></i> Enroll to Access</a>
+              {% endif %}
+            </article>
           {% endif %}
-        </article>
-      {% endif %}
-    {% else %}
-      <p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted); padding: 3rem 0;">No sessions found matching your criteria.</p>
-    {% endfor %}
+        {% else %}
+          <p style="text-align: center; color: var(--text-muted); padding: 2rem 0;">No Python sessions found matching your criteria.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- R Column -->
+    <div class="curriculum-track-column" style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; border-bottom: 2px solid var(--purple-brand); padding-bottom: 0.75rem; margin-bottom: 0.5rem;">
+        <span style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 12px; background: rgba(86, 0, 126, 0.08); color: var(--purple-brand); font-size: 1.5rem;">
+          <i class="fa-solid fa-registered"></i>
+        </span>
+        <div>
+          <h3 style="font-size: 1.5rem; font-weight: 800; margin: 0;">R Curriculum</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; font-weight: 600;">Statistical Computing & Data Analysis</p>
+        </div>
+      </div>
+      
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        {% for session in r_sessions %}
+          {% set is_guest = not current_user.is_authenticated %}
+          {% set is_admin = current_user.is_authenticated and current_user.is_admin %}
+          {% set is_level_match = is_guest or is_admin or (current_user.study_level == 'Professional') or (session.difficulty == current_user.study_level) %}
+          
+          {% if is_level_match %}
+            {% set has_access = is_guest or is_admin or session_access_map.get(session.id, false) %}
+            <article class="card hover-scale {% if not has_access %}locked-session{% endif %}" style="{% if not has_access %}opacity: 0.65; position: relative;{% endif %} flex: 1;">
+              {% if not has_access %}
+                <div style="position: absolute; top: 12px; right: 12px; font-size: 1.25rem; color: var(--red-400); z-index: 10;">
+                  <i class="fa-solid fa-lock"></i>
+                </div>
+              {% endif %}
+              <div class="card-top">
+                <span class="badge">{{ session.difficulty }}</span>
+                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;"><i class="fa-regular fa-clock"></i> {{ session.duration }}</span>
+              </div>
+              <h3 style="font-weight: 800; font-size: 1.35rem; margin-bottom: 0.75rem;">Session {{ session.display_order }}: {{ session.clean_title }}</h3>
+              <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; height: 4.5rem;">{{ session.description }}</p>
+              
+              <!-- Features / Checkmarks List -->
+              <ul style="list-style: none; padding: 0; margin: 0 0 1.25rem 0; font-size: 0.9rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.35rem;">
+                <li style="display: flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-circle-check" style="color: var(--purple-brand); font-size: 0.95rem;"></i> Comprehensive R training</li>
+                <li style="display: flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-circle-check" style="color: var(--purple-brand); font-size: 0.95rem;"></i> Hands-on code examples</li>
+              </ul>
+
+              {% if current_user.is_authenticated %}
+                {% if current_user.is_admin %}
+                  <a class="btn primary" href="{{ url_for('session_detail', slug=session.slug) }}" style="width: 100%;"><i class="fa-solid fa-eye"></i> Preview Session</a>
+                {% else %}
+                  {% if has_access %}
+                    <a class="btn primary" href="{{ url_for('session_detail', slug=session.slug) }}" style="width: 100%;"><i class="fa-solid fa-book-open-reader"></i> Learn Session</a>
+                  {% else %}
+                    <button class="btn" disabled style="width: 100%; cursor: not-allowed; background: rgba(0,0,0,0.08); border-color: rgba(255,255,255,0.05); color: var(--text-muted);"><i class="fa-solid fa-lock"></i> Locked (Pass prior quizzes)</button>
+                  {% endif %}
+                {% endif %}
+              {% else %}
+                <a class="btn" href="{{ url_for('register') }}" style="width: 100%;"><i class="fa-solid fa-user-plus"></i> Enroll to Access</a>
+              {% endif %}
+            </article>
+          {% endif %}
+        {% else %}
+          <p style="text-align: center; color: var(--text-muted); padding: 2rem 0;">No R sessions found matching your criteria.</p>
+        {% endfor %}
+      </div>
+    </div>
   </div>
 </section>
 
