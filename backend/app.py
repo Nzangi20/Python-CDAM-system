@@ -458,82 +458,60 @@ def check_session_access(user, display_order, course_type=None):
 
 
 def seed_sessions() -> None:
-    # Explicitly clean Session 2 title to ensure it has no duplicate text
-    s2 = Session.query.filter_by(slug="session-2-data-import-eda").first()
-    if s2:
-        s2.title = "Session 2: Data Import, Cleaning, and Exploratory Data Analysis (EDA)"
-        db.session.add(s2)
-        db.session.commit()
-
-    # Clean up title repetitions/prefixes in existing database sessions
-    import re
-    for session_obj in Session.query.all():
-        title_changed = False
-        if "atory Data Analysis (EDA) atory Data Analysis (EDA)" in session_obj.title:
-            session_obj.title = session_obj.title.replace(
-                "atory Data Analysis (EDA) atory Data Analysis (EDA)",
-                "atory Data Analysis (EDA)"
-            )
-            title_changed = True
-        
-        # Strip redundant prefixes like "Session X: Session X:"
-        cleaned = re.sub(r"^(Session\s+\d+:\s*)+", "", session_obj.title, flags=re.IGNORECASE).strip()
-        new_title = f"Session {session_obj.display_order}: {cleaned}"
-        if session_obj.title != new_title:
-            session_obj.title = new_title
-            title_changed = True
-            
-        if title_changed:
-            db.session.add(session_obj)
-    db.session.commit()
-
-    # Only seed initial sessions if they are not already in the database.
-    # We do NOT overwrite existing sessions or delete sessions created/edited by admins.
+    # 1. Update/insert Python sessions from SESSIONS
     for idx, item in enumerate(SESSIONS, start=1):
         session_obj = Session.query.filter_by(slug=item["slug"]).first()
         if not session_obj:
-            session_obj = Session(
-                title=item["title"],
-                slug=item["slug"],
-                description=item["description"],
-                content=item["content"],
-                objectives=item["objectives"],
-                expected_outcomes=item.get("expected_outcomes", ""),
-                learning_notes=item.get("learning_notes", ""),
-                instructions=item.get("instructions", ""),
-                code_examples=item["code_examples"],
-                resources=item["resources"],
-                quiz_json=json.dumps(item.get("quiz", [])),
-                duration=item["duration"],
-                difficulty=item["difficulty"],
-                display_order=idx,
-                published=True,
-                course_type="python",
-            )
-            db.session.add(session_obj)
-            
+            session_obj = Session(slug=item["slug"])
+        session_obj.title = item["title"]
+        session_obj.description = item["description"]
+        session_obj.content = item.get("content", "")
+        session_obj.objectives = item["objectives"]
+        session_obj.expected_outcomes = item.get("expected_outcomes", "")
+        session_obj.learning_notes = item.get("learning_notes", "")
+        session_obj.instructions = item.get("instructions", "")
+        session_obj.code_examples = item["code_examples"]
+        session_obj.resources = item["resources"]
+        session_obj.quiz_json = json.dumps(item.get("quiz", []))
+        session_obj.duration = item["duration"]
+        session_obj.difficulty = item["difficulty"]
+        session_obj.display_order = idx
+        session_obj.published = True
+        session_obj.course_type = "python"
+        db.session.add(session_obj)
+
+    # 2. Update/insert R sessions from R_SESSIONS
+    r_slugs = [item["slug"] for item in R_SESSIONS]
     for idx, item in enumerate(R_SESSIONS, start=1):
         session_obj = Session.query.filter_by(slug=item["slug"]).first()
         if not session_obj:
-            session_obj = Session(
-                title=item["title"],
-                slug=item["slug"],
-                description=item["description"],
-                content=item["content"],
-                objectives=item["objectives"],
-                expected_outcomes=item.get("expected_outcomes", ""),
-                learning_notes=item.get("learning_notes", ""),
-                instructions=item.get("instructions", ""),
-                code_examples=item["code_examples"],
-                resources=item["resources"],
-                quiz_json=json.dumps(item.get("quiz", [])),
-                duration=item["duration"],
-                difficulty=item["difficulty"],
-                display_order=idx,
-                published=True,
-                course_type="r",
-            )
-            db.session.add(session_obj)
+            session_obj = Session(slug=item["slug"])
+        session_obj.title = item["title"]
+        session_obj.description = item["description"]
+        session_obj.content = item.get("content", "")
+        session_obj.objectives = item["objectives"]
+        session_obj.expected_outcomes = item.get("expected_outcomes", "")
+        session_obj.learning_notes = item.get("learning_notes", "")
+        session_obj.instructions = item.get("instructions", "")
+        session_obj.code_examples = item["code_examples"]
+        session_obj.resources = item["resources"]
+        session_obj.quiz_json = json.dumps(item.get("quiz", []))
+        session_obj.duration = item["duration"]
+        session_obj.difficulty = item["difficulty"]
+        session_obj.display_order = idx
+        session_obj.published = True
+        session_obj.course_type = "r"
+        db.session.add(session_obj)
+
+    # 3. Clean up any obsolete seeded R sessions
+    obsolete_r_sessions = Session.query.filter(
+        Session.course_type == "r",
+        Session.slug.like("r-session-%"),
+        ~Session.slug.in_(r_slugs)
+    ).all()
+    for s in obsolete_r_sessions:
+        db.session.delete(s)
+
     db.session.commit()
 
 
@@ -2915,8 +2893,11 @@ def initialize():
         try:
             inspector = inspect(db.engine)
             if "sessions" in inspector.get_table_names():
-                if Session.query.first() is not None:
-                    # Database is already seeded. Skip to avoid concurrent lock deadlocks.
+                r_db_count = Session.query.filter_by(course_type="r").count()
+                existing_r_slugs = {s.slug for s in Session.query.filter_by(course_type="r").all()}
+                expected_r_slugs = {item["slug"] for item in R_SESSIONS}
+                if r_db_count == len(R_SESSIONS) and existing_r_slugs == expected_r_slugs:
+                    # Database is already seeded and matches expected structure. Skip.
                     return
         except Exception as e:
             print(f"Database check skipped during startup: {e}")

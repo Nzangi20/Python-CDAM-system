@@ -600,9 +600,9 @@ for pkg, ver in dependencies.items():
 
 R_SESSIONS = [
     {
-        "title": "Session 1: Introduction to R, RStudio, and Basic Data Types",
+        "title": "Session 1: Introduction to R for Data Science",
         "slug": "r-session-1-intro-to-r",
-        "description": "Get started with R syntax, RStudio workspace, and basic variables.",
+        "description": "Learn the fundamentals of R programming, RStudio IDE, and the core concepts of data science.",
         "duration": "45 min",
         "difficulty": "Beginner",
         "objectives": """- Set up R and understand the RStudio workspace layout
@@ -631,7 +631,7 @@ gpa <- 3.8
 print(paste("Student:", name, "Age:", age, "GPA:", gpa))
 print(class(name))
 print(class(age))""",
-        "resources": "- [R Manuals](https://cran.r-project.org/manuals.html)\\n- [RStudio Desktop](https://posit.co/download/rstudio-desktop/)",
+        "resources": "- [R Manuals](https://cran.r-project.org/manuals.html)\n- [RStudio Desktop](https://posit.co/download/rstudio-desktop/)",
         "quiz": [
             {"question": "What is the standard assignment operator in R?", "options": ["<-", "=", "==", "assign"], "correct": 0},
             {"question": "How do you start a single-line comment in R?", "options": ["#", "//", "/*", "<!--"], "correct": 0},
@@ -639,9 +639,9 @@ print(class(age))""",
         ]
     },
     {
-        "title": "Session 2: Data Import, Cleaning, and Exploratory Data Analysis (EDA) in R",
+        "title": "Session 2: Data Import, Cleaning and EDA",
         "slug": "r-session-2-data-import-eda",
-        "description": "Learn to load CSV data, find missing variables, and perform basic data cleaning.",
+        "description": "Master data importation, cleaning techniques, and exploratory data analysis to prepare datasets for analysis.",
         "duration": "50 min",
         "difficulty": "Beginner",
         "objectives": """- Read CSV files using base R read.csv
@@ -677,7 +677,7 @@ print(df_clean)""",
     {
         "title": "Session 3: Data Manipulation with dplyr",
         "slug": "r-session-3-dplyr-manipulation",
-        "description": "Filter rows, select columns, and calculate grouping summaries using dplyr.",
+        "description": "Learn powerful data manipulation techniques using dplyr to transform and organize your data efficiently.",
         "duration": "60 min",
         "difficulty": "Beginner",
         "objectives": """- Understand tidyverse and the pipe operator (%>% or |>)
@@ -720,7 +720,7 @@ print(grouped)""",
     {
         "title": "Session 4: Data Visualization with ggplot2",
         "slug": "r-session-4-ggplot2-visualization",
-        "description": "Create publication-quality charts using the Grammar of Graphics.",
+        "description": "Create professional, publication-quality graphics using ggplot2 and the Grammar of Graphics.",
         "duration": "60 min",
         "difficulty": "Beginner",
         "objectives": """- Understand the layers of the Grammar of Graphics
@@ -757,9 +757,9 @@ print("Plot structured successfully!")""",
         ]
     },
     {
-        "title": "Session 5: Hypothesis Testing in R",
+        "title": "Session 5: Hypothesis Testing",
         "slug": "r-session-5-hypothesis-testing",
-        "description": "Formulate statistical claims and compute t-tests in R.",
+        "description": "Learn statistical hypothesis testing methods including t-tests, chi-square tests, and correlation analysis.",
         "duration": "60 min",
         "difficulty": "Beginner",
         "objectives": """- Define null and alternative hypotheses
@@ -789,9 +789,9 @@ print(paste("P-value:", test_result$p.value))""",
         ]
     },
     {
-        "title": "Session 6: Correlation and Regression Analysis in R",
+        "title": "Session 6: Correlation and Regression Analysis",
         "slug": "r-session-6-correlation-regression",
-        "description": "Compute Pearson correlation and fit linear regression models.",
+        "description": "Master correlation analysis and regression modeling to understand and predict relationships between variables.",
         "duration": "75 min",
         "difficulty": "Beginner",
         "objectives": """- Measure association with cor() and cor.test()
@@ -821,9 +821,9 @@ print(summary(model))""",
         ]
     },
     {
-        "title": "Session 7: ANOVA and Non-Parametric Tests in R",
+        "title": "Session 7: ANOVA and Non-Parametric Tests",
         "slug": "r-session-7-anova-tests",
-        "description": "Compare multiple groups with aov() and Kruskal-Wallis tests.",
+        "description": "Extend your statistical testing toolkit with Analysis of Variance (ANOVA) and non-parametric alternatives.",
         "duration": "75 min",
         "difficulty": "Beginner",
         "objectives": """- Run One-Way ANOVA tests using aov()
@@ -853,9 +853,9 @@ print(summary(fit))""",
         ]
     },
     {
-        "title": "Session 8: Time Series Analysis in R",
+        "title": "Session 8: Time Series Analysis",
         "slug": "r-session-8-time-series",
-        "description": "Build ts objects, analyze seasonal patterns, and plot decompositions.",
+        "description": "Master time series analysis techniques for forecasting and trend analysis.",
         "duration": "75 min",
         "difficulty": "Beginner",
         "objectives": """- Convert vectors into time series using ts()
@@ -886,49 +886,9 @@ print("Decomposition completed successfully.")""",
         ]
     },
     {
-        "title": "Session 9: Reporting with R Markdown",
-        "slug": "r-session-9-r-markdown",
-        "description": "Construct dynamic reports that blend text explanations with executed R chunks.",
-        "duration": "60 min",
-        "difficulty": "Beginner",
-        "objectives": """- Structure R Markdown (.Rmd) documents with YAML headers
-- Control code chunk display (echo, eval, warning, message)
-- Knit documents to HTML, PDF, or Word formats""",
-        "expected_outcomes": """- Build R Markdown reports.
-- Control chunk rendering settings.
-- Produce formatted client summaries.""",
-        "learning_notes": """### R Markdown
-R Markdown files combine text (in Markdown format) with embedded R code chunks.
-Chunks are marked by:
-```
-{r}
-# R code goes here
-```
-Use `knitr` to build the document, executing all code chunks and inserting their outputs directly into the final report.""",
-        "instructions": "Run the R code to generate a text report summary.",
-        "content": "Create reproducible document reports that update automatically when new data is added.",
-        "code_examples": """# Simulate dynamic report generation
-student_count <- 150
-passing_pct <- 94.2
-report <- paste(
-  "--- CDAM ACADEMIC REPORT ---",
-  paste("Total Students Evaluated:", student_count),
-  paste("Curriculum Completion Rate:", passing_pct, "%"),
-  "Recommendation: Advance to Machine Learning module.",
-  sep = "\\n"
-)
-cat(report)""",
-        "resources": "- [R Markdown Cookbook](https://bookdown.org/yihui/rmarkdown-cookbook/)",
-        "quiz": [
-            {"question": "What extension do R Markdown source files use?", "options": [".Rmd", ".R", ".md", ".rmarkdown"], "correct": 0},
-            {"question": "Which chunk option prevents R code from being shown in the output?", "options": ["echo = FALSE", "eval = FALSE", "include = FALSE", "results = 'hide'"], "correct": 0},
-            {"question": "What is the process of generating the final document from an Rmd file called?", "options": ["Knitting", "Compiling", "Rendering", "Building"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 10: Capstone Project",
-        "slug": "r-session-10-capstone-beginner",
-        "description": "Incorporate data cleaning, manipulation, and plotting into a single R pipeline.",
+        "title": "Session 9: Capstone Projects",
+        "slug": "r-session-9-capstone",
+        "description": "Apply all your R data science skills to real-world capstone projects.",
         "duration": "90 min",
         "difficulty": "Beginner",
         "objectives": """- Combine EDA, cleaning, and dplyr operations in one script
@@ -957,284 +917,5 @@ print(summary)""",
             {"question": "Which dplyr verb aggregates values?", "options": ["summarize()", "filter()", "arrange()", "select()"], "correct": 0},
             {"question": "What package is the foundation of data manipulation in R?", "options": ["dplyr", "ggplot2", "tidyr", "readr"], "correct": 0}
         ]
-    },
-    {
-        "title": "Session 11: Advanced Data Wrangling with tidyr and dplyr",
-        "slug": "r-session-11-advanced-wrangling",
-        "description": "Reshape data frames and handle complex table joins.",
-        "duration": "60 min",
-        "difficulty": "Professional",
-        "objectives": """- Perform inner, left, right, and full joins with dplyr
-- Pivot tables between wide and long layouts using tidyr
-- Separate and unite composite columns""",
-        "expected_outcomes": """- Join data frames on key variables.
-- Reshape tables with pivot_longer() and pivot_wider().
-- Clean composite variables.""",
-        "learning_notes": """### tidyr & Joins
-- `left_join()`, `right_join()`, `inner_join()`, `full_join()`: Combine tables.
-- `pivot_longer()`: Convert wide tables (multiple columns) to long format.
-- `pivot_wider()`: Convert long tables back to wide format.""",
-        "instructions": "Run the pivot code to see wide data pivoted into a long layout.",
-        "content": "Reshape, merge, and clean complex tables for advanced analytics.",
-        "code_examples": """library(tidyr)
-library(dplyr)
-# Create wide data
-wide_data <- data.frame(
-  Year = c(2023, 2024),
-  HR_Expense = c(50000, 52000),
-  IT_Expense = c(75000, 80000)
-)
-# Reshape to long format
-long_data <- wide_data %>%
-  pivot_longer(cols = ends_with("Expense"), names_to = "Dept", values_to = "Expense")
-print("Long Format:")
-print(long_data)""",
-        "resources": "- [tidyr Cheat Sheet](https://github.com/rstudio/cheatsheets/blob/main/data-import.pdf)",
-        "quiz": [
-            {"question": "Which tidyr function reshapes data from wide to long?", "options": ["pivot_longer()", "pivot_wider()", "gather()", "spread()"], "correct": 0},
-            {"question": "Which join preserves all rows in the left table?", "options": ["left_join()", "right_join()", "inner_join()", "full_join()"], "correct": 0},
-            {"question": "How do you split a composite column into two columns?", "options": ["separate()", "unite()", "split()", "mutate()"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 12: Functional Programming in R (purrr / apply family)",
-        "slug": "r-session-12-functional-programming",
-        "description": "Optimize loops using vectorization, the apply family, and purrr map functions.",
-        "duration": "60 min",
-        "difficulty": "Professional",
-        "objectives": """- Avoid slow for loops using vectorized calculations
-- Apply functions across margins using apply, sapply, and lapply
-- Build robust iterations using the purrr package""",
-        "expected_outcomes": """- Replace manual loops with map() functions.
-- Run functions over lists and data frame columns.
-- Standardize output types with map_double() or map_chr().""",
-        "learning_notes": """### Functional Iteration
-In R, loops can be slow and hard to read. Instead, use vectorization or map functions:
-- `lapply()`, `sapply()`: Base R loop-replacements.
-- `purrr::map()`: Tidyverse iteration returning a list.
-- `purrr::map_dbl()`: Iteration guaranteed to return a numeric vector.""",
-        "instructions": "Execute the iteration code to square numeric vectors without using loops.",
-        "content": "Write clean, fast, and testable code using R functional programming.",
-        "code_examples": """library(purrr)
-# Vector of inputs
-numbers <- 1:10
-# Square even numbers using map and filter equivalents
-squared_evens <- numbers %>%
-  keep(~ .x %% 2 == 0) %>%
-  map_dbl(~ .x^2)
-print("Squared Evens:")
-print(squared_evens)""",
-        "resources": "- [Functional Programming with purrr](https://r4ds.had.co.nz/iteration.html)",
-        "quiz": [
-            {"question": "Which purrr function maps and guarantees a numeric double vector output?", "options": ["map_dbl()", "map()", "map_chr()", "map_num()"], "correct": 0},
-            {"question": "What is the base R equivalent of map returning a list?", "options": ["lapply()", "sapply()", "apply()", "mapply()"], "correct": 0},
-            {"question": "Which verb filters elements in purrr?", "options": ["keep()", "filter()", "discard()", "select()"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 13: Advanced Data Visualization with ggplot2",
-        "slug": "r-session-13-advanced-visualization",
-        "description": "Build multi-panel grids, color scales, and custom themes for publication.",
-        "duration": "75 min",
-        "difficulty": "Professional",
-        "objectives": """- Use facet_wrap and facet_grid to split panels by variables
-- Customize color gradients and discrete color palettes
-- Build bespoke theme templates for academic or corporate guidelines""",
-        "expected_outcomes": """- Build faceted charts.
-- Configure color mappings.
-- Design theme layouts.""",
-        "learning_notes": """### ggplot2 Customization
-- `facet_wrap(~ variable)`: Splits plots into multiple panels based on a categorical variable.
-- `theme()`: Allows customizing text sizes, backgrounds, legend coordinates, and gridlines.
-- `scale_color_manual()`: Enforces custom hex palettes.""",
-        "instructions": "Run the plotting script to inspect a simulated faceted chart structure.",
-        "content": "Create publication-quality graphic panels matching design requirements.",
-        "code_examples": """library(ggplot2)
-# Prepare data
-df <- data.frame(
-  Hours = c(2, 5, 7, 8),
-  FinalExam = c(55, 72, 88, 92),
-  Group = c("A", "A", "B", "B")
-)
-# Build faceted plot
-p <- ggplot(df, aes(x=Hours, y=FinalExam, color=Group)) +
-  geom_point(size=3) +
-  facet_wrap(~Group) +
-  theme_bw()
-print("Faceted plot structured successfully.")""",
-        "resources": "- [ggplot2 Themes Gallery](https://ggplot2.org/)",
-        "quiz": [
-            {"question": "Which function splits plots into separate panels based on a variable?", "options": ["facet_wrap()", "split_plot()", "grid_layout()", "panel_wrap()"], "correct": 0},
-            {"question": "How do you customize individual chart elements like legend placement?", "options": ["theme()", "labs()", "scale_legend()", "options()"], "correct": 0},
-            {"question": "Which package provides pre-defined themes like theme_economist()?", "options": ["ggthemes", "ggplot2", "scales", "gridExtra"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 14: Statistical Modeling in R (Multiple Regression)",
-        "slug": "r-session-14-statistical-modeling",
-        "description": "Fit multiple regression models, evaluate residuals, and diagnose collinearity.",
-        "duration": "75 min",
-        "difficulty": "Professional",
-        "objectives": """- Fit multivariate models using lm(y ~ x1 + x2)
-- Read ANOVA tables and interpret multi-predictor coefficients
-- Inspect model assumptions using plot(model)""",
-        "expected_outcomes": """- Construct multiple regression models.
-- Interpret coefficient estimates and R-squared.
-- Diagnose model assumptions (homoscedasticity, normality).""",
-        "learning_notes": """### Multiple Linear Regression
-We model y on multiple predictors:
-`model <- lm(y ~ x1 + x2, data=df)`
-Interpret results:
-- **p-value**: Assesses significance of individual predictors.
-- **R-squared**: Goodness-of-fit.
-- **Residual plots**: Check for heteroscedasticity or non-normality.""",
-        "instructions": "Execute the multiple linear model to check model coefficients.",
-        "content": "Estimate relationships using multivariate statistical models.",
-        "code_examples": """# Fit multiple predictors model
-df <- data.frame(
-  Hours = c(2, 4, 6, 8, 10),
-  Practice = c(60, 70, 85, 90, 95),
-  Exam = c(50, 60, 70, 80, 95)
-)
-model <- lm(Exam ~ Hours + Practice, data=df)
-print(summary(model))""",
-        "resources": "- [Regression Diagnostics in R](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/lm.html)",
-        "quiz": [
-            {"question": "How do you add multiple predictors in lm()?", "options": ["lm(y ~ x1 + x2)", "lm(y ~ x1, x2)", "lm(y ~ x1 & x2)", "lm(y ~ x1 * x2)"], "correct": 0},
-            {"question": "Which command generates standard diagnostics plots for lm models?", "options": ["plot(model)", "diagnose(model)", "check(model)", "summary(model)"], "correct": 0},
-            {"question": "What does a high VIF (Variance Inflation Factor) indicate?", "options": ["High multicollinearity", "Homoscedasticity", "High accuracy", "High model fit"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 15: Machine Learning in R (Supervised Learning)",
-        "slug": "r-session-15-supervised-learning",
-        "description": "Train classification models and measure prediction accuracy.",
-        "duration": "75 min",
-        "difficulty": "Professional",
-        "objectives": """- Split data frames into train and test sets in R
-- Train Logistic Regression models using glm()
-- Compute confusion matrices, accuracy, and F1 metrics""",
-        "expected_outcomes": """- Build train/test partition splits.
-- Train glm() classification models.
-- Predict and evaluate class outcomes.""",
-        "learning_notes": """### Logistic Regression in R
-For binary classification, use Generalized Linear Models:
-`model <- glm(y ~ x, data=df, family="binomial")`
-Generate probability predictions with `predict(model, newdata, type="response")`.""",
-        "instructions": "Execute the logistic classifier code to fit and predict test outcomes.",
-        "content": "Build R pipelines to classify records and evaluate accuracy.",
-        "code_examples": """# Logistic classification
-df <- data.frame(
-  Hours = c(2, 1, 5, 8, 9),
-  Passed = c(0, 0, 0, 1, 1)
-)
-# Train binomial logistic model
-model <- glm(Passed ~ Hours, data=df, family="binomial")
-probs <- predict(model, newdata=data.frame(Hours=6), type="response")
-print(paste("Probability for 6 hours:", probs))""",
-        "resources": "- [caret Package Documentation](https://topepo.github.io/caret/)",
-        "quiz": [
-            {"question": "Which family parameter is specified in glm() for binary logistic regression?", "options": ["'binomial'", "'gaussian'", "'poisson'", "'logistic'"], "correct": 0},
-            {"question": "What parameter is required in predict() to get probabilities instead of log-odds?", "options": ["type = 'response'", "type = 'prob'", "type = 'class'", "probabilities = TRUE"], "correct": 0},
-            {"question": "What package is standard for building machine learning pipelines in R?", "options": ["caret", "ggplot2", "dplyr", "tidyr"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 16: Unsupervised Learning in R",
-        "slug": "r-session-16-unsupervised-learning",
-        "description": "Cluster unlabeled datasets using K-Means and simplify features with PCA.",
-        "duration": "75 min",
-        "difficulty": "Professional",
-        "objectives": """- Run K-means clustering using kmeans()
-- Perform Principal Component Analysis with prcomp()
-- Select cluster numbers using the elbow method""",
-        "expected_outcomes": """- Cluster observations.
-- Run PCA using prcomp().
-- Plot variables along principal component axes.""",
-        "learning_notes": """### Unsupervised Learning
-- `kmeans(data, centers)`: Cluster data.
-- `prcomp(data, scale.=TRUE)`: Runs Principal Component Analysis, scaling variables to unit variance.""",
-        "instructions": "Run the clustering script to output centers and coordinates.",
-        "content": "Discover patterns in unlabeled datasets using R clustering algorithms.",
-        "code_examples": """# Cluster sample
-X <- matrix(c(1, 2, 1, 4, 1, 0, 10, 2, 10, 4, 10, 0), ncol=2, byrow=TRUE)
-# Perform K-Means
-fit <- kmeans(X, centers=2)
-print("Cluster Centers:")
-print(fit$centers)
-print("Cluster Assignments:")
-print(fit$cluster)""",
-        "resources": "- [PCA in R Tutorial](https://www.r-bloggers.com/2021/05/principal-component-analysis-pca-in-r/)",
-        "quiz": [
-            {"question": "Which function runs K-Means clustering in R?", "options": ["kmeans()", "k_means()", "cluster()", "prcomp()"], "correct": 0},
-            {"question": "Which base R function runs Principal Component Analysis?", "options": ["prcomp()", "pca()", "princomp()", "kmeans()"], "correct": 0},
-            {"question": "Why is scaling variables important in PCA?", "options": ["To prevent columns with large scales from dominating", "To speed up calculation", "To center the output around zero", "To remove NA values"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 17: Working with Web Data (httr / jsonlite)",
-        "slug": "r-session-17-web-data",
-        "description": "Fetch REST API records using httr and parse JSON datasets using jsonlite.",
-        "duration": "60 min",
-        "difficulty": "Professional",
-        "objectives": """- Send GET requests with httr::GET
-- Parse JSON payloads with jsonlite::fromJSON
-- Convert nested lists into clean Tidyverse tibbles""",
-        "expected_outcomes": """- Retrieve HTTP data feeds.
-- Convert JSON strings into data frames.
-- Connect R scripts to external web APIs.""",
-        "learning_notes": """### Web APIs & JSON in R
-- `httr::GET(url)`: Fetches online payloads.
-- `jsonlite::fromJSON(txt)`: Converts JSON strings directly into R lists or data frames.""",
-        "instructions": "Run the script to parse a simulated JSON API server response.",
-        "content": "Connect your R session to remote APIs and databases.",
-        "code_examples": """library(jsonlite)
-# Simulating a JSON API payload response
-json_response <- '{"status": "success", "data": {"users": [{"name": "AI Coach", "role": "Tutor"}]}}'
-parsed <- fromJSON(json_response)
-print("API Response Status:")
-print(parsed$status)
-print("Coach Name:")
-print(parsed$data$users$name)""",
-        "resources": "- [jsonlite Vignette](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-apis.html)",
-        "quiz": [
-            {"question": "Which function parses JSON strings into R structures?", "options": ["fromJSON()", "parse_json()", "read_json()", "json_parse()"], "correct": 0},
-            {"question": "Which package is commonly used for HTTP requests in R?", "options": ["httr", "jsonlite", "xml2", "curl"], "correct": 0},
-            {"question": "What structure is usually returned by fromJSON() for tabular data?", "options": ["data.frame", "list", "vector", "matrix"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 18: R Packages and Reproducibility (renv)",
-        "slug": "r-session-18-reproducibility",
-        "description": "Track dependencies and restore environments with renv.",
-        "duration": "60 min",
-        "difficulty": "Professional",
-        "objectives": """- Initialize renv for projects using renv::init()
-- Save package lockfiles with renv::snapshot()
-- Restore library settings with renv::restore()""",
-        "expected_outcomes": """- Build isolated package libraries.
-- Snapshot project dependencies.
-- Enforce reproducible packages.""",
-        "learning_notes": """### renv & Reproducibility in R
-The `renv` package manages private project libraries, locking specific versions of packages like ggplot2 or dplyr to guarantee your analysis works on any computer:
-- `renv::init()`: Sets up the project environment.
-- `renv::snapshot()`: Saves installed packages to a `renv.lock` file.
-- `renv::restore()`: Re-installs packages listed in the lockfile.""",
-        "instructions": "Execute the R code to write out a simulated package lockfile manifest.",
-        "content": "Lock package versions to guarantee statistical reproducibility.",
-        "code_examples": """# Simulated R package manifest
-manifest <- list(
-  R_version = "4.3.1",
-  packages = list(dplyr = "1.1.2", ggplot2 = "3.4.2", tidyr = "1.3.0")
-)
-print("CDAM R Environment Manifest:")
-print(manifest$packages)""",
-        "resources": "- [renv Official Guide](https://rstudio.github.io/renv/articles/renv.html)",
-        "quiz": [
-            {"question": "Which R package is standard for virtual environments?", "options": ["renv", "devtools", "usethis", "packrat"], "correct": 0},
-            {"question": "Which function saves installed packages to a lockfile?", "options": ["renv::snapshot()", "renv::init()", "renv::save()", "renv::restore()"], "correct": 0},
-            {"question": "How do you restore a project's packages from a lockfile?", "options": ["renv::restore()", "renv::install()", "renv::load()", "renv::init()"], "correct": 0}
-        ]
     }
 ]
-
