@@ -65,7 +65,7 @@ def login_admin(client):
 def test_homepage_lists_sessions(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert b"Master Python for Data Science" in response.data
+    assert b"Master Python and R for Data Science" in response.data
     assert b"Introduction to Python" in response.data
 
 
@@ -893,7 +893,9 @@ def test_admin_registration_and_mandatory_password_reset(client):
         "name": "Admin Registered Student",
         "avatar": "",
         "study_level": "Professional",
-        "new_password": "finalPreferredPassword123"
+        "new_password": "finalPreferredPassword123",
+        "enroll_python": "yes",
+        "enroll_r": "yes"
     }
     reset_resp = client.post("/student/profile", data=profile_reset_data, follow_redirects=True)
     assert reset_resp.status_code == 200
@@ -1044,8 +1046,8 @@ def test_dual_track_registration_and_switching(client):
     
     # Check that dashboard now lists R session
     resp_dashboard = client.get("/dashboard", follow_redirects=True)
-    assert b"Introduction to R" in resp_dashboard.data
-    assert b"Introduction to Python" not in resp_dashboard.data
+    assert b"Start with Session 1: Introduction to R" in resp_dashboard.data
+    assert b"Start with Session 1: Introduction to Python" not in resp_dashboard.data
     
     # Switch back to Python
     resp_switch_py = client.get("/set-track/python", follow_redirects=True)
@@ -1054,8 +1056,8 @@ def test_dual_track_registration_and_switching(client):
     
     # Check dashboard lists Python session
     resp_dashboard_py = client.get("/dashboard", follow_redirects=True)
-    assert b"Introduction to Python" in resp_dashboard_py.data
-    assert b"Introduction to R" not in resp_dashboard_py.data
+    assert b"Start with Session 1: Introduction to Python" in resp_dashboard_py.data
+    assert b"Start with Session 1: Introduction to R" not in resp_dashboard_py.data
 
 
 def test_r_sandbox_code_execution(client):
