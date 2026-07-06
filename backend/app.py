@@ -1528,6 +1528,7 @@ def admin_ai_generate_questions():
     question_types = payload.get("question_types", ["mcq"])
     difficulty = payload.get("difficulty", "Professional")
     context_type = payload.get("context_type", "exam")
+    course_type = payload.get("course_type", "python").strip()
 
     if not topic:
         return jsonify({"error": "Topic is required."}), 400
@@ -1538,7 +1539,8 @@ def admin_ai_generate_questions():
             num_questions=num_questions,
             question_types=question_types,
             difficulty=difficulty,
-            context_type=context_type
+            context_type=context_type,
+            course_type=course_type
         )
         return jsonify({"questions": questions})
     except Exception as e:

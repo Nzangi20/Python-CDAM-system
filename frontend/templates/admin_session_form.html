@@ -61,8 +61,8 @@
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-        <label>Python Code Examples (Runs inside student code emulator)</label>
-        <textarea name="code_examples" rows="6" placeholder="import pandas as pd&#10;df = pd.DataFrame({'A': [1, 2]})&#10;print(df)" required style="font-family: monospace;">{{ session_obj.code_examples if session_obj else '' }}</textarea>
+        <label id="codeExamplesLabel">Python Code Examples (Runs inside student code emulator)</label>
+        <textarea name="code_examples" id="codeExamplesTextarea" rows="6" placeholder="import pandas as pd&#10;df = pd.DataFrame({'A': [1, 2]})&#10;print(df)" required style="font-family: monospace;">{{ session_obj.code_examples if session_obj else '' }}</textarea>
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 0.5rem;">
@@ -298,6 +298,26 @@
     const aiGenerateBtn = document.getElementById("quizAiGenerateBtn");
     const sessionTitleInput = document.querySelector('input[name="title"]');
     const aiTopicInput = document.getElementById("quizAiTopicInput");
+    const courseTypeSelect = document.querySelector('select[name="course_type"]');
+    const codeExamplesLabel = document.getElementById("codeExamplesLabel");
+    const codeExamplesTextarea = document.getElementById("codeExamplesTextarea");
+
+    function updateCodeExamplesLabel() {
+      if (courseTypeSelect && codeExamplesLabel && codeExamplesTextarea) {
+        if (courseTypeSelect.value === "r") {
+          codeExamplesLabel.innerHTML = 'R Code Examples (Runs inside student code emulator)';
+          codeExamplesTextarea.placeholder = 'library(dplyr)\ndf <- data.frame(A = c(1, 2))\nprint(df)';
+        } else {
+          codeExamplesLabel.innerHTML = 'Python Code Examples (Runs inside student code emulator)';
+          codeExamplesTextarea.placeholder = 'import pandas as pd\ndf = pd.DataFrame({\'A\': [1, 2]})\nprint(df)';
+        }
+      }
+    }
+
+    if (courseTypeSelect) {
+      courseTypeSelect.addEventListener("change", updateCodeExamplesLabel);
+      updateCodeExamplesLabel();
+    }
 
     if (toggleAiBtn && aiPanel) {
       toggleAiBtn.addEventListener("click", () => {
@@ -339,7 +359,8 @@
               num_questions: numQ,
               question_types: ["mcq"],
               difficulty: difficulty,
-              context_type: "quiz"
+              context_type: "quiz",
+              course_type: courseTypeSelect ? courseTypeSelect.value : "python"
             })
           });
 

@@ -277,14 +277,16 @@ Format each section with clear headers and numbering. For MCQs, mark the correct
         num_questions: int,
         question_types: list[str],
         difficulty: str,
-        context_type: str = "exam"
+        context_type: str = "exam",
+        course_type: str = "python"
     ) -> list[dict]:
         """
         Generate structured questions as a JSON array and parse them into a list of dicts.
         """
         types_str = ", ".join(question_types)
+        lang = "R" if course_type == "r" else "Python"
         if context_type == "quiz":
-            prompt = f"""You are a Python for Data Science and Machine Learning teacher.
+            prompt = f"""You are a {lang} for Data Science and Machine Learning teacher.
 Generate a practice quiz for the topic: "{topic}".
 The target difficulty is: {difficulty}.
 Generate exactly {num_questions} multiple-choice questions.
@@ -306,7 +308,7 @@ Each question object in the JSON array must follow this structure exactly:
 Where "correct" is the 0-indexed integer (0, 1, 2, or 3) representing the index of the correct option.
 """
         else:
-            prompt = f"""You are a Python for Data Science and Machine Learning teacher.
+            prompt = f"""You are a {lang} for Data Science and Machine Learning teacher.
 Generate an examination for the topic: "{topic}".
 The target difficulty is: {difficulty}.
 Generate exactly {num_questions} questions of types: {types_str}.

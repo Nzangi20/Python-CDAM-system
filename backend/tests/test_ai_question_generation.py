@@ -110,7 +110,8 @@ def test_api_admin_ai_generate_questions_success(client):
             num_questions=1,
             question_types=["mcq"],
             difficulty="Professional",
-            context_type="exam"
+            context_type="exam",
+            course_type="python"
         )
 
 def test_session_quiz_persistence(client):
