@@ -2864,22 +2864,22 @@ def migrate_schema() -> None:
                 conn.execute(text("ALTER TABLE users ADD COLUMN study_level VARCHAR(30) DEFAULT 'Beginner'"))
         if "is_suspended" not in columns:
             with db.engine.begin() as conn:
-                conn.execute(text("ALTER TABLE users ADD COLUMN is_suspended BOOLEAN DEFAULT 0"))
+                conn.execute(text("ALTER TABLE users ADD COLUMN is_suspended BOOLEAN DEFAULT FALSE"))
         if "reg_number" not in columns:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE users ADD COLUMN reg_number VARCHAR(100)"))
         if "require_password_change" not in columns:
             with db.engine.begin() as conn:
-                conn.execute(text("ALTER TABLE users ADD COLUMN require_password_change BOOLEAN DEFAULT 0"))
+                conn.execute(text("ALTER TABLE users ADD COLUMN require_password_change BOOLEAN DEFAULT FALSE"))
         if "password_reset_status" not in columns:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE users ADD COLUMN password_reset_status VARCHAR(30)"))
         if "enrolled_python" not in columns:
             with db.engine.begin() as conn:
-                conn.execute(text("ALTER TABLE users ADD COLUMN enrolled_python BOOLEAN DEFAULT 1"))
+                conn.execute(text("ALTER TABLE users ADD COLUMN enrolled_python BOOLEAN DEFAULT TRUE"))
         if "enrolled_r" not in columns:
             with db.engine.begin() as conn:
-                conn.execute(text("ALTER TABLE users ADD COLUMN enrolled_r BOOLEAN DEFAULT 0"))
+                conn.execute(text("ALTER TABLE users ADD COLUMN enrolled_r BOOLEAN DEFAULT FALSE"))
     if "exams" in inspector.get_table_names():
         columns = {col["name"] for col in inspector.get_columns("exams")}
         if "study_level" not in columns:
@@ -2897,7 +2897,7 @@ def migrate_schema() -> None:
         columns = {col["name"] for col in inspector.get_columns("user_sandbox_files")}
         if "is_global" not in columns:
             with db.engine.begin() as conn:
-                conn.execute(text("ALTER TABLE user_sandbox_files ADD COLUMN is_global BOOLEAN DEFAULT 0"))
+                conn.execute(text("ALTER TABLE user_sandbox_files ADD COLUMN is_global BOOLEAN DEFAULT FALSE"))
 
 
 def initialize():
