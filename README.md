@@ -60,3 +60,9 @@ We maintain full coverage across backend CRUD endpoints, integrity violations, s
 ```bash
 python -m pytest backend/tests/test_app.py -v
 ```
+
+---
+
+## 🚀 Cloud Deployment
+For step-by-step instructions on deploying the LMS platform to the cloud, see the [Vercel Deployment Guide](vercel_deployment_guide.md).
+
