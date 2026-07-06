@@ -26,6 +26,34 @@
         </select>
       </div>
 
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
+        <label><i class="fa-solid fa-book"></i> Enrolled Tracks</label>
+        <div style="display: flex; gap: 1.5rem; margin: 0.25rem 0;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+            <input type="checkbox" name="enroll_python" value="yes" {% if current_user.enrolled_python %}checked{% endif %} style="width: auto; height: auto; margin: 0;" id="enroll_python" /> Python Programming
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;">
+            <input type="checkbox" name="enroll_r" value="yes" {% if current_user.enrolled_r %}checked{% endif %} style="width: auto; height: auto; margin: 0;" id="enroll_r" /> R Programming
+          </label>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const form = document.querySelector('form');
+          if (form) {
+            form.addEventListener('submit', function(e) {
+              const py = document.getElementById('enroll_python').checked;
+              const r = document.getElementById('enroll_r').checked;
+              if (!py && !r) {
+                e.preventDefault();
+                alert('Please select at least one track to enroll.');
+              }
+            });
+          }
+        });
+      </script>
+
       {% if current_user.require_password_change %}
       <div style="display: flex; flex-direction: column; gap: 0.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem; margin-top: 1rem;">
         <h4 style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--red-400);">Security Credential Refresh</h4>

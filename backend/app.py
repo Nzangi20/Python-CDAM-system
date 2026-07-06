@@ -961,6 +961,24 @@ def student_profile():
         current_user.name = request.form.get("name", current_user.name).strip()
         current_user.avatar = request.form.get("avatar", current_user.avatar).strip() or current_user.avatar
         current_user.study_level = request.form.get("study_level", current_user.study_level)
+        
+        # Track enrollment update
+        enroll_py = request.form.get("enroll_python") == "yes"
+        enroll_r = request.form.get("enroll_r") == "yes"
+        if not enroll_py and not enroll_r:
+            flash("You must be enrolled in at least one track.", "error")
+            return redirect(url_for("student_profile"))
+        
+        current_user.enrolled_python = enroll_py
+        current_user.enrolled_r = enroll_r
+        
+        # Active track check
+        active_track = get_active_track()
+        if active_track == "python" and not enroll_py:
+            session["active_track"] = "r"
+        elif active_track == "r" and not enroll_r:
+            session["active_track"] = "python"
+
         if new_password:
             if not current_user.require_password_change:
                 flash("Password change must be approved by an administrator.", "error")
