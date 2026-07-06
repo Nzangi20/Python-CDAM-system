@@ -69,7 +69,14 @@ app = Flask(
     static_folder=str(FRONTEND_DIR / "static"),
 )
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "change-this-in-production")
-db_url = os.environ.get("DATABASE_URL", "mysql+pymysql://root:@localhost:3306/cdam_lms").strip()
+
+# Detect if running on Vercel and default to a SQLite temp DB if DATABASE_URL is missing
+if os.environ.get("VERCEL"):
+    db_default = "sqlite:///" + str(Path("/tmp") / "cdam.db")
+else:
+    db_default = "mysql+pymysql://root:@localhost:3306/cdam_lms"
+
+db_url = os.environ.get("DATABASE_URL", db_default).strip()
 if db_url.startswith("mysql://"):
     db_url = db_url.replace("mysql://", "mysql+pymysql://", 1)
 elif db_url.startswith("postgres://"):
@@ -2993,7 +3000,10 @@ def initialize():
 
 
 # Automatically initialize and seed the database on server startup/import
-initialize()
+try:
+    initialize()
+except Exception as e:
+    print(f"CRITICAL: Database initialization failed during startup: {e}")
 
 if __name__ == "__main__":
     app.run(debug=False)

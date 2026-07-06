@@ -11,6 +11,8 @@ Before deploying to Vercel, please note these architecture requirements:
 > [!IMPORTANT]
 > **Ephemeral Filesystem (No SQLite)**: Vercel serverless containers are stateless and have a read-only filesystem. Any local file database (like SQLite `cdam.db`) will be reset every time the container restarts. You **must** connect to a hosted MySQL or PostgreSQL database for production.
 >
+> **Serverless Function Size Limit (250MB)**: Installing heavy data science libraries like `pandas`, `scipy`, `numpy`, `scikit-learn`, `matplotlib`, and `seaborn` exceeds Vercel's serverless size limit of 250MB. Thus, we have removed these libraries from the main deployment `requirements.txt` to keep the deployment lightweight. For local development or environments where the Python sandbox needs full data science support, run: `pip install -r requirements-sandbox.txt`.
+>
 > **R Sandbox Limitations on Vercel**: Vercel serverless runtimes do not have the R compiler/interpreter preinstalled. If your production environment requires the interactive R code execution sandbox, you should deploy using a Docker container on platforms like **Render**, **Railway**, or **AWS EC2** instead.
 
 ---
