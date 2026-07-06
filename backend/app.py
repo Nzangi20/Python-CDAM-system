@@ -1186,7 +1186,21 @@ def run_code():
         temp_script_path = os.path.join(workspace_dir, f"script_{current_user.id}.R")
         with open(temp_script_path, "w", encoding="utf-8") as f:
             f.write(code)
-        cmd = ["Rscript", temp_script_path]
+        
+        # Check standard installation paths for Rscript on Windows
+        rscript_bin = "Rscript"
+        possible_paths = [
+            r"C:\Program Files\R\R-4.6.0\bin\x64\Rscript.exe",
+            r"C:\Program Files\R\R-4.6.0\bin\Rscript.exe",
+            r"C:\Program Files\R\R-4.5.0\bin\x64\Rscript.exe",
+            r"C:\Program Files\R\R-4.4.0\bin\x64\Rscript.exe",
+            r"C:\Program Files\R\R-4.3.0\bin\x64\Rscript.exe",
+        ]
+        for path in possible_paths:
+            if os.path.exists(path):
+                rscript_bin = path
+                break
+        cmd = [rscript_bin, temp_script_path]
     else:
         cmd = [sys.executable, "-c", code]
 
@@ -2350,15 +2364,27 @@ def admin_register_student():
             flash("An account with this registration number already exists.", "error")
             return redirect(url_for("admin_register_student"))
             
-        if "enroll_python" not in request.form and "enroll_r" not in request.form:
-            enroll_python = True
-            enroll_r = False
+        if "enroll_track" in request.form:
+            enroll_track = request.form.get("enroll_track")
+            if enroll_track == "python":
+                enroll_python = True
+                enroll_r = False
+            elif enroll_track == "r":
+                enroll_python = False
+                enroll_r = True
+            else:
+                enroll_python = True
+                enroll_r = True
         else:
-            enroll_python = request.form.get("enroll_python") == "yes"
-            enroll_r = request.form.get("enroll_r") == "yes"
-            if not enroll_python and not enroll_r:
-                flash("Student must be enrolled in at least one track.", "error")
-                return redirect(url_for("admin_register_student"))
+            if "enroll_python" not in request.form and "enroll_r" not in request.form:
+                enroll_python = True
+                enroll_r = False
+            else:
+                enroll_python = request.form.get("enroll_python") == "yes"
+                enroll_r = request.form.get("enroll_r") == "yes"
+                if not enroll_python and not enroll_r:
+                    flash("Student must be enrolled in at least one track.", "error")
+                    return redirect(url_for("admin_register_student"))
             
         user = User(
             name=name,
@@ -2389,11 +2415,23 @@ def admin_update_enrollments(user_id: int):
     if not user or user.is_admin:
         flash("User not found.", "error")
         return redirect(url_for("admin_panel"))
-    enroll_python = request.form.get("enroll_python") == "yes"
-    enroll_r = request.form.get("enroll_r") == "yes"
-    if not enroll_python and not enroll_r:
-        flash("Student must be enrolled in at least one track.", "error")
-        return redirect(url_for("admin_student_detail", user_id=user_id))
+    if "enroll_track" in request.form:
+        enroll_track = request.form.get("enroll_track")
+        if enroll_track == "python":
+            enroll_python = True
+            enroll_r = False
+        elif enroll_track == "r":
+            enroll_python = False
+            enroll_r = True
+        else:
+            enroll_python = True
+            enroll_r = True
+    else:
+        enroll_python = request.form.get("enroll_python") == "yes"
+        enroll_r = request.form.get("enroll_r") == "yes"
+        if not enroll_python and not enroll_r:
+            flash("Student must be enrolled in at least one track.", "error")
+            return redirect(url_for("admin_student_detail", user_id=user_id))
     user.enrolled_python = enroll_python
     user.enrolled_r = enroll_r
     db.session.commit()

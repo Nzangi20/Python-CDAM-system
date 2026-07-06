@@ -158,66 +158,129 @@
 
 <!-- Sessions Management Panel -->
 <section class="tab-panel card" id="sessions">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
     <h3 style="font-weight: 800; font-size: 1.25rem;"><i class="fa-solid fa-book-open" style="color: var(--red-500);"></i> Curriculum Sessions</h3>
     <a class="btn primary" href="{{ url_for('admin_session_new') }}" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;"><i class="fa-solid fa-plus"></i> Add Session</a>
   </div>
   
-  <p class="muted" style="font-size: 0.9rem; margin-bottom: 1.5rem;">Below is the ordered list of sessions. Reordering can be managed through the Drag and Drop planner if enabled, or by organizing by order index.</p>
-  
-  <div style="overflow-x: auto;">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Order</th>
-          <th>Track</th>
-          <th>Session Title</th>
-          <th>Slug</th>
-          <th>Difficulty</th>
-          <th>Duration</th>
-          <th>Status</th>
-          <th style="text-align: right;">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for s in sessions %}
+  <!-- Python Track Sessions -->
+  <div style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+      <h4 style="font-weight: 700; font-size: 1.05rem; color: var(--red-400); margin: 0;">
+        <i class="fa-brands fa-python" style="margin-right: 0.4rem;"></i> Python Programming Track
+      </h4>
+      <span class="badge" style="background: rgba(239, 68, 68, 0.1); color: var(--red-400); border-color: rgba(239, 68, 68, 0.2); font-size: 0.75rem;">
+        {{ sessions | selectattr('course_type', 'equalto', 'python') | list | length }} Sessions
+      </span>
+    </div>
+    <div style="overflow-x: auto;">
+      <table class="admin-table">
+        <thead>
           <tr>
-            <td style="font-weight: 800; color: var(--red-400);">#{{ s.display_order }}</td>
-            <td>
-              <span class="badge" style="background: {% if s.course_type == 'python' %}rgba(239, 68, 68, 0.12){% else %}rgba(86, 0, 126, 0.12){% endif %}; color: {% if s.course_type == 'python' %}var(--red-400){% else %}var(--purple-brand){% endif %}; border-color: {% if s.course_type == 'python' %}rgba(239, 68, 68, 0.25){% else %}rgba(86, 0, 126, 0.25){% endif %}; font-size: 0.75rem;">
-                <i class="fa-solid {% if s.course_type == 'python' %}fa-brands fa-python{% else %}fa-registered{% endif %}"></i> {{ s.course_type | capitalize }}
-              </span>
-            </td>
-            <td style="font-weight: 700;">{{ s.clean_title }}</td>
-            <td><code>{{ s.slug }}</code></td>
-            <td><span class="badge">{{ s.difficulty }}</span></td>
-            <td>{{ s.duration }}</td>
-            <td>
-              {% if s.published %}
-                <span class="badge success">Published</span>
-              {% else %}
-                <span class="badge" style="background: rgba(255,255,255,0.05); border-color: var(--border);">Draft</span>
-              {% endif %}
-            </td>
-            <td style="text-align: right; white-space: nowrap;">
-              <a href="{{ url_for('admin_session_edit', session_id=s.id) }}" class="btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
-              <form method="post" action="{{ url_for('admin_toggle_publish', session_id=s.id) }}" style="display: inline; margin: 0;">
-                <button type="submit" class="btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
-                  {{ "Unpublish" if s.published else "Publish" }}
-                </button>
-              </form>
-              <form method="post" action="{{ url_for('admin_session_delete', session_id=s.id) }}" onsubmit="return confirm('Are you sure you want to delete this session? This action is irreversible.')" style="display: inline; margin: 0;">
-                <button type="submit" class="btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: rgba(239, 68, 68, 0.4); color: var(--red-400); background: rgba(239, 68, 68, 0.05);">
-                  <i class="fa-regular fa-trash-can"></i>
-                </button>
-              </form>
-            </td>
+            <th>Order</th>
+            <th>Session Title</th>
+            <th>Slug</th>
+            <th>Difficulty</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th style="text-align: right;">Actions</th>
           </tr>
-        {% else %}
-          <tr><td colspan="8" class="muted" style="text-align: center; padding: 2rem 0;">No sessions created yet.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {% for s in sessions if s.course_type == 'python' %}
+            <tr>
+              <td style="font-weight: 800; color: var(--red-400);">#{{ s.display_order }}</td>
+              <td style="font-weight: 700;">{{ s.clean_title }}</td>
+              <td><code>{{ s.slug }}</code></td>
+              <td><span class="badge">{{ s.difficulty }}</span></td>
+              <td>{{ s.duration }}</td>
+              <td>
+                {% if s.published %}
+                  <span class="badge success">Published</span>
+                {% else %}
+                  <span class="badge" style="background: rgba(255,255,255,0.05); border-color: var(--border);">Draft</span>
+                {% endif %}
+              </td>
+              <td style="text-align: right; white-space: nowrap;">
+                <a href="{{ url_for('admin_session_edit', session_id=s.id) }}" class="btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+                <form method="post" action="{{ url_for('admin_toggle_publish', session_id=s.id) }}" style="display: inline; margin: 0;">
+                  <button type="submit" class="btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                    {{ "Unpublish" if s.published else "Publish" }}
+                  </button>
+                </form>
+                <form method="post" action="{{ url_for('admin_session_delete', session_id=s.id) }}" onsubmit="return confirm('Are you sure you want to delete this session? This action is irreversible.')" style="display: inline; margin: 0;">
+                  <button type="submit" class="btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: rgba(239, 68, 68, 0.4); color: var(--red-400); background: rgba(239, 68, 68, 0.05);">
+                    <i class="fa-regular fa-trash-can"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="7" class="muted" style="text-align: center; padding: 2rem 0;">No Python sessions created yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- R Track Sessions -->
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+      <h4 style="font-weight: 700; font-size: 1.05rem; color: var(--purple-brand); margin: 0;">
+        <i class="fa-solid fa-registered" style="margin-right: 0.4rem;"></i> R Programming Track
+      </h4>
+      <span class="badge" style="background: rgba(86, 0, 126, 0.1); color: var(--purple-brand); border-color: rgba(86, 0, 126, 0.2); font-size: 0.75rem;">
+        {{ sessions | selectattr('course_type', 'equalto', 'r') | list | length }} Sessions
+      </span>
+    </div>
+    <div style="overflow-x: auto;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Session Title</th>
+            <th>Slug</th>
+            <th>Difficulty</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th style="text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in sessions if s.course_type == 'r' %}
+            <tr>
+              <td style="font-weight: 800; color: var(--purple-brand);">#{{ s.display_order }}</td>
+              <td style="font-weight: 700;">{{ s.clean_title }}</td>
+              <td><code>{{ s.slug }}</code></td>
+              <td><span class="badge">{{ s.difficulty }}</span></td>
+              <td>{{ s.duration }}</td>
+              <td>
+                {% if s.published %}
+                  <span class="badge success">Published</span>
+                {% else %}
+                  <span class="badge" style="background: rgba(255,255,255,0.05); border-color: var(--border);">Draft</span>
+                {% endif %}
+              </td>
+              <td style="text-align: right; white-space: nowrap;">
+                <a href="{{ url_for('admin_session_edit', session_id=s.id) }}" class="btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+                <form method="post" action="{{ url_for('admin_toggle_publish', session_id=s.id) }}" style="display: inline; margin: 0;">
+                  <button type="submit" class="btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                    {{ "Unpublish" if s.published else "Publish" }}
+                  </button>
+                </form>
+                <form method="post" action="{{ url_for('admin_session_delete', session_id=s.id) }}" onsubmit="return confirm('Are you sure you want to delete this session? This action is irreversible.')" style="display: inline; margin: 0;">
+                  <button type="submit" class="btn ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border-color: rgba(239, 68, 68, 0.4); color: var(--red-400); background: rgba(239, 68, 68, 0.05);">
+                    <i class="fa-regular fa-trash-can"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="7" class="muted" style="text-align: center; padding: 2rem 0;">No R sessions created yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </section>
 

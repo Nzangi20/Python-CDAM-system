@@ -100,34 +100,15 @@
         
         <form method="post" action="{{ url_for('admin_update_enrollments', user_id=student.id) }}" style="width: 100%; border-top: 1px solid var(--border); padding-top: 0.75rem; margin-top: 0.5rem;" id="enrollmentToggleForm">
           <label style="font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.5rem; color: var(--text);">Manage Enrollments</label>
-          <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.75rem;">
-            <label style="font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.35rem; color: var(--text);">
-              <input type="checkbox" name="enroll_python" value="yes" {% if student.enrolled_python %}checked{% endif %} /> Python Track
-            </label>
-            <label style="font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.35rem; color: var(--text);">
-              <input type="checkbox" name="enroll_r" value="yes" {% if student.enrolled_r %}checked{% endif %} /> R Track
-            </label>
-          </div>
+          <select name="enroll_track" required style="width: 100%; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--text); margin-bottom: 0.75rem; font-size: 0.85rem;">
+            <option value="python" {% if student.enrolled_python and not student.enrolled_r %}selected{% endif %}>Python Track Only</option>
+            <option value="r" {% if student.enrolled_r and not student.enrolled_python %}selected{% endif %}>R Track Only</option>
+            <option value="both" {% if student.enrolled_python and student.enrolled_r %}selected{% endif %}>Both Python & R Tracks</option>
+          </select>
           <button class="btn primary" type="submit" style="width: 100%; padding: 0.5rem; font-size: 0.8rem; font-weight: 700;"><i class="fa-solid fa-save"></i> Save Tracks</button>
         </form>
       </div>
     </div>
-    
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const toggleForm = document.getElementById("enrollmentToggleForm");
-        if (toggleForm) {
-          toggleForm.addEventListener("submit", (e) => {
-            const py = toggleForm.querySelector('input[name="enroll_python"]').checked;
-            const r = toggleForm.querySelector('input[name="enroll_r"]').checked;
-            if (!py && !r) {
-              alert("The student must be enrolled in at least one track.");
-              e.preventDefault();
-            }
-          });
-        }
-      });
-    </script>
   </aside>
 
   <!-- Right Side: Analytics, Exam attempts & Activities -->
