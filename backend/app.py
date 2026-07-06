@@ -1,10 +1,17 @@
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent
+# Ensure the backend directory is on sys.path so sibling modules
+# (seed_data, utils, ai_service) can be found when Vercel runs
+# this file from the project root rather than from backend/.
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
 # Load .env file from project root if it exists
 load_dotenv(BASE_DIR.parent / ".env")
 
