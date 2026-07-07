@@ -4,7 +4,8 @@
   
   <!-- Controls HUD (hidden during print) -->
   <div style="margin-bottom: 2rem; display: flex; justify-content: center; gap: 1rem;" class="no-print">
-    <button class="btn primary" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Transcript</button>
+    <button class="btn primary" onclick="downloadPDF()"><i class="fa-solid fa-download"></i> Download Transcript</button>
+    <button class="btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Transcript</button>
     <a class="btn" href="{{ url_for('student_dashboard') }}"><i class="fa-solid fa-house"></i> Return to Dashboard</a>
   </div>
 
@@ -178,4 +179,18 @@
     }
   }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+  function downloadPDF() {
+    const element = document.querySelector('.transcript-canvas');
+    const opt = {
+      margin:       [0.5, 0.5, 0.5, 0.5],
+      filename:     'CDAM_Transcript_{{ (user.reg_number or user.name) | replace("/", "_") | replace(" ", "_") }}.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+  }
+</script>
 {% endblock %}
