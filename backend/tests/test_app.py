@@ -1238,6 +1238,36 @@ def test_admin_track_awareness(client):
         assert student.enrolled_r is True
 
 
+def test_transcript_active_track_display(client):
+    # 1. Register a student with Python track only
+    client.post(
+        "/register",
+        data={"name": "Python Student", "reg_number": "EB3/PY001/26", "password": "password123", "study_level": "Beginner", "enroll_python": "yes", "enroll_r": "no"},
+        follow_redirects=True,
+    )
+    
+    resp_py = client.get("/transcript")
+    assert resp_py.status_code == 200
+    assert b"Python for Data Science Masterclass" in resp_py.data
+    assert b"R for Data Science" not in resp_py.data
+
+    # Log out
+    client.get("/logout")
+
+    # 2. Register a student with R track only
+    client.post(
+        "/register",
+        data={"name": "R Student", "reg_number": "EB3/R0001/26", "password": "password123", "study_level": "Beginner", "enroll_python": "no", "enroll_r": "yes"},
+        follow_redirects=True,
+    )
+    
+    resp_r = client.get("/transcript")
+    assert resp_r.status_code == 200
+    assert b"R for Data Science (Statistical Computing" in resp_r.data
+    assert b"Python for Data Science Masterclass" not in resp_r.data
+
+
+
 
 
 

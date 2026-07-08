@@ -42,7 +42,13 @@
         </div>
         <div>
           <div><span class="muted" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Program of Study:</span></div>
-          <strong>Python for Data Science Masterclass</strong>
+          <strong>
+            {% if active_track == 'r' %}
+              R for Data Science (Statistical Computing & Data Analysis)
+            {% else %}
+              Python for Data Science Masterclass
+            {% endif %}
+          </strong>
         </div>
         <div>
           <div><span class="muted" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Academic Study Level:</span></div>
@@ -191,7 +197,7 @@
     const element = document.querySelector('.transcript-canvas');
     const opt = {
       margin:       [0.5, 0.5, 0.5, 0.5],
-      filename:     'CDAM_Transcript_{{ (user.reg_number or user.name) | replace("/", "_") | replace(" ", "_") }}.pdf',
+      filename:     'CDAM_{{ "R" if active_track == "r" else "Python" }}_Transcript_{{ (user.reg_number or user.name) | replace("/", "_") | replace(" ", "_") }}.pdf',
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true },
       jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }

@@ -1021,7 +1021,8 @@ def transcript():
         exams=exams,
         exam_attempts=exam_attempts,
         certificate_ready=ctx["certificate_ready"],
-        completed_at=utc_now()
+        completed_at=utc_now(),
+        active_track=get_active_track()
     )
 
 
