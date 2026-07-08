@@ -138,7 +138,13 @@
       <!-- Summary Statistics & Signature Footer -->
       <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 2rem; border-top: 1px solid var(--border); padding-top: 2rem;">
         <div style="text-align: left; font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.35rem;">
-          <div><strong>Course Completion Status:</strong> <span class="badge success">COMPLETED</span></div>
+          <div><strong>Course Completion Status:</strong> 
+            {% if certificate_ready %}
+              <span class="badge success">COMPLETED</span>
+            {% else %}
+              <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">IN PROGRESS</span>
+            {% endif %}
+          </div>
           <div><strong>Date of Issuance:</strong> {{ completed_at.strftime('%B %d, %Y') }}</div>
           <div><strong>Verification Hash:</strong> <code style="font-size: 0.75rem;">CU-CDAM-TR-{{ user.id }}-{{ completed_at.strftime('%Y%m%d') }}</code></div>
         </div>

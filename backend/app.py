@@ -994,11 +994,8 @@ def student_profile():
 @login_required
 @student_required
 def certificate():
-    ctx = dashboard_context(current_user.id)
-    if not ctx["certificate_ready"]:
-        flash("Complete all sessions to unlock your certificate.", "error")
-        return redirect(url_for("student_dashboard"))
-    return render_template("certificate.html", user=current_user, completed_at=utc_now())
+    flash("Certificates are currently not active. Please refer to your Academic Transcript.", "warning")
+    return redirect(url_for("student_dashboard"))
 
 
 @app.route("/transcript")
@@ -1006,10 +1003,6 @@ def certificate():
 @student_required
 def transcript():
     ctx = dashboard_context(current_user.id)
-    if not ctx["certificate_ready"]:
-        flash("Complete all sessions to unlock your academic transcript.", "error")
-        return redirect(url_for("student_dashboard"))
-        
     sessions = ctx["sessions"]
     progress_map = ctx["progress_map"]
     
@@ -1027,6 +1020,7 @@ def transcript():
         quiz_map=quiz_map,
         exams=exams,
         exam_attempts=exam_attempts,
+        certificate_ready=ctx["certificate_ready"],
         completed_at=utc_now()
     )
 

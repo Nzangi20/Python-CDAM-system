@@ -399,6 +399,7 @@ def test_dashboard_rendering(client):
     resp = client.get("/student/dashboard")
     assert resp.status_code == 200
     assert b"Welcome back" in resp.data
+    assert b"View Transcript" in resp.data
     assert b"View Certificate" not in resp.data
 
     # 2. Access dashboard with 100% progress
@@ -412,7 +413,8 @@ def test_dashboard_rendering(client):
         
     resp_complete = client.get("/student/dashboard")
     assert resp_complete.status_code == 200
-    assert b"View Certificate" in resp_complete.data
+    assert b"View Transcript" in resp_complete.data
+    assert b"View Certificate" not in resp_complete.data
 
 
 def test_admin_delete_student(client):
@@ -536,11 +538,13 @@ def test_transcript_and_trials_limit(client):
     # 1. Register and login
     register_and_login(client, reg_number="EB3/99999/26", password="mytestpassword", study_level="Beginner")
     
-    # 2. Check transcript requires 100% progress (which is currently 0%, so it should redirect)
+    # 2. Check transcript is accessible with 0% progress
     resp_tr = client.get("/transcript")
-    assert resp_tr.status_code == 302
+    assert resp_tr.status_code == 200
+    assert b"Official Academic Transcript" in resp_tr.data
+    assert b"IN PROGRESS" in resp_tr.data
     
-    # 3. Seed student progress to 100% to unlock transcript
+    # 3. Seed student progress to 100%
     with app.app_context():
         student = User.query.filter_by(reg_number="EB3/99999/26").first()
         student_id = student.id
@@ -557,6 +561,7 @@ def test_transcript_and_trials_limit(client):
     assert resp_tr_unlocked.status_code == 200
     assert b"Official Academic Transcript" in resp_tr_unlocked.data
     assert b"EB3/99999/26" in resp_tr_unlocked.data
+    assert b"COMPLETED" in resp_tr_unlocked.data
     
     # 4. Check trials limit logic (at most 3 attempts, blocked after passing)
     with app.app_context():
