@@ -6,3 +6,5 @@ Markdown==3.7
 pymysql==1.2.0
 python-dotenv==1.0.1
 requests>=2.28.0
+gunicorn==23.0.0
+
