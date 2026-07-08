@@ -59,6 +59,13 @@
       <a class="btn primary" href="{{ url_for('transcript') }}" style="background: var(--purple-brand); color: #ffffff; font-weight: 700; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.15); padding: 0.65rem 1.25rem; border-radius: 8px;">
         <i class="fa-solid fa-file-invoice"></i> View Transcript
       </a>
+    {% else %}
+      <a class="btn primary" href="{{ url_for('certificate') }}" style="background: rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.7); font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.65rem 1.25rem; border-radius: 8px;" onclick="alert('Complete all sessions (100% progress) to unlock your certificate.'); return false;">
+        <i class="fa-solid fa-lock" style="margin-right: 0.35rem; color: rgba(255, 255, 255, 0.7);"></i> Certificate (Locked)
+      </a>
+      <a class="btn primary" href="{{ url_for('transcript') }}" style="background: rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.7); font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.65rem 1.25rem; border-radius: 8px;" onclick="alert('Complete all sessions (100% progress) to unlock your transcript.'); return false;">
+        <i class="fa-solid fa-lock" style="margin-right: 0.35rem; color: rgba(255, 255, 255, 0.7);"></i> Transcript (Locked)
+      </a>
     {% endif %}
   </div>
 </div>
@@ -192,6 +199,45 @@
 
   <!-- Right Side Column -->
   <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <!-- Academic Records -->
+    <div class="card" style="border: 1px solid var(--border); border-radius: 12px; background: var(--lavender-brand);">
+      <h2 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 0.75rem; color: var(--purple-brand); display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-file-invoice"></i> Academic Records
+      </h2>
+      <p style="font-size: 0.9rem; margin-bottom: 1.25rem; line-height: 1.45; color: var(--text-muted);">
+        Your official Chuka University transcript and certificate will be generated automatically once you complete all learning sessions.
+      </p>
+      
+      <!-- Progress Bar -->
+      <div style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem; font-weight: 600;">
+          <span class="muted">Requirements Met:</span>
+          <span style="color: var(--purple-brand); font-weight: 800;">{{ progress_pct }}%</span>
+        </div>
+        <div class="mini-progress" style="height: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; overflow: hidden; margin: 0; border: none;">
+          <span style="display: block; height: 100%; width: {{ progress_pct }}%; background: linear-gradient(90deg, var(--red-500) 0%, var(--purple-brand) 100%);"></span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        {% if progress_pct == 100 %}
+          <a class="btn primary" href="{{ url_for('transcript') }}" style="background: var(--purple-brand); border: none; text-align: center; font-weight: 700; width: 100%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(86, 0, 126, 0.2); color: #ffffff;">
+            <i class="fa-solid fa-download"></i> Download Transcript
+          </a>
+          <a class="btn" href="{{ url_for('certificate') }}" style="border: 1px solid var(--border); text-align: center; font-weight: 700; width: 100%; display: flex; justify-content: center; align-items: center; color: var(--text); background: var(--bg-soft);">
+            <i class="fa-solid fa-award"></i> View Certificate
+          </a>
+        {% else %}
+          <button class="btn" style="width: 100%; cursor: not-allowed; opacity: 0.7; font-weight: 700; border: 1px dashed var(--border); display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--bg-soft); color: var(--text-muted);" onclick="alert('Complete all sessions (100% progress) to unlock your transcript.');">
+            <i class="fa-solid fa-lock" style="color: var(--red-500);"></i> Transcript Locked
+          </button>
+          <button class="btn" style="width: 100%; cursor: not-allowed; opacity: 0.7; font-weight: 700; border: 1px dashed var(--border); display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--bg-soft); color: var(--text-muted);" onclick="alert('Complete all sessions (100% progress) to unlock your certificate.');">
+            <i class="fa-solid fa-lock" style="color: var(--red-500);"></i> Certificate Locked
+          </button>
+        {% endif %}
+      </div>
+    </div>
+
     <!-- Recent Notifications -->
     <div class="card">
       <h2 style="font-weight: 800; font-size: 1.25rem; margin-bottom: 1rem;"><i class="fa-regular fa-bell" style="color: var(--red-500);"></i> Notifications</h2>

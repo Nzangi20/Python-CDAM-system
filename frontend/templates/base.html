@@ -137,6 +137,7 @@
         {% if current_user.is_authenticated %}
           {% if not current_user.is_admin %}
             <a href="{{ url_for('dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+            <a href="{{ url_for('transcript') }}"><i class="fa-solid fa-file-invoice"></i> Transcript</a>
           {% endif %}
           {% if current_user.is_admin %}
             <a href="{{ url_for('admin_panel') }}"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
