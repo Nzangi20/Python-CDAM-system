@@ -516,10 +516,20 @@ def seed_sessions() -> None:
         
         if is_new or force_update:
             session_obj.title = item["title"]
-            session_obj.description = item["description"]
-            session_obj.content = item.get("content", "")
-            session_obj.objectives = item["objectives"]
-            session_obj.expected_outcomes = item.get("expected_outcomes", "")
+            if is_new:
+                session_obj.description = item["description"]
+                session_obj.content = item.get("content", "")
+                session_obj.objectives = item["objectives"]
+                session_obj.expected_outcomes = item.get("expected_outcomes", "")
+            else:
+                if not session_obj.description:
+                    session_obj.description = item["description"]
+                if not session_obj.content:
+                    session_obj.content = item.get("content", "")
+                if not session_obj.objectives:
+                    session_obj.objectives = item["objectives"]
+                if not session_obj.expected_outcomes:
+                    session_obj.expected_outcomes = item.get("expected_outcomes", "")
             session_obj.learning_notes = item.get("learning_notes", "")
             session_obj.instructions = item.get("instructions", "")
             session_obj.code_examples = item["code_examples"]
@@ -545,10 +555,20 @@ def seed_sessions() -> None:
             
         if is_new or force_update:
             session_obj.title = item["title"]
-            session_obj.description = item["description"]
-            session_obj.content = item.get("content", "")
-            session_obj.objectives = item["objectives"]
-            session_obj.expected_outcomes = item.get("expected_outcomes", "")
+            if is_new:
+                session_obj.description = item["description"]
+                session_obj.content = item.get("content", "")
+                session_obj.objectives = item["objectives"]
+                session_obj.expected_outcomes = item.get("expected_outcomes", "")
+            else:
+                if not session_obj.description:
+                    session_obj.description = item["description"]
+                if not session_obj.content:
+                    session_obj.content = item.get("content", "")
+                if not session_obj.objectives:
+                    session_obj.objectives = item["objectives"]
+                if not session_obj.expected_outcomes:
+                    session_obj.expected_outcomes = item.get("expected_outcomes", "")
             session_obj.learning_notes = item.get("learning_notes", "")
             session_obj.instructions = item.get("instructions", "")
             session_obj.code_examples = item["code_examples"]
@@ -687,10 +707,10 @@ def dashboard_context(user_id: int):
     
     user = db.session.get(User, user_id)
     study_level = getattr(user, "study_level", "Beginner")
-    if study_level == "Beginner":
-        total_sessions = 10
+    if active_track == "r":
+        total_sessions = 9 if study_level == "Beginner" else 16
     else:
-        total_sessions = 18
+        total_sessions = 10 if study_level == "Beginner" else 18
 
     sessions = sessions[:total_sessions]
 
@@ -733,7 +753,31 @@ def dashboard_context(user_id: int):
         result = next((q for q in quiz_scores if q.session_id == session.id), None)
         chart_values.append(result.score if result else 0)
 
-    certificate_ready = completed_count == total_sessions and total_sessions > 0
+    # Calculate Python eligibility
+    python_ready = True
+    if user.enrolled_python:
+        python_sessions_needed = 10 if study_level == "Beginner" else 18
+        python_sessions = Session.query.filter_by(published=True, course_type="python").order_by(Session.display_order).all()
+        python_sessions = python_sessions[:python_sessions_needed]
+        python_completed = [s for s in python_sessions if progress_map.get(s.id) and progress_map[s.id].completed]
+        python_ready = len(python_completed) >= len(python_sessions) and len(python_sessions) > 0
+        
+    # Calculate R eligibility
+    r_ready = True
+    if user.enrolled_r:
+        r_sessions_needed = 9 if study_level == "Beginner" else 16
+        r_sessions = Session.query.filter_by(published=True, course_type="r").order_by(Session.display_order).all()
+        r_sessions = r_sessions[:r_sessions_needed]
+        r_completed = [s for s in r_sessions if progress_map.get(s.id) and progress_map[s.id].completed]
+        r_ready = len(r_completed) >= len(r_sessions) and len(r_sessions) > 0
+
+    if user.enrolled_python and user.enrolled_r:
+        certificate_ready = python_ready and r_ready
+    elif user.enrolled_r:
+        certificate_ready = r_ready
+    else:
+        certificate_ready = python_ready
+
     notifications = Notification.query.filter(
         db.or_(Notification.user_id.is_(None), Notification.user_id == user_id)
     ).order_by(Notification.created_at.desc()).limit(5).all()
@@ -1413,8 +1457,9 @@ def view_notes(session_id: int):
 
 
 @app.route("/api/run-code", methods=["POST"])
-@login_required
 def run_code():
+    if not current_user.is_authenticated:
+        return jsonify({"output": "", "error": "Authentication required. Please login again."}), 401
     import subprocess
     import sys
     import os
@@ -1424,7 +1469,8 @@ def run_code():
         return jsonify({"output": "", "error": "No code provided."})
     
     # Establish user-specific sandbox workspace directory
-    workspace_dir = os.path.join(app.root_path, "sandbox_workspace", f"user_{current_user.id}")
+    import tempfile
+    workspace_dir = os.path.join(tempfile.gettempdir(), "sandbox_workspace", f"user_{current_user.id}")
     os.makedirs(workspace_dir, exist_ok=True)
     
     # Dynamically restore missing sandbox files from database
@@ -1556,7 +1602,8 @@ def sandbox_upload():
     if not filename:
         return jsonify({"error": "Invalid filename."}), 400
         
-    workspace_dir = os.path.join(app.root_path, "sandbox_workspace", f"user_{current_user.id}")
+    import tempfile
+    workspace_dir = os.path.join(tempfile.gettempdir(), "sandbox_workspace", f"user_{current_user.id}")
     os.makedirs(workspace_dir, exist_ok=True)
     
     # Save to disk first
@@ -1593,7 +1640,8 @@ def sandbox_upload():
 @login_required
 def sandbox_list_files():
     import os
-    workspace_dir = os.path.join(app.root_path, "sandbox_workspace", f"user_{current_user.id}")
+    import tempfile
+    workspace_dir = os.path.join(tempfile.gettempdir(), "sandbox_workspace", f"user_{current_user.id}")
     os.makedirs(workspace_dir, exist_ok=True)
     
     try:
@@ -1663,7 +1711,8 @@ def sandbox_delete_file(filename):
         return jsonify({"error": f"Failed to delete record: {str(e)}"}), 500
         
     # Delete from local disk
-    workspace_dir = os.path.join(app.root_path, "sandbox_workspace", f"user_{current_user.id}")
+    import tempfile
+    workspace_dir = os.path.join(tempfile.gettempdir(), "sandbox_workspace", f"user_{current_user.id}")
     file_path = os.path.join(workspace_dir, filename)
     if os.path.exists(file_path) and os.path.isfile(file_path):
         try:

@@ -23,7 +23,8 @@
 
     <p class="ts-motto">Knowledge is Wealth (<em>Sapientia divitia est</em>) Akili ni Mali)</p>
     <div class="ts-dept">Center for Data Science and Analytics</div>
-    <div class="ts-doctitle">TRANSCRIPT</div>
+    <div class="ts-doctitle">OFFICIAL ACADEMIC TRANSCRIPT</div>
+    <!-- Official Academic Transcript -->
 
     <!-- Candidate Fields -->
     <div class="ts-field-row">
@@ -37,10 +38,16 @@
     <div class="ts-field-row">
       <span class="ts-field-label">Short Course Name:</span>
       <span class="ts-field-value">
-        {% if active_track == 'r' %}
-          R for Data Science (Statistical Computing &amp; Data Analysis)
+        {% if user.enrolled_python and user.enrolled_r %}
+          Master Python and R for Data Science
+          <!-- Python for Data Science Masterclass -->
+          <!-- R for Data Science (Statistical Computing & Data Analysis) -->
+        {% elif user.enrolled_r %}
+          Master R for Data Science
+          <!-- R for Data Science (Statistical Computing & Data Analysis) -->
         {% else %}
-          Python for Data Science Masterclass
+          Master Python for Data Science
+          <!-- Python for Data Science Masterclass -->
         {% endif %}
       </span>
     </div>
@@ -56,27 +63,72 @@
       </thead>
       <tbody>
         {% set counter = namespace(n=0) %}
-        {% for exam in exams if exam.course_type == active_track %}
-          {% set counter.n = counter.n + 1 %}
-          {# Find matching attempt records for this exam #}
-          {% set attempts_list = [] %}
-          {% for att in exam_attempts if att.exam_id == exam.id %}
-            {% set _ = attempts_list.append(att) %}
+        {% if user.enrolled_python and user.enrolled_r %}
+          {# Show python first #}
+          {% for exam in exams if exam.course_type == 'python' %}
+            {% set counter.n = counter.n + 1 %}
+            {# Find matching attempt records for this exam #}
+            {% set attempts_list = [] %}
+            {% for att in exam_attempts if att.exam_id == exam.id %}
+              {% set _ = attempts_list.append(att) %}
+            {% endfor %}
+            <tr>
+              <td class="ts-col-no">{{ counter.n }}</td>
+              <td>{{ exam.title }}</td>
+              <td class="ts-col-score">
+                {% if attempts_list %}
+                  {% set best_attempt = attempts_list | sort(attribute='score', reverse=True) | first %}
+                  {{ best_attempt.score }}%
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+            </tr>
           {% endfor %}
-
-          <tr>
-            <td class="ts-col-no">{{ counter.n }}</td>
-            <td>{{ exam.title }}</td>
-            <td class="ts-col-score">
-              {% if attempts_list %}
-                {% set best_attempt = attempts_list | sort(attribute='score', reverse=True) | first %}
-                {{ best_attempt.score }}%
-              {% else %}
-                —
-              {% endif %}
-            </td>
-          </tr>
-        {% endfor %}
+          {# Show R later #}
+          {% for exam in exams if exam.course_type == 'r' %}
+            {% set counter.n = counter.n + 1 %}
+            {# Find matching attempt records for this exam #}
+            {% set attempts_list = [] %}
+            {% for att in exam_attempts if att.exam_id == exam.id %}
+              {% set _ = attempts_list.append(att) %}
+            {% endfor %}
+            <tr>
+              <td class="ts-col-no">{{ counter.n }}</td>
+              <td>{{ exam.title }}</td>
+              <td class="ts-col-score">
+                {% if attempts_list %}
+                  {% set best_attempt = attempts_list | sort(attribute='score', reverse=True) | first %}
+                  {{ best_attempt.score }}%
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          {# Show only active track #}
+          {% for exam in exams if exam.course_type == active_track %}
+            {% set counter.n = counter.n + 1 %}
+            {# Find matching attempt records for this exam #}
+            {% set attempts_list = [] %}
+            {% for att in exam_attempts if att.exam_id == exam.id %}
+              {% set _ = attempts_list.append(att) %}
+            {% endfor %}
+            <tr>
+              <td class="ts-col-no">{{ counter.n }}</td>
+              <td>{{ exam.title }}</td>
+              <td class="ts-col-score">
+                {% if attempts_list %}
+                  {% set best_attempt = attempts_list | sort(attribute='score', reverse=True) | first %}
+                  {{ best_attempt.score }}%
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        {% endif %}
       </tbody>
     </table>
 
@@ -84,7 +136,7 @@
     <div class="ts-result-row">
       <span class="ts-field-label">Overall Result:</span>
       <span class="ts-field-value" style="max-width:160px; flex:none;">
-        {% if certificate_ready %}PASS{% else %}IN PROGRESS{% endif %}
+        {% if certificate_ready %}PASS (COMPLETED){% else %}IN PROGRESS{% endif %}
       </span>
     </div>
 
