@@ -1312,19 +1312,6 @@ def download_notes(session_id: int):
     return send_from_directory(UPLOADS_DIR, filename, as_attachment=False)
 
 
-@app.route("/dataset/<path:filename>/download")
-@login_required
-def download_dataset(filename):
-    from flask import send_from_directory
-    import os
-    datasets_dir = BASE_DIR.parent / "Python materials"
-    filename = os.path.basename(filename)
-    if not os.path.exists(datasets_dir / filename):
-        flash("Dataset file not found.", "error")
-        return redirect(request.referrer or url_for("student_dashboard"))
-    return send_from_directory(datasets_dir, filename, as_attachment=True)
-
-
 @app.route("/session/<int:session_id>/view")
 @login_required
 def view_notes(session_id: int):
