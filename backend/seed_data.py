@@ -34,11 +34,7 @@ gpa = 3.8
 print(f"Student: {name}, Age: {age}, GPA: {gpa}")
 print(type(name), type(age), type(gpa))""",
         "resources": "- [Python Official Tutorial](https://docs.python.org/3/tutorial/)\\n- [Jupyter Notebook Docs](https://jupyter-notebook.readthedocs.io/)",
-        "quiz": [
-            {"question": "Which of the following is a float in Python?", "options": ["3.14", "3", "'3.14'", "True"], "correct": 0},
-            {"question": "How do you start a single-line comment in Python?", "options": ["#", "//", "/*", "<!--"], "correct": 0},
-            {"question": "What is the result of type(True)?", "options": ["bool", "str", "int", "float"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 2: Data Importation, Cleaning, and Exploratory Data Analysis",
@@ -70,11 +66,7 @@ df_clean = df.dropna()
 print("\\nCleaned:")
 print(df_clean)""",
         "resources": "- [Pandas IO Docs](https://pandas.pydata.org/docs/user_guide/io.html)",
-        "quiz": [
-            {"question": "Which pandas function drops rows with missing values?", "options": ["dropna()", "fillna()", "drop()", "remove_nulls()"], "correct": 0},
-            {"question": "What does EDA stand for?", "options": ["Exploratory Data Analysis", "Efficient Data Aggregation", "Estimated Domain Association", "Error Detection Assessment"], "correct": 0},
-            {"question": "Which parameter in pandas is used to load custom missing value markers?", "options": ["na_values", "null_marker", "empty_vals", "fill_na"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 3: Data Manipulation in Python",
@@ -102,11 +94,7 @@ print(east_only)
 print("\\nGrouped Revenue:")
 print(df.groupby('Region').sum())""",
         "resources": "- [Pandas Indexing Tutorial](https://pandas.pydata.org/docs/user_guide/indexing.html)",
-        "quiz": [
-            {"question": "Which statement extracts column 'Revenue'?", "options": ["df['Revenue']", "df.get_row('Revenue')", "df.select('Revenue')", "df.loc_col('Revenue')"], "correct": 0},
-            {"question": "How do you compute grouping metrics on categories in pandas?", "options": ["groupby()", "pivot()", "aggregate()", "join()"], "correct": 0},
-            {"question": "How do you combine multiple filters in pandas?", "options": ["Using & and | operators", "Using and / or keywords", "Using join", "Nesting functions"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 4: Data Visualization with Matplotlib and Seaborn Libraries",
@@ -136,11 +124,7 @@ plt.xlabel("Hours Studied")
 plt.ylabel("Score")
 print("Chart ready for rendering!")""",
         "resources": "- [Matplotlib Gallery](https://matplotlib.org/stable/gallery/index.html)\\n- [Seaborn Tutorial](https://seaborn.pydata.org/tutorial.html)",
-        "quiz": [
-            {"question": "Which alias is commonly used for matplotlib.pyplot?", "options": ["plt", "mpl", "plot", "pyplot"], "correct": 0},
-            {"question": "Which plot is ideal for showing continuous variables' correlations?", "options": ["Scatter plot", "Bar chart", "Pie chart", "Histogram"], "correct": 0},
-            {"question": "How do you add a title to a matplotlib plot?", "options": ["plt.title('My Title')", "plt.set_title('My Title')", "plt.header('My Title')", "plt.label('My Title')"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 5: Hypothesis Testing",
@@ -167,11 +151,7 @@ t_stat, p_val = stats.ttest_1samp(scores, popmean=80)
 print(f"T-statistic: {t_stat:.4f}")
 print(f"P-value: {p_val:.4f}")""",
         "resources": "- [SciPy Stats Tutorial](https://docs.scipy.org/doc/scipy/tutorial/stats.html)",
-        "quiz": [
-            {"question": "If p-value is 0.02 and alpha is 0.05, what do you do?", "options": ["Reject the null hypothesis", "Fail to reject the null hypothesis", "Increase alpha value", "Discard the dataset"], "correct": 0},
-            {"question": "What test compares the means of two independent groups?", "options": ["Two-sample independent t-test", "One-sample t-test", "Chi-square test", "ANOVA"], "correct": 0},
-            {"question": "What does a t-test measure?", "options": ["Difference between group means relative to variance", "Standard deviation of one group", "Correlation coefficient", "Outlier count"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 6: Correlation and Regression Analysis",
@@ -202,11 +182,7 @@ slope, intercept, r, p_val, std_err = stats.linregress(hours, scores)
 print(f"Correlation Coefficient: {corr:.4f}")
 print(f"Regression Line: y = {slope:.2f}x + {intercept:.2f}")""",
         "resources": "- [SciPy linregress Docs](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.linregress.html)",
-        "quiz": [
-            {"question": "What does a correlation coefficient of -0.9 indicate?", "options": ["Strong negative correlation", "Strong positive correlation", "Weak negative correlation", "No correlation"], "correct": 0},
-            {"question": "In y = mx + c, what does m represent?", "options": ["Slope", "Y-intercept", "Residual value", "Mean of x"], "correct": 0},
-            {"question": "What is the range of Pearson's correlation coefficient?", "options": ["-1 to 1", "0 to 1", "-inf to inf", "0 to 100"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 7: Analysis of Variance (ANOVA) and Non-Parametric Tests",
@@ -234,11 +210,7 @@ f_stat, p_val = stats.f_oneway(method_A, method_B, method_C)
 print(f"F-statistic: {f_stat:.4f}")
 print(f"P-value: {p_val:.4f}")""",
         "resources": "- [ANOVA on Wikipedia](https://en.wikipedia.org/wiki/Analysis_of_variance)",
-        "quiz": [
-            {"question": "What null hypothesis does One-Way ANOVA test?", "options": ["All group means are equal", "At least one group mean is different", "Group variances are unequal", "The data is normally distributed"], "correct": 0},
-            {"question": "Which test is a non-parametric alternative to ANOVA?", "options": ["Kruskal-Wallis test", "Independent t-test", "Chi-square test", "Paired t-test"], "correct": 0},
-            {"question": "What is verified by checking ANOVA assumptions?", "options": ["Normality and Homoscedasticity", "Linearity and independence only", "Multicollinearity", "Accuracy score"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 8: Time Series Analysis",
@@ -268,11 +240,7 @@ print(ts)
 print("\\n2-Day Rolling Mean:")
 print(ts.rolling(window=2).mean())""",
         "resources": "- [Pandas Time Series Guide](https://pandas.pydata.org/docs/user_guide/timeseries.html)",
-        "quiz": [
-            {"question": "How do you parse string date formats in pandas?", "options": ["pd.to_datetime()", "pd.as_time()", "df.format_dates()", "df.parse_time()"], "correct": 0},
-            {"question": "What does df.rolling(window=7).mean() compute?", "options": ["7-period moving average", "Mean of every 7th row", "Total sum of 7 columns", "Cumulative sum"], "correct": 0},
-            {"question": "Which pandas function rescales time frequencies?", "options": ["resample()", "groupby()", "reindex()", "shift()"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 9: Data Visualization with PyGWalker in Python",
@@ -302,11 +270,7 @@ Recommendation: Advance to Machine Learning module.
 '''
 print(report)""",
         "resources": "- [Jupyter Markdown Guide](https://www.markdownguide.org/tools/jupyter-notebook/)",
-        "quiz": [
-            {"question": "Which markdown tag creates a main header in a Jupyter cell?", "options": ["# Header", "## Header", "**Header**", "<h1>Header"], "correct": 0},
-            {"question": "What tool exports Jupyter Notebooks to HTML/PDF?", "options": ["nbconvert", "pdfmaker", "jupconvert", "exporter"], "correct": 0},
-            {"question": "How can you run all cells in Jupyter at once?", "options": ["Cell -> Run All", "Ctrl + Enter", "Alt + Shift", "Run File"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 10: Capstone Project in Python",
@@ -333,11 +297,7 @@ summary = df.groupby('Level')['Score'].mean()
 print("CDAM Capstone Executive Summary:")
 print(summary)""",
         "resources": "- [CDAM Graduation Portal](https://cdam.chuka.ac.ke/grad/)",
-        "quiz": [
-            {"question": "What is the first step of a standard data pipeline?", "options": ["Data ingestion / import", "Statistical modeling", "Data visualization", "Model deployment"], "correct": 0},
-            {"question": "What does groupby aggregate functions return?", "options": ["Summary metrics matching categories", "Raw lists of strings", "The original un-aggregated rows", "JSON templates"], "correct": 0},
-            {"question": "Why is keeping a code log important?", "options": ["For reproducibility of results", "To speed up server responses", "To save memory space", "It is not important"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 11: Python Essentials",
@@ -363,11 +323,7 @@ df = pd.DataFrame(data)
 pivot = df.pivot_table(values='Expense', index='Year', columns='Dept', aggfunc='sum')
 print(pivot)""",
         "resources": "- [Pandas Reshaping Documentation](https://pandas.pydata.org/docs/user_guide/reshaping.html)",
-        "quiz": [
-            {"question": "Which pandas function performs database-style joins?", "options": ["pd.merge()", "pd.concat()", "pd.join_only()", "pd.pivot()"], "correct": 0},
-            {"question": "What is the opposite of pivoting wide data (melting)?", "options": ["Melting wide to long", "Reshaping index", "Joining categories", "Grouping"], "correct": 0},
-            {"question": "How do you stack a DataFrame column index?", "options": ["df.stack()", "df.unstack()", "df.pivot()", "df.groupby()"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 12: Numerical and Tabular Computing with NumPy and Pandas",
@@ -396,11 +352,7 @@ print("Squared Evens:", squared_evens)
 comp = [x**2 for x in numbers if x % 2 == 0]
 print("Comprehension matches:", comp == squared_evens)""",
         "resources": "- [Python Functional Programming HowTo](https://docs.python.org/3/howto/functional.html)",
-        "quiz": [
-            {"question": "What keyword defines anonymous inline functions?", "options": ["lambda", "anonymous", "def", "inline"], "correct": 0},
-            {"question": "Which structure replaces map and filter cleanly?", "options": ["List comprehension", "While loop", "Try-Except block", "Class definition"], "correct": 0},
-            {"question": "Is list comprehension generally faster than manual for loops?", "options": ["Yes, it is optimized in C", "No, it is identical", "No, it is slower", "Only on Windows"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 13: Advanced Data Visualization in Python",
@@ -431,11 +383,7 @@ print("Correlation Matrix:")
 print(corr)
 print("\\nHeatmap generated successfully.")""",
         "resources": "- [Seaborn Heatmap Docs](https://seaborn.pydata.org/generated/seaborn.heatmap.html)",
-        "quiz": [
-            {"question": "How do you create a 2x2 subplot grid in matplotlib?", "options": ["plt.subplots(2, 2)", "plt.grid(2, 2)", "plt.panels(2, 2)", "plt.axes_grid(2, 2)"], "correct": 0},
-            {"question": "Which seaborn function plots correlation grids?", "options": ["heatmap()", "barplot()", "boxplot()", "scatterplot()"], "correct": 0},
-            {"question": "How do you save a matplotlib chart to a high-res image file?", "options": ["plt.savefig('name.png', dpi=300)", "plt.write('name.png')", "plt.export('name.png')", "plt.save('name.png')"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 14: Machine Learning Fundamentals with Scikit-Learn",
@@ -464,11 +412,7 @@ X = sm.add_constant(df['StudyHours'])
 model = sm.OLS(df['ExamScore'], X).fit()
 print(model.summary().tables[1])""",
         "resources": "- [Statsmodels OLS Guide](https://www.statsmodels.org/stable/regression.html)",
-        "quiz": [
-            {"question": "What does a high R-squared indicate?", "options": ["Model explains a large portion of variance", "Model is statistically insignificant", "Residuals are not normal", "Perfect accuracy"], "correct": 0},
-            {"question": "Why do we add a constant column in statsmodels regression?", "options": ["To calculate the y-intercept", "To normalize the data", "To avoid division by zero", "It is optional"], "correct": 0},
-            {"question": "Which metric evaluates overall model significance?", "options": ["F-statistic p-value", "R-squared value", "Intercept coefficient", "Standard error"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 15: Supervised Learning – Classification",
@@ -497,11 +441,7 @@ model = LogisticRegression().fit(X, y)
 print("Coefficients:", model.coef_)
 print("Predict on study hours [6]:", model.predict([[6.0]]))""",
         "resources": "- [Scikit-Learn Supervised Learning Guide](https://scikit-learn.org/stable/supervised_learning.html)",
-        "quiz": [
-            {"question": "Which of these is a classification task?", "options": ["Predicting if an email is spam", "Predicting next month's sales", "Clustering users by behavior", "Sorting records"], "correct": 0},
-            {"question": "What is the target parameter in supervised learning?", "options": ["Labeled training answers", "Unlabeled categories", "Number of columns", "File paths"], "correct": 0},
-            {"question": "Which scikit-learn class trains logistic models?", "options": ["LogisticRegression", "LinearRegression", "KMeans", "DecisionTreeRegressor"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 16: Supervised Learning – Regression",
@@ -530,11 +470,7 @@ print("Cluster centers:")
 print(kmeans.cluster_centers_)
 print("Labels:", kmeans.labels_)""",
         "resources": "- [Scikit-Learn Clustering Docs](https://scikit-learn.org/stable/modules/clustering.html)",
-        "quiz": [
-            {"question": "What is unsupervised learning?", "options": ["Training models on unlabeled data", "Training models with supervised labels", "Running Python without a compiler", "None of the above"], "correct": 0},
-            {"question": "Which parameter determines group counts in K-Means?", "options": ["n_clusters", "max_iter", "n_init", "random_state"], "correct": 0},
-            {"question": "What does PCA stand for?", "options": ["Principal Component Analysis", "Predictive Categorical Association", "Pearson Correlation Analysis", "Polynomial Component Alignment"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 17: Unsupervised Learning – K-Means and PCA",
@@ -560,11 +496,7 @@ parsed = json.loads(json_response)
 print("API Response Status:", parsed['status'])
 print("Coach Name:", parsed['data']['users'][0]['name'])""",
         "resources": "- [Python Requests Documentation](https://requests.readthedocs.io/)",
-        "quiz": [
-            {"question": "Which python library is standard for HTTP requests?", "options": ["requests", "json", "urllib_only", "socket"], "correct": 0},
-            {"question": "What data format resembles Python dictionaries?", "options": ["JSON", "CSV", "XML", "YAML"], "correct": 0},
-            {"question": "Which method parses a JSON string into a Python dict?", "options": ["json.loads()", "json.dumps()", "json.parse()", "json.dict()"], "correct": 0}
-        ]
+        "quiz": []
     },
     {
         "title": "Session 18: Capstone Project in Python",
@@ -590,332 +522,393 @@ for pkg, ver in dependencies.items():
     print(f" - {pkg}=={ver}")
     print("Lockfile generated successfully.")""",
         "resources": "- [Pip Virtual Environments](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)",
-        "quiz": [
-            {"question": "Which file specifies project packages and versions?", "options": ["requirements.txt", "packages.json", "environment.html", "setup.py only"], "correct": 0},
-            {"question": "Why do we set random seeds in machine learning models?", "options": ["To ensure identical results on every run", "To speed up model training times", "To optimize model performance", "To clean raw string inputs"], "correct": 0},
-            {"question": "How do you install requirements in a new environment?", "options": ["pip install -r requirements.txt", "pip install requirements", "python run requirements", "git pull requirements"], "correct": 0}
-        ]
+        "quiz": []
     }
 ]
 
-R_SESSIONS = [
-    {
-        "title": "Session 1: Introduction to R for Data Science",
-        "slug": "r-session-1-intro-to-r",
-        "description": "Learn the fundamentals of R programming, RStudio IDE, and the core concepts of data science.",
-        "duration": "45 min",
-        "difficulty": "Beginner",
-        "objectives": """- Set up R and understand the RStudio workspace layout
-- Understand variables, vectors, and basic numeric, character, and logical data types
-- Execute print statements and run simple calculations in R console""",
-        "expected_outcomes": """- Declare variables in R using the assignment operator (<-).
-- Identify vector classes (numeric, character, logical).
-- Run basic math operations on vectors.""",
-        "learning_notes": """### R & RStudio Overview
-R is a programming language specifically built for statistical computing and graphics. RStudio is the standard IDE for R.
-
-### Assignment Operator
-In R, we typically use `<-` instead of `=` for assignment:
-`x <- 10`
-
-### Core Data Types
-- `numeric`: Decimals or integers (e.g., 3.14, 42)
-- `character`: Text strings wrapped in quotes
-- `logical`: TRUE or FALSE values (can be abbreviated as T or F)""",
-        "instructions": "Run the code editor cell to calculate variable values and print their class.",
-        "content": "Get comfortable writing basic R syntax, assigning variables, and checking their types.",
-        "code_examples": """# Declare variables in R
-name <- "CDAM Student"
-age <- 20
-gpa <- 3.8
-print(paste("Student:", name, "Age:", age, "GPA:", gpa))
-print(class(name))
-print(class(age))""",
-        "resources": "- [R Manuals](https://cran.r-project.org/manuals.html)\n- [RStudio Desktop](https://posit.co/download/rstudio-desktop/)",
-        "quiz": [
-            {"question": "What is the standard assignment operator in R?", "options": ["<-", "=", "==", "assign"], "correct": 0},
-            {"question": "How do you start a single-line comment in R?", "options": ["#", "//", "/*", "<!--"], "correct": 0},
-            {"question": "Which function is used to check the data type of an object in R?", "options": ["class()", "type()", "typeof()", "datatype()"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 2: Data Import, Cleaning and EDA",
-        "slug": "r-session-2-data-import-eda",
-        "description": "Master data importation, cleaning techniques, and exploratory data analysis to prepare datasets for analysis.",
-        "duration": "50 min",
-        "difficulty": "Beginner",
-        "objectives": """- Read CSV files using base R read.csv
-- Identify missing values (NA) in data frames
-- Clean missing values using na.omit and basic imputation""",
-        "expected_outcomes": """- Load a CSV file into an R data.frame.
-- Detect missing entries with is.na().
-- Filter out rows containing missing values.""",
-        "learning_notes": """### Exploratory Data Analysis in R
-We begin by inspecting data structures using `str()` and calculating summary stats using `summary()`.
-
-### Missing Data (NA)
-In R, missing values are represented by `NA`. We use `is.na(x)` to find them, and `na.omit()` to drop rows containing any NAs.""",
-        "instructions": "Execute the R code to see how rows containing NA values are filtered from a data frame.",
-        "content": "Clean datasets using R's built-in functions before starting analysis.",
-        "code_examples": """# Create a sample data frame with NA values
-df <- data.frame(
-  Name = c("Alice", "Bob", "Carol", NA),
-  Age = c(25, NA, 30, 22)
-)
-print("Original Data Frame:")
-print(df)
-df_clean <- na.omit(df)
-print("Cleaned Data Frame:")
-print(df_clean)""",
-        "resources": "- [R Data Import/Export Guide](https://cran.r-project.org/doc/manuals/r-release/R-data.html)",
-        "quiz": [
-            {"question": "What value represents missing data in R?", "options": ["NA", "Null", "None", "NaN"], "correct": 0},
-            {"question": "Which function drops rows with missing values in R?", "options": ["na.omit()", "is.na()", "drop_na()", "remove.na()"], "correct": 0},
-            {"question": "Which function gives a quick summary statistics of a data frame?", "options": ["summary()", "str()", "head()", "describe()"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 3: Data Manipulation with dplyr",
-        "slug": "r-session-3-dplyr-manipulation",
-        "description": "Learn powerful data manipulation techniques using dplyr to transform and organize your data efficiently.",
-        "duration": "60 min",
-        "difficulty": "Beginner",
-        "objectives": """- Understand tidyverse and the pipe operator (%>% or |>)
-- Use dplyr verbs: filter, select, mutate, and arrange
-- Perform group summaries using group_by and summarize""",
-        "expected_outcomes": """- Slice and subset data frames using dplyr verbs.
-- Compute average scores for categories.
-- Chain multiple operations using pipe syntax.""",
-        "learning_notes": """### dplyr Manipulation
-The `dplyr` package is the core tool of the Tidyverse for data manipulation:
-- `filter()`: Keep rows matching criteria.
-- `select()`: Pick columns by name.
-- `mutate()`: Create or transform columns.
-- `summarize()`: Aggregate values.
-
-### Pipe Operator
-The pipe operator `%>%` passes the result of one function as the first argument of the next.""",
-        "instructions": "Run the dplyr script to filter sales data and aggregate revenue statistics.",
-        "content": "Master dplyr to write readable, elegant data pipelines in R.",
-        "code_examples": """library(dplyr)
-# Create sales data
-df <- data.frame(
-  Region = c("East", "West", "East", "West"),
-  Revenue = c(100, 150, 200, 300)
-)
-# Filter and summarize
-east_only <- df %>% filter(Region == "East")
-print("East Region only:")
-print(east_only)
-grouped <- df %>% group_by(Region) %>% summarize(Total = sum(Revenue))
-print("Grouped Revenue:")
-print(grouped)""",
-        "resources": "- [dplyr Cheatsheet](https://github.com/rstudio/cheatsheets/blob/main/data-transformation.pdf)",
-        "quiz": [
-            {"question": "Which dplyr verb is used to subset rows?", "options": ["filter()", "select()", "mutate()", "slice()"], "correct": 0},
-            {"question": "Which operator is the classical Tidyverse pipe?", "options": ["%>%", "%>%", "|>", "->"], "correct": 0},
-            {"question": "How do you add new columns in dplyr?", "options": ["mutate()", "add()", "select()", "transform()"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 4: Data Visualization with ggplot2",
-        "slug": "r-session-4-ggplot2-visualization",
-        "description": "Create professional, publication-quality graphics using ggplot2 and the Grammar of Graphics.",
-        "duration": "60 min",
-        "difficulty": "Beginner",
-        "objectives": """- Understand the layers of the Grammar of Graphics
-- Create scatter plots, bar charts, and line plots with ggplot
-- Customize themes, colors, and axis labels""",
-        "expected_outcomes": """- Build charts using ggplot() and geom functions.
-- Customize colors and labels.
-- Save charts using ggsave().""",
-        "learning_notes": """### ggplot2 & Grammar of Graphics
-ggplot2 is built on the Grammar of Graphics, combining data, aesthetic mappings (`aes`), and geometric layers (`geom_`):
-- `geom_point()`: Scatter plots.
-- `geom_line()`: Line charts.
-- `geom_bar()`: Bar charts.""",
-        "instructions": "Execute the ggplot code to set up a sample line chart.",
-        "content": "Create rich, multi-layered visual charts using ggplot2.",
-        "code_examples": """library(ggplot2)
-# Prepare data
-df <- data.frame(
-  Hours = c(1, 2, 3, 4),
-  Score = c(10, 20, 25, 30)
-)
-# Construct line chart
-p <- ggplot(df, aes(x=Hours, y=Score)) +
-  geom_line(color="red") +
-  geom_point(color="blue", size=3) +
-  theme_minimal() +
-  labs(title="Performance Chart", x="Hours", y="Score")
-print("Plot structured successfully!")""",
-        "resources": "- [ggplot2 Elegant Graphics for Data Analysis](https://ggplot2-book.org/)",
-        "quiz": [
-            {"question": "What is the core function to initialize a plot in ggplot2?", "options": ["ggplot()", "plot()", "ggpoint()", "geom()"], "correct": 0},
-            {"question": "How are layers combined in a ggplot2 call?", "options": ["Using the + operator", "Using pipes (%>%)", "By nesting arguments", "Using commas"], "correct": 0},
-            {"question": "Which geom adds a scatter plot layer?", "options": ["geom_point()", "geom_scatter()", "geom_dot()", "geom_line()"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 5: Hypothesis Testing",
-        "slug": "r-session-5-hypothesis-testing",
-        "description": "Learn statistical hypothesis testing methods including t-tests, chi-square tests, and correlation analysis.",
-        "duration": "60 min",
-        "difficulty": "Beginner",
-        "objectives": """- Define null and alternative hypotheses
-- Run one-sample and two-sample t-tests using base R
-- Read t-test outputs and extract p-values""",
-        "expected_outcomes": """- Set up hypotheses.
-- Execute t.test() on numeric columns.
-- Evaluate p-values against significance thresholds (alpha=0.05).""",
-        "learning_notes": """### t-tests in R
-We compare group means to population norms or control treatments:
-- `t.test(x, mu=val)`: One-sample t-test.
-- `t.test(x, y)`: Independent two-sample t-test.
-If the p-value is smaller than alpha (usually 0.05), we reject the null hypothesis.""",
-        "instructions": "Execute the R script to run a t-test and compute significance.",
-        "content": "Verify experimental differences statistically using t-tests.",
-        "code_examples": """# Student scores sample
-scores <- c(78, 85, 92, 88, 79, 81, 95, 87)
-# Run one-sample t-test
-test_result <- t.test(scores, mu=80)
-print(test_result)
-print(paste("P-value:", test_result$p.value))""",
-        "resources": "- [Quick-R t-tests](https://www.statmethods.net/stats/ttests.html)",
-        "quiz": [
-            {"question": "Which base R function performs a t-test?", "options": ["t.test()", "ttest()", "t_test()", "stats.ttest()"], "correct": 0},
-            {"question": "How do you extract the p-value from a t-test result object?", "options": ["result$p.value", "result$pvalue", "p_value(result)", "result$p_val"], "correct": 0},
-            {"question": "What is the typical alpha significance limit?", "options": ["0.05", "0.01 only", "0.10", "0.50"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 6: Correlation and Regression Analysis",
-        "slug": "r-session-6-correlation-regression",
-        "description": "Master correlation analysis and regression modeling to understand and predict relationships between variables.",
-        "duration": "75 min",
-        "difficulty": "Beginner",
-        "objectives": """- Measure association with cor() and cor.test()
-- Fit simple linear models using lm()
-- Extract slope, intercept, and R-squared metrics""",
-        "expected_outcomes": """- Calculate Pearson's r.
-- Fit regression lines.
-- Summarize coefficients using summary().""",
-        "learning_notes": """### Correlation & Regression
-- `cor(x, y)`: Returns the Pearson correlation coefficient.
-- `lm(formula, data)`: Fits a linear model. The formula is written as `y ~ x`.
-Extract model statistics using `summary(model)`.""",
-        "instructions": "Run the regression model code to find intercept and slope parameters.",
-        "content": "Predict outcomes and trace associations with linear regression models.",
-        "code_examples": """# Correlation and Regression
-hours <- c(2, 4, 6, 8, 10)
-scores <- c(55, 65, 75, 80, 95)
-corr <- cor(hours, scores)
-print(paste("Correlation:", corr))
-model <- lm(scores ~ hours)
-print(summary(model))""",
-        "resources": "- [Linear Models in R](https://www.r-bloggers.com/2016/01/fitting-a-least-squares-regression-line-in-r/)",
-        "quiz": [
-            {"question": "Which function computes correlation in R?", "options": ["cor()", "correlation()", "pearson()", "lm_cor()"], "correct": 0},
-            {"question": "How do you define a regression formula of y on x in lm()?", "options": ["y ~ x", "y = x", "x ~ y", "lm(y, x)"], "correct": 0},
-            {"question": "Which function returns regression statistics like R-squared?", "options": ["summary()", "coef()", "lm_stats()", "print()"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 7: ANOVA and Non-Parametric Tests",
-        "slug": "r-session-7-anova-tests",
-        "description": "Extend your statistical testing toolkit with Analysis of Variance (ANOVA) and non-parametric alternatives.",
-        "duration": "75 min",
-        "difficulty": "Beginner",
-        "objectives": """- Run One-Way ANOVA tests using aov()
-- Run post-hoc checks with TukeyHSD()
-- Implement Kruskal-Wallis non-parametric tests""",
-        "expected_outcomes": """- Test differences across three or more categories.
-- Run Tukey multiple comparisons.
-- Perform non-parametric tests when assumptions fail.""",
-        "learning_notes": """### ANOVA in R
-Use `aov(Score ~ Method, data=df)` to perform Analysis of Variance. Follow up significant ANOVA results with `TukeyHSD()` to find specific group differences.
-If normality assumptions are violated, use `kruskal.test()`.""",
-        "instructions": "Execute the ANOVA and Tukey test scripts to find significant cohort variations.",
-        "content": "Compare multiple population segments simultaneously and analyze variance.",
-        "code_examples": """# Group data frame
-df <- data.frame(
-  Method = factor(c(rep("A", 4), rep("B", 4), rep("C", 4))),
-  Score = c(85, 88, 90, 82, 72, 75, 80, 78, 91, 95, 88, 92)
-)
-# Perform ANOVA
-fit <- aov(Score ~ Method, data=df)
-print(summary(fit))""",
-        "resources": "- [ANOVA in R Tutorial](https://www.datanovia.com/en/lessons/anova-in-r/)",
-        "quiz": [
-            {"question": "Which function is standard for ANOVA in R?", "options": ["aov()", "anova()", "lm_anova()", "compare_means()"], "correct": 0},
-            {"question": "What post-hoc test compares all pairwise means after a significant ANOVA?", "options": ["TukeyHSD()", "t.test()", "kruskal.test()", "pairwise.t.test()"], "correct": 0},
-            {"question": "Which non-parametric test replaces ANOVA in R?", "options": ["kruskal.test()", "wilcox.test()", "chisq.test()", "aov()"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 8: Time Series Analysis",
-        "slug": "r-session-8-time-series",
-        "description": "Master time series analysis techniques for forecasting and trend analysis.",
-        "duration": "75 min",
-        "difficulty": "Beginner",
-        "objectives": """- Convert vectors into time series using ts()
-- Decompose series into trend, seasonal, and random parts
-- Fit simple moving averages and exponential smoothing""",
-        "expected_outcomes": """- Build ts time-frequency objects.
-- Plot decompositions with decompose().
-- Compute forecasts.""",
-        "learning_notes": """### Time Series in R
-- `ts(data, start, frequency)`: Declares a time series object.
-- `decompose()`: Breaks a series into trend, seasonal, and random components.
-Plot components instantly with `plot(decompose(ts_object))`.""",
-        "instructions": "Run the time-series setup to construct a simulated quarterly time series object.",
-        "content": "Decompose time variables and isolate quarterly trends.",
-        "code_examples": """# Simulated quarterly sales data over 2 years
-sales <- c(100, 120, 110, 150, 105, 125, 115, 160)
-# Create ts object starting in 2023
-ts_sales <- ts(sales, start=c(2023, 1), frequency=4)
-print(ts_sales)
-# Decompose
-fit <- decompose(ts_sales, type="additive")
-print("Decomposition completed successfully.")""",
-        "resources": "- [Time Series Analysis with R](https://otexts.com/fpp2/)",
-        "quiz": [
-            {"question": "Which function creates a time series object in R?", "options": ["ts()", "timeseries()", "as.ts()", "zoo()"], "correct": 0},
-            {"question": "What does frequency=12 indicate in ts()?", "options": ["Monthly data", "Quarterly data", "Weekly data", "Annual data"], "correct": 0},
-            {"question": "Which function decomposes a time series into seasonal and trend segments?", "options": ["decompose()", "ts_decompose()", "split_series()", "forecast()"], "correct": 0}
-        ]
-    },
-    {
-        "title": "Session 9: Capstone Projects",
-        "slug": "r-session-9-capstone",
-        "description": "Apply all your R data science skills to real-world capstone projects.",
-        "duration": "90 min",
-        "difficulty": "Beginner",
-        "objectives": """- Combine EDA, cleaning, and dplyr operations in one script
-- Draw inferences from statistical comparisons
-- Present final insights in a structured format""",
-        "expected_outcomes": """- Build an end-to-end data pipeline.
-- Clean and analyze multi-class performance parameters.
-- Output aggregate stats.""",
-        "learning_notes": """### Capstone Integration
-Bring together everything you've learned: data frame instantiation, dplyr aggregation verbs, stats, plotting, and reporting.""",
-        "instructions": "Execute the R code to run the capstone performance pipeline.",
-        "content": "Confirm your beginner track mastery by executing this complete R analysis pipeline.",
-        "code_examples": """library(dplyr)
-# Capstone Simulation
-df <- data.frame(
-  ID = 1:4,
-  Level = c("Beginner", "Beginner", "Advanced", "Advanced"),
-  Score = c(85, 78, 92, 88)
-)
-summary <- df %>% group_by(Level) %>% summarize(MeanScore = mean(Score))
-print("CDAM Capstone Executive Summary:")
-print(summary)""",
-        "resources": "- [CDAM R Portal](https://cdam.chuka.ac.ke/grad/r/)",
-        "quiz": [
-            {"question": "What is the first step of a reproducible data pipeline?", "options": ["Importing the data", "Modeling variables", "Plotting correlations", "Generating a report"], "correct": 0},
-            {"question": "Which dplyr verb aggregates values?", "options": ["summarize()", "filter()", "arrange()", "select()"], "correct": 0},
-            {"question": "What package is the foundation of data manipulation in R?", "options": ["dplyr", "ggplot2", "tidyr", "readr"], "correct": 0}
-        ]
-    }
-]
+R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
+                         'name <- "CDAM Student"\n'
+                         'age <- 20\n'
+                         'gpa <- 3.8\n'
+                         'print(paste("Student:", name, "Age:", age, "GPA:", gpa))\n'
+                         'print(class(name))\n'
+                         'print(class(age))',
+        'content': 'Get comfortable writing basic R syntax, assigning variables, and checking their types.',
+        'description': 'Learn the fundamentals of R programming, RStudio IDE, and the core concepts of data science.',
+        'difficulty': 'Beginner',
+        'duration': '45 min',
+        'expected_outcomes': '- Declare variables in R using the assignment operator (<-).\n'
+                             '- Identify vector classes (numeric, character, logical).\n'
+                             '- Run basic math operations on vectors.',
+        'instructions': 'Run the code editor cell to calculate variable values and print their class.',
+        'learning_notes': '### R & RStudio Overview\n'
+                          'R is a programming language specifically built for statistical computing and graphics. '
+                          'RStudio is the standard IDE for R.\n'
+                          '\n'
+                          '### Assignment Operator\n'
+                          'In R, we typically use `<-` instead of `=` for assignment:\n'
+                          '`x <- 10`\n'
+                          '\n'
+                          '### Core Data Types\n'
+                          '- `numeric`: Decimals or integers (e.g., 3.14, 42)\n'
+                          '- `character`: Text strings wrapped in quotes\n'
+                          '- `logical`: TRUE or FALSE values (can be abbreviated as T or F)',
+        'notes_file_path': 'https://019f40c2-09d4-fb31-50b0-e79ca532e49e.share.connect.posit.cloud/',
+        'objectives': '- Set up R and understand the RStudio workspace layout\n'
+                      '- Understand variables, vectors, and basic numeric, character, and logical data types\n'
+                      '- Execute print statements and run simple calculations in R console',
+        'quiz': [],
+        'resources': '- [R Manuals](https://cran.r-project.org/manuals.html)\n'
+                     '- [RStudio Desktop](https://posit.co/download/rstudio-desktop/)',
+        'slug': 'r-session-1-intro-to-r',
+        'title': 'Session 1: Introduction to R for Data Science'},
+    {   'code_examples': '# Create a sample data frame with NA values\n'
+                         'df <- data.frame(\n'
+                         '  Name = c("Alice", "Bob", "Carol", NA),\n'
+                         '  Age = c(25, NA, 30, 22)\n'
+                         ')\n'
+                         'print("Original Data Frame:")\n'
+                         'print(df)\n'
+                         'df_clean <- na.omit(df)\n'
+                         'print("Cleaned Data Frame:")\n'
+                         'print(df_clean)',
+        'content': "Clean datasets using R's built-in functions before starting analysis.",
+        'description': 'Master data importation, cleaning techniques, and exploratory data analysis to prepare '
+                       'datasets for analysis.',
+        'difficulty': 'Beginner',
+        'duration': '50 min',
+        'expected_outcomes': '- Load a CSV file into an R data.frame.\n'
+                             '- Detect missing entries with is.na().\n'
+                             '- Filter out rows containing missing values.',
+        'instructions': 'Execute the R code to see how rows containing NA values are filtered from a data frame.',
+        'learning_notes': '### Exploratory Data Analysis in R\n'
+                          'We begin by inspecting data structures using `str()` and calculating summary stats using '
+                          '`summary()`.\n'
+                          '\n'
+                          '### Missing Data (NA)\n'
+                          'In R, missing values are represented by `NA`. We use `is.na(x)` to find them, and '
+                          '`na.omit()` to drop rows containing any NAs.',
+        'notes_file_path': 'https://019f40cd-56e7-ef68-cdd0-fbffbf783050.share.connect.posit.cloud/',
+        'objectives': '- Read CSV files using base R read.csv\n'
+                      '- Identify missing values (NA) in data frames\n'
+                      '- Clean missing values using na.omit and basic imputation',
+        'quiz': [],
+        'resources': '- [R Data Import/Export Guide](https://cran.r-project.org/doc/manuals/r-release/R-data.html)',
+        'slug': 'r-session-2-data-import-eda',
+        'title': 'Session 2: Data Import, Cleaning and EDA'},
+    {   'code_examples': 'library(dplyr)\n'
+                         '# Create sales data\n'
+                         'df <- data.frame(\n'
+                         '  Region = c("East", "West", "East", "West"),\n'
+                         '  Revenue = c(100, 150, 200, 300)\n'
+                         ')\n'
+                         '# Filter and summarize\n'
+                         'east_only <- df %>% filter(Region == "East")\n'
+                         'print("East Region only:")\n'
+                         'print(east_only)\n'
+                         'grouped <- df %>% group_by(Region) %>% summarize(Total = sum(Revenue))\n'
+                         'print("Grouped Revenue:")\n'
+                         'print(grouped)',
+        'content': 'Master dplyr to write readable, elegant data pipelines in R.',
+        'description': 'Learn powerful data manipulation techniques using dplyr to transform and organize your data '
+                       'efficiently.',
+        'difficulty': 'Beginner',
+        'duration': '60 min',
+        'expected_outcomes': '- Slice and subset data frames using dplyr verbs.\n'
+                             '- Compute average scores for categories.\n'
+                             '- Chain multiple operations using pipe syntax.',
+        'instructions': 'Run the dplyr script to filter sales data and aggregate revenue statistics.',
+        'learning_notes': '### dplyr Manipulation\n'
+                          'The `dplyr` package is the core tool of the Tidyverse for data manipulation:\n'
+                          '- `filter()`: Keep rows matching criteria.\n'
+                          '- `select()`: Pick columns by name.\n'
+                          '- `mutate()`: Create or transform columns.\n'
+                          '- `summarize()`: Aggregate values.\n'
+                          '\n'
+                          '### Pipe Operator\n'
+                          'The pipe operator `%>%` passes the result of one function as the first argument of the '
+                          'next.',
+        'notes_file_path': 'https://019f40d2-7d76-1343-15a2-638e763635bf.share.connect.posit.cloud/',
+        'objectives': '- Understand tidyverse and the pipe operator (%>% or |>)\n'
+                      '- Use dplyr verbs: filter, select, mutate, and arrange\n'
+                      '- Perform group summaries using group_by and summarize',
+        'quiz': [],
+        'resources': '- [dplyr Cheatsheet](https://github.com/rstudio/cheatsheets/blob/main/data-transformation.pdf)',
+        'slug': 'r-session-3-dplyr-manipulation',
+        'title': 'Session 3: Data Manipulation with dplyr'},
+    {   'code_examples': 'library(ggplot2)\n'
+                         '# Prepare data\n'
+                         'df <- data.frame(\n'
+                         '  Hours = c(1, 2, 3, 4),\n'
+                         '  Score = c(10, 20, 25, 30)\n'
+                         ')\n'
+                         '# Construct line chart\n'
+                         'p <- ggplot(df, aes(x=Hours, y=Score)) +\n'
+                         '  geom_line(color="red") +\n'
+                         '  geom_point(color="blue", size=3) +\n'
+                         '  theme_minimal() +\n'
+                         '  labs(title="Performance Chart", x="Hours", y="Score")\n'
+                         'print("Plot structured successfully!")',
+        'content': 'Create rich, multi-layered visual charts using ggplot2.',
+        'description': 'Create professional, publication-quality graphics using ggplot2 and the Grammar of Graphics.',
+        'difficulty': 'Beginner',
+        'duration': '60 min',
+        'expected_outcomes': '- Build charts using ggplot() and geom functions.\n'
+                             '- Customize colors and labels.\n'
+                             '- Save charts using ggsave().',
+        'instructions': 'Execute the ggplot code to set up a sample line chart.',
+        'learning_notes': '### ggplot2 & Grammar of Graphics\n'
+                          'ggplot2 is built on the Grammar of Graphics, combining data, aesthetic mappings (`aes`), '
+                          'and geometric layers (`geom_`):\n'
+                          '- `geom_point()`: Scatter plots.\n'
+                          '- `geom_line()`: Line charts.\n'
+                          '- `geom_bar()`: Bar charts.',
+        'notes_file_path': 'https://019f40d7-71c6-36e8-2d30-e50a254eb4f9.share.connect.posit.cloud/',
+        'objectives': '- Understand the layers of the Grammar of Graphics\n'
+                      '- Create scatter plots, bar charts, and line plots with ggplot\n'
+                      '- Customize themes, colors, and axis labels',
+        'quiz': [],
+        'resources': '- [ggplot2 Elegant Graphics for Data Analysis](https://ggplot2-book.org/)',
+        'slug': 'r-session-4-ggplot2-visualization',
+        'title': 'Session 4: Data Visualization with ggplot2'},
+    {   'code_examples': '# Student scores sample\n'
+                         'scores <- c(78, 85, 92, 88, 79, 81, 95, 87)\n'
+                         '# Run one-sample t-test\n'
+                         'test_result <- t.test(scores, mu=80)\n'
+                         'print(test_result)\n'
+                         'print(paste("P-value:", test_result$p.value))',
+        'content': 'Verify experimental differences statistically using t-tests.',
+        'description': 'Learn statistical hypothesis testing methods including t-tests, chi-square tests, and '
+                       'correlation analysis.',
+        'difficulty': 'Beginner',
+        'duration': '60 min',
+        'expected_outcomes': '- Set up hypotheses.\n'
+                             '- Execute t.test() on numeric columns.\n'
+                             '- Evaluate p-values against significance thresholds (alpha=0.05).',
+        'instructions': 'Execute the R script to run a t-test and compute significance.',
+        'learning_notes': '### t-tests in R\n'
+                          'We compare group means to population norms or control treatments:\n'
+                          '- `t.test(x, mu=val)`: One-sample t-test.\n'
+                          '- `t.test(x, y)`: Independent two-sample t-test.\n'
+                          'If the p-value is smaller than alpha (usually 0.05), we reject the null hypothesis.',
+        'notes_file_path': 'https://019f40da-5e17-a6e6-580a-2b22194e2728.share.connect.posit.cloud/',
+        'objectives': '- Define null and alternative hypotheses\n'
+                      '- Run one-sample and two-sample t-tests using base R\n'
+                      '- Read t-test outputs and extract p-values',
+        'quiz': [],
+        'resources': '- [Quick-R t-tests](https://www.statmethods.net/stats/ttests.html)',
+        'slug': 'r-session-5-hypothesis-testing',
+        'title': 'Session 5: Hypothesis Testing'},
+    {   'code_examples': '# Correlation and Regression\n'
+                         'hours <- c(2, 4, 6, 8, 10)\n'
+                         'scores <- c(55, 65, 75, 80, 95)\n'
+                         'corr <- cor(hours, scores)\n'
+                         'print(paste("Correlation:", corr))\n'
+                         'model <- lm(scores ~ hours)\n'
+                         'print(summary(model))',
+        'content': 'Predict outcomes and trace associations with linear regression models.',
+        'description': 'Master correlation analysis and regression modeling to understand and predict relationships '
+                       'between variables.',
+        'difficulty': 'Beginner',
+        'duration': '75 min',
+        'expected_outcomes': "- Calculate Pearson's r.\n"
+                             '- Fit regression lines.\n'
+                             '- Summarize coefficients using summary().',
+        'instructions': 'Run the regression model code to find intercept and slope parameters.',
+        'learning_notes': '### Correlation & Regression\n'
+                          '- `cor(x, y)`: Returns the Pearson correlation coefficient.\n'
+                          '- `lm(formula, data)`: Fits a linear model. The formula is written as `y ~ x`.\n'
+                          'Extract model statistics using `summary(model)`.',
+        'notes_file_path': 'https://019f40dc-ff38-1995-58a7-a986fc1eb9aa.share.connect.posit.cloud/',
+        'objectives': '- Measure association with cor() and cor.test()\n'
+                      '- Fit simple linear models using lm()\n'
+                      '- Extract slope, intercept, and R-squared metrics',
+        'quiz': [],
+        'resources': '- [Linear Models in '
+                     'R](https://www.r-bloggers.com/2016/01/fitting-a-least-squares-regression-line-in-r/)',
+        'slug': 'r-session-6-correlation-regression',
+        'title': 'Session 6: Correlation and Regression Analysis'},
+    {   'code_examples': '# Group data frame\n'
+                         'df <- data.frame(\n'
+                         '  Method = factor(c(rep("A", 4), rep("B", 4), rep("C", 4))),\n'
+                         '  Score = c(85, 88, 90, 82, 72, 75, 80, 78, 91, 95, 88, 92)\n'
+                         ')\n'
+                         '# Perform ANOVA\n'
+                         'fit <- aov(Score ~ Method, data=df)\n'
+                         'print(summary(fit))',
+        'content': 'Compare multiple population segments simultaneously and analyze variance.',
+        'description': 'Extend your statistical testing toolkit with Analysis of Variance (ANOVA) and non-parametric '
+                       'alternatives.',
+        'difficulty': 'Beginner',
+        'duration': '75 min',
+        'expected_outcomes': '- Test differences across three or more categories.\n'
+                             '- Run Tukey multiple comparisons.\n'
+                             '- Perform non-parametric tests when assumptions fail.',
+        'instructions': 'Execute the ANOVA and Tukey test scripts to find significant cohort variations.',
+        'learning_notes': '### ANOVA in R\n'
+                          'Use `aov(Score ~ Method, data=df)` to perform Analysis of Variance. Follow up significant '
+                          'ANOVA results with `TukeyHSD()` to find specific group differences.\n'
+                          'If normality assumptions are violated, use `kruskal.test()`.',
+        'notes_file_path': 'https://019f40e0-0802-97af-4580-c6dee929895a.share.connect.posit.cloud/',
+        'objectives': '- Run One-Way ANOVA tests using aov()\n'
+                      '- Run post-hoc checks with TukeyHSD()\n'
+                      '- Implement Kruskal-Wallis non-parametric tests',
+        'quiz': [],
+        'resources': '- [ANOVA in R Tutorial](https://www.datanovia.com/en/lessons/anova-in-r/)',
+        'slug': 'r-session-7-anova-tests',
+        'title': 'Session 7: ANOVA and Non-Parametric Tests'},
+    {   'code_examples': '# Simulated quarterly sales data over 2 years\n'
+                         'sales <- c(100, 120, 110, 150, 105, 125, 115, 160)\n'
+                         '# Create ts object starting in 2023\n'
+                         'ts_sales <- ts(sales, start=c(2023, 1), frequency=4)\n'
+                         'print(ts_sales)\n'
+                         '# Decompose\n'
+                         'fit <- decompose(ts_sales, type="additive")\n'
+                         'print("Decomposition completed successfully.")',
+        'content': 'Decompose time variables and isolate quarterly trends.',
+        'description': 'Master time series analysis techniques for forecasting and trend analysis.',
+        'difficulty': 'Beginner',
+        'duration': '75 min',
+        'expected_outcomes': '- Build ts time-frequency objects.\n'
+                             '- Plot decompositions with decompose().\n'
+                             '- Compute forecasts.',
+        'instructions': 'Run the time-series setup to construct a simulated quarterly time series object.',
+        'learning_notes': '### Time Series in R\n'
+                          '- `ts(data, start, frequency)`: Declares a time series object.\n'
+                          '- `decompose()`: Breaks a series into trend, seasonal, and random components.\n'
+                          'Plot components instantly with `plot(decompose(ts_object))`.',
+        'notes_file_path': 'https://019f4142-087e-cf54-f225-1f6c1d12382b.share.connect.posit.cloud/',
+        'objectives': '- Convert vectors into time series using ts()\n'
+                      '- Decompose series into trend, seasonal, and random parts\n'
+                      '- Fit simple moving averages and exponential smoothing',
+        'quiz': [],
+        'resources': '- [Time Series Analysis with R](https://otexts.com/fpp2/)',
+        'slug': 'r-session-8-time-series',
+        'title': 'Session 8: Time Series Analysis'},
+    {   'code_examples': 'library(dplyr)\n'
+                         '# Capstone Simulation\n'
+                         'df <- data.frame(\n'
+                         '  ID = 1:4,\n'
+                         '  Level = c("Beginner", "Beginner", "Advanced", "Advanced"),\n'
+                         '  Score = c(85, 78, 92, 88)\n'
+                         ')\n'
+                         'summary <- df %>% group_by(Level) %>% summarize(MeanScore = mean(Score))\n'
+                         'print("CDAM Capstone Executive Summary:")\n'
+                         'print(summary)',
+        'content': 'Confirm your beginner track mastery by executing this complete R analysis pipeline.',
+        'description': 'Apply all your R data science skills to real-world capstone projects.',
+        'difficulty': 'Beginner',
+        'duration': '90 min',
+        'expected_outcomes': '- Build an end-to-end data pipeline.\n'
+                             '- Clean and analyze multi-class performance parameters.\n'
+                             '- Output aggregate stats.',
+        'instructions': 'Execute the R code to run the capstone performance pipeline.',
+        'learning_notes': '### Capstone Integration\n'
+                          "Bring together everything you've learned: data frame instantiation, dplyr aggregation "
+                          'verbs, stats, plotting, and reporting.',
+        'notes_file_path': 'https://019f413a-2978-f27d-2314-c298cdb340e7.share.connect.posit.cloud/',
+        'objectives': '- Combine EDA, cleaning, and dplyr operations in one script\n'
+                      '- Draw inferences from statistical comparisons\n'
+                      '- Present final insights in a structured format',
+        'quiz': [],
+        'resources': '- [CDAM R Portal](https://cdam.chuka.ac.ke/grad/r/)',
+        'slug': 'r-session-9-capstone',
+        'title': 'Session 9: Capstone Projects'},
+    {   'code_examples': '',
+        'content': 'Intermediate to advanced statistical modeling and regression analysis.',
+        'description': 'Deep dive into statistical modeling, regression techniques, and predictive analysis.',
+        'difficulty': 'Professional',
+        'duration': '60 min',
+        'expected_outcomes': '',
+        'instructions': '',
+        'learning_notes': '',
+        'notes_file_path': None,
+        'objectives': '',
+        'quiz': [],
+        'resources': '',
+        'slug': 'r-session-10',
+        'title': 'Session 10: Session Ten'},
+    {   'code_examples': '',
+        'content': 'Master advanced functional programming concepts using tidyverse tools.',
+        'description': 'Advanced data transformation, nesting, and functional programming with purrr.',
+        'difficulty': 'Professional',
+        'duration': '60 min',
+        'expected_outcomes': '',
+        'instructions': '',
+        'learning_notes': '',
+        'notes_file_path': None,
+        'objectives': '',
+        'quiz': [],
+        'resources': '',
+        'slug': 'r-session-11',
+        'title': 'Session 11: Session Eleven'},
+    {   'code_examples': '',
+        'content': 'Implement classification models and inspect performance metrics in R.',
+        'description': 'Supervised machine learning algorithms, classification models, and model evaluation.',
+        'difficulty': 'Professional',
+        'duration': '75 min',
+        'expected_outcomes': '',
+        'instructions': '',
+        'learning_notes': '',
+        'notes_file_path': None,
+        'objectives': '',
+        'quiz': [],
+        'resources': '',
+        'slug': 'r-session-12',
+        'title': 'Session 12: Session Twelve'},
+    {   'code_examples': '',
+        'content': 'Discover patterns in unlabeled datasets using clustering and PCA reduction.',
+        'description': 'Unsupervised learning, clustering algorithms (K-means), and dimension reduction (PCA).',
+        'difficulty': 'Professional',
+        'duration': '75 min',
+        'expected_outcomes': '',
+        'instructions': '',
+        'learning_notes': '',
+        'notes_file_path': None,
+        'objectives': '',
+        'quiz': [],
+        'resources': '',
+        'slug': 'r-session-13',
+        'title': 'Session 13: Session Thirteen'},
+    {   'code_examples': '',
+        'content': 'Train basic deep learning networks and optimize parameters.',
+        'description': 'Deep learning foundations, neural networks, and advanced tensor operations in R.',
+        'difficulty': 'Professional',
+        'duration': '90 min',
+        'expected_outcomes': '',
+        'instructions': '',
+        'learning_notes': '',
+        'notes_file_path': None,
+        'objectives': '',
+        'quiz': [],
+        'resources': '',
+        'slug': 'r-session-14',
+        'title': 'Session 14: Session Fourteen'},
+    {   'code_examples': '',
+        'content': 'Extract topics and perform sentiments analysis on textual corpora.',
+        'description': 'Natural language processing (NLP), text mining, and sentiment analysis with tidytext.',
+        'difficulty': 'Professional',
+        'duration': '90 min',
+        'expected_outcomes': '',
+        'instructions': '',
+        'learning_notes': '',
+        'notes_file_path': None,
+        'objectives': '',
+        'quiz': [],
+        'resources': '',
+        'slug': 'r-session-15',
+        'title': 'Session 15: Session Fifteen'},
+    {   'code_examples': '',
+        'content': 'Combine ML/AI capabilities into a final R capstone project.',
+        'description': 'Capstone project integration, final model deployments, and system reporting.',
+        'difficulty': 'Professional',
+        'duration': '120 min',
+        'expected_outcomes': '',
+        'instructions': '',
+        'learning_notes': '',
+        'notes_file_path': None,
+        'objectives': '',
+        'quiz': [],
+        'resources': '',
+        'slug': 'r-session-16',
+        'title': 'Session 16: Session Sixteen'}]

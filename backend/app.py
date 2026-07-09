@@ -451,8 +451,16 @@ def check_session_access_with_reason(user, display_order, course_type=None):
         return False, "not_enrolled"
 
     level = getattr(user, "study_level", "Beginner")
-    if display_order > 10 and level != "Professional":
-        return False, "restricted_level"
+    if course_type == "r":
+        if level != "Professional":
+            if display_order > 9:
+                return False, "restricted_level"
+        else:
+            if display_order > 16:
+                return False, "restricted_level"
+    else:
+        if display_order > 10 and level != "Professional":
+            return False, "restricted_level"
         
     prev_sessions = Session.query.filter(Session.display_order < display_order, Session.published == True, Session.course_type == course_type).all()
     for s in prev_sessions:
@@ -518,6 +526,7 @@ def seed_sessions() -> None:
         session_obj.quiz_json = json.dumps(item.get("quiz", []))
         session_obj.duration = item["duration"]
         session_obj.difficulty = item["difficulty"]
+        session_obj.notes_file_path = item.get("notes_file_path", None)
         session_obj.display_order = idx
         session_obj.published = True
         session_obj.course_type = "r"
@@ -822,9 +831,17 @@ def index():
         level = getattr(current_user, "study_level", "Beginner")
 
         for s in all_published:
-            if s.display_order > 10 and level != "Professional":
-                session_access_map[s.id] = False
-                continue
+            if s.course_type == "r":
+                if level != "Professional" and s.display_order > 9:
+                    session_access_map[s.id] = False
+                    continue
+                if s.display_order > 16:
+                    session_access_map[s.id] = False
+                    continue
+            else:
+                if level != "Professional" and s.display_order > 10:
+                    session_access_map[s.id] = False
+                    continue
             # Check all previous sessions of the same course_type are completed
             access = True
             for prev in all_published:
@@ -1125,6 +1142,8 @@ def ensure_notes_file_exists(session) -> bool:
     """Ensure session's note file exists on disk, auto-restoring from DB BLOB if missing."""
     if not session:
         return False
+    if session.notes_file_path and (session.notes_file_path.startswith("http://") or session.notes_file_path.startswith("https://")):
+        return True
     # If we have the binary data in database, the note is available virtually
     if session.notes_file_data:
         if session.notes_file_path:
@@ -1255,15 +1274,19 @@ def session_detail(slug: str):
     
     notes_exist = False
     is_viewable = False
+    is_external = False
     notes_filename = ""
     if ensure_notes_file_exists(session):
-        filename = session.notes_file_path.split("/")[-1]
         notes_exist = True
-        notes_filename = filename.split("-", 2)[-1] if len(filename.split("-", 2)) > 2 else filename
-        import os
-        ext = os.path.splitext(filename)[1].lower()
-        if ext in {".pdf", ".txt", ".md", ".png", ".jpg", ".jpeg", ".gif", ".svg"}:
-            is_viewable = True
+        if session.notes_file_path and (session.notes_file_path.startswith("http://") or session.notes_file_path.startswith("https://")):
+            is_external = True
+        else:
+            filename = session.notes_file_path.split("/")[-1]
+            notes_filename = filename.split("-", 2)[-1] if len(filename.split("-", 2)) > 2 else filename
+            import os
+            ext = os.path.splitext(filename)[1].lower()
+            if ext in {".pdf", ".txt", ".md", ".png", ".jpg", ".jpeg", ".gif", ".svg"}:
+                is_viewable = True
             
     now = utc_now()
     exams = Exam.query.filter_by(published=True, study_level=current_user.study_level).all()
@@ -1291,6 +1314,7 @@ def session_detail(slug: str):
         show_exam=False,
         notes_exist=notes_exist,
         is_viewable=is_viewable,
+        is_external=is_external,
         notes_filename=notes_filename,
         upcoming=upcoming,
         available=available,
@@ -1308,6 +1332,8 @@ def download_notes(session_id: int):
     if not session or not ensure_notes_file_exists(session):
         flash("Notes file not found.", "error")
         return redirect(request.referrer or url_for("student_dashboard"))
+    if session.notes_file_path and (session.notes_file_path.startswith("http://") or session.notes_file_path.startswith("https://")):
+        return redirect(session.notes_file_path)
     access, reason = check_session_access_with_reason(current_user, session.display_order, course_type=session.course_type)
     if not access:
         if reason == "not_enrolled":
@@ -1343,6 +1369,8 @@ def view_notes(session_id: int):
     if not session or not ensure_notes_file_exists(session):
         flash("Notes file not found.", "error")
         return redirect(request.referrer or url_for("student_dashboard"))
+    if session.notes_file_path and (session.notes_file_path.startswith("http://") or session.notes_file_path.startswith("https://")):
+        return redirect(session.notes_file_path)
     access, reason = check_session_access_with_reason(current_user, session.display_order, course_type=session.course_type)
     if not access:
         if reason == "not_enrolled":
