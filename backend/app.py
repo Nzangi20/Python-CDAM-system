@@ -534,6 +534,100 @@ def seed_sessions() -> None:
 
     db.session.commit()
 
+    # 4. Seed PDF files for Python sessions
+    python_materials_dir = BASE_DIR.parent / "Python materials"
+    pdf_mapping = {
+        1: "Session One Introduction to Python Jupyter Notebook and Basic Data Types.pdf",
+        2: "Session Two Data Importation Cleaning and Exploratory Data Analysis.pdf",
+        3: "Session Three Data Manipulation Python.pdf",
+        4: "Session Four Data Visualization with Matplotlib and seabon Libraries.pdf",
+        5: "Session Five Hypothesis Testing.pdf",
+        6: "Session Six Correlation and Regression Analysis.pdf",
+        7: "Session Seven Analysis of Variance (ANOVA) and Non-Parametric Tests.pdf",
+        8: "Session Eight Time Series Analysis.pdf",
+        9: "Session Nine Data Visualization with PyGWalker in python.pdf",
+        10: "Session Ten Capstone project in Python.pdf",
+        11: "Session Eleven_Python_Essentials.pdf",
+        13: "Session Thirteen Advanced Data Visualization in Python.pdf",
+        14: "Session Fourteen Machine Learning Fundamentals with Scikit-Learn.pdf",
+        15: "Session Fifteen Supervised Learning – Classification.pdf",
+        16: "Session Sixteen Supervised Learning-Regression.pdf",
+        17: "Session Seventeen Unsupervised Learning-Kmeans and PCA.pdf",
+        18: "Session Eighteen Capstone project in Python.pdf"
+    }
+    
+    if python_materials_dir.exists():
+        for order, pdf_name in pdf_mapping.items():
+            session_obj = Session.query.filter_by(course_type="python", display_order=order).first()
+            if session_obj:
+                pdf_path = python_materials_dir / pdf_name
+                if pdf_path.exists():
+                    try:
+                        with open(pdf_path, "rb") as f:
+                            pdf_data = f.read()
+                        stored_name = f"{session_obj.slug}-seeded-{pdf_name.replace(' ', '_')}"
+                        session_obj.notes_file_path = f"uploads/notes/{stored_name}"
+                        session_obj.notes_file_name = pdf_name
+                        session_obj.notes_file_data = pdf_data
+                        
+                        # Ensure UPLOADS_DIR exists and write to disk
+                        UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+                        dest = UPLOADS_DIR / stored_name
+                        with open(dest, "wb") as f_dest:
+                            f_dest.write(pdf_data)
+                    except Exception as e:
+                        print(f"Error seeding PDF for python session {order}: {e}")
+        db.session.commit()
+
+    # 5. Seed CSV datasets into UserSandboxFile (is_global=True)
+    csv_files = [
+        "Agricultural_Crop_Production_Machine_Learning_Dataset.csv",
+        "Agricultural_Production_Capstone_Dataset.csv",
+        "Banking_Transactions_Capstone_Dataset.csv",
+        "Customer_Banking_Transactions_Machine_Learning_Dataset.csv",
+        "GSSsubset.csv",
+        "Retail_Sales_Capstone_Dataset.csv",
+        "Retail_Sales_Machine_Learning_Dataset.csv",
+        "SMdata.csv",
+        "german_credit__data.csv",
+        "mtcars.csv",
+        "murban.csv"
+    ]
+    
+    try:
+        admin_user = User.query.filter_by(is_admin=True).first()
+        admin_id = admin_user.id if admin_user else 1
+        
+        if python_materials_dir.exists():
+            for csv_name in csv_files:
+                csv_path = python_materials_dir / csv_name
+                if csv_path.exists():
+                    try:
+                        with open(csv_path, "rb") as f:
+                            csv_data = f.read()
+                        file_size = len(csv_data)
+                        
+                        # Check if this global file already exists in database
+                        sandbox_file = UserSandboxFile.query.filter_by(filename=csv_name, is_global=True).first()
+                        if not sandbox_file:
+                            sandbox_file = UserSandboxFile(
+                                user_id=admin_id,
+                                filename=csv_name,
+                                file_data=csv_data,
+                                file_size=file_size,
+                                is_global=True
+                            )
+                            db.session.add(sandbox_file)
+                        else:
+                            sandbox_file.file_data = csv_data
+                            sandbox_file.file_size = file_size
+                            sandbox_file.user_id = admin_id
+                    except Exception as e:
+                        print(f"Error seeding CSV {csv_name}: {e}")
+            db.session.commit()
+    except Exception as ex:
+        print(f"Error preparing admin/sandbox datasets: {ex}")
+
 
 def get_user_progress_map(user_id: int) -> dict[int, UserProgress]:
     rows = UserProgress.query.filter_by(user_id=user_id).all()
@@ -1045,6 +1139,76 @@ def ensure_notes_file_exists(session) -> bool:
     return False
 
 
+DATASETS = [
+    {
+        "filename": "Agricultural_Crop_Production_Machine_Learning_Dataset.csv",
+        "name": "Agricultural Crop Production (ML)",
+        "size": "1.75 MB",
+        "description": "Comprehensive dataset for machine learning models predicting crop production and yields."
+    },
+    {
+        "filename": "Agricultural_Production_Capstone_Dataset.csv",
+        "name": "Agricultural Production Capstone",
+        "size": "261 KB",
+        "description": "Capstone project dataset analyzing seasonal crop yields and regional production factors."
+    },
+    {
+        "filename": "Banking_Transactions_Capstone_Dataset.csv",
+        "name": "Banking Transactions Capstone",
+        "size": "270 KB",
+        "description": "Capstone dataset featuring customer account transaction logs and deposit trends."
+    },
+    {
+        "filename": "Customer_Banking_Transactions_Machine_Learning_Dataset.csv",
+        "name": "Customer Banking Transactions (ML)",
+        "size": "1.76 MB",
+        "description": "Large-scale dataset for building customer transaction classification and anomaly models."
+    },
+    {
+        "filename": "GSSsubset.csv",
+        "name": "General Social Survey (GSS) Subset",
+        "size": "52 KB",
+        "description": "A subset of the General Social Survey data, useful for statistical analysis and hypothesis testing."
+    },
+    {
+        "filename": "Retail_Sales_Capstone_Dataset.csv",
+        "name": "Retail Sales Capstone",
+        "size": "192 KB",
+        "description": "Historical retail store sales records for sales forecasting capstone project."
+    },
+    {
+        "filename": "Retail_Sales_Machine_Learning_Dataset.csv",
+        "name": "Retail Sales (ML)",
+        "size": "1.23 MB",
+        "description": "Detailed store transaction and promo event data for training retail prediction models."
+    },
+    {
+        "filename": "SMdata.csv",
+        "name": "Social Media User Data",
+        "size": "36 KB",
+        "description": "Demographics and engagement metrics of social media users for basic statistical training."
+    },
+    {
+        "filename": "german_credit__data.csv",
+        "name": "German Credit Risk Dataset",
+        "size": "48 KB",
+        "description": "Standard banking risk dataset to classify loan applicants as good or bad credit risks."
+    },
+    {
+        "filename": "mtcars.csv",
+        "name": "Motor Trend Car Road Tests",
+        "size": "36 KB",
+        "description": "Classic dataset containing design parameters and performance attributes of 32 automobiles."
+    },
+    {
+        "filename": "murban.csv",
+        "name": "Urban Migration Survey",
+        "size": "4 KB",
+        "description": "Small dataset tracking demographics and factors influencing migration to urban centers."
+    }
+]
+
+
 @app.route("/session/<slug>")
 @login_required
 def session_detail(slug: str):
@@ -1124,6 +1288,7 @@ def session_detail(slug: str):
         upcoming=upcoming,
         available=available,
         exam_attempts=exam_attempts,
+        datasets=DATASETS,
     )
 
 
@@ -1145,6 +1310,19 @@ def download_notes(session_id: int):
     
     filename = session.notes_file_path.split("/")[-1]
     return send_from_directory(UPLOADS_DIR, filename, as_attachment=False)
+
+
+@app.route("/dataset/<path:filename>/download")
+@login_required
+def download_dataset(filename):
+    from flask import send_from_directory
+    import os
+    datasets_dir = BASE_DIR.parent / "Python materials"
+    filename = os.path.basename(filename)
+    if not os.path.exists(datasets_dir / filename):
+        flash("Dataset file not found.", "error")
+        return redirect(request.referrer or url_for("student_dashboard"))
+    return send_from_directory(datasets_dir, filename, as_attachment=True)
 
 
 @app.route("/session/<int:session_id>/view")
@@ -2963,7 +3141,16 @@ def initialize():
                 r_db_count = Session.query.filter_by(course_type="r").count()
                 existing_r_slugs = {s.slug for s in Session.query.filter_by(course_type="r").all()}
                 expected_r_slugs = {item["slug"] for item in R_SESSIONS}
-                if r_db_count == len(R_SESSIONS) and existing_r_slugs == expected_r_slugs:
+                python_notes_count = Session.query.filter(Session.course_type == "python", Session.notes_file_path != None).count()
+                
+                global_files_count = 0
+                if "user_sandbox_files" in inspector.get_table_names():
+                    global_files_count = UserSandboxFile.query.filter_by(is_global=True).count()
+                
+                if (r_db_count == len(R_SESSIONS) and 
+                    existing_r_slugs == expected_r_slugs and 
+                    python_notes_count >= 17 and 
+                    global_files_count >= 11):
                     # Database is already seeded and matches expected structure. Skip.
                     return
         except Exception as e:

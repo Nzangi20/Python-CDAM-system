@@ -1,0 +1,501 @@
+Region,Year,Month,Age,Intervention_Type,Total,Positive,Incidence_Rate,Latitude,Longitude,time
+Low Risk,2022,Sep,5 to 14,Vaccinations,25,1,0.038,1.398151,38.451101,1
+Coastal,2022,May,5 to 14,Vaccinations,380,158,0.416,-3.858256,40.213519,2
+Highland,2022,Jul,5 to 14,Bed nets,271,103,0.379,0.53997,35.555555,3
+Low Risk,2022,Dec,5 to 14,Vaccinations,26,1,0.037,1.35527,38.202328,4
+Seasonal,2022,Jul,5 to 14,None,275,124,0.45,0.451452,36.96706,5
+Highland,2022,Apr,5 to 14,None,60,27,0.442,0.498972,35.982033,6
+Highland,2022,Apr,5 to 14,Bed nets,420,95,0.226,0.55258,36.224556,7
+Highland,2022,May,5 to 14,None,106,28,0.265,0.341303,36.15353,8
+Low Risk,2022,Dec,5 to 14,Bed nets,14,0,0.029,1.303416,38.196378,9
+Highland,2022,Dec,5 to 14,Indoor spraying,452,197,0.436,0.512701,35.817008,10
+Coastal,2022,Dec,5 to 14,Indoor spraying,51,3,0.052,-3.325686,39.674149,11
+Lake Basin,2022,Aug,5 to 14,Indoor spraying,113,36,0.315,-0.354204,34.482019,12
+Highland,2022,Dec,5 to 14,Indoor spraying,395,100,0.254,0.558391,35.524672,1
+Coastal,2022,Mar,5 to 14,Vaccinations,322,123,0.383,-3.127492,40.318502,2
+Seasonal,2022,Sep,5 to 14,Bed nets,254,52,0.204,0.654988,36.996538,3
+Lake Basin,2022,Sep,5 to 14,None,319,37,0.117,-0.193554,34.718195,4
+Seasonal,2022,Dec,5 to 14,Vaccinations,278,46,0.167,0.153977,36.179792,5
+Lake Basin,2022,Jul,5 to 14,None,291,35,0.119,-0.324161,34.940707,6
+Coastal,2022,Jan,5 to 14,None,119,31,0.261,-4.457069,39.81877,7
+Lake Basin,2022,Dec,5 to 14,Vaccinations,107,9,0.087,-0.128726,34.058092,8
+Low Risk,2022,Jun,5 to 14,None,47,1,0.022,1.312119,37.694834,9
+Low Risk,2022,Apr,5 to 14,None,35,0,0.01,1.291536,38.018715,10
+Lake Basin,2022,Sep,5 to 14,None,93,23,0.247,-0.163458,34.710218,11
+Highland,2022,Apr,5 to 14,Indoor spraying,197,81,0.414,0.303989,36.299677,12
+Lake Basin,2022,Oct,5 to 14,None,196,50,0.253,0.196584,34.804512,1
+Coastal,2022,Feb,5 to 14,None,108,9,0.084,-3.819979,39.595515,2
+Highland,2022,Dec,5 to 14,Vaccinations,188,40,0.213,0.458367,36.137849,3
+Highland,2022,Jul,5 to 14,Vaccinations,466,54,0.117,0.385469,36.107656,4
+Coastal,2022,May,5 to 14,Vaccinations,295,92,0.311,-4.403101,39.657112,5
+Low Risk,2022,Nov,5 to 14,Bed nets,28,1,0.036,1.612399,37.580772,6
+Seasonal,2022,Jun,5 to 14,Bed nets,390,166,0.426,0.268705,36.284257,7
+Highland,2022,Feb,5 to 14,None,273,133,0.488,0.733693,36.140501,8
+Low Risk,2022,Apr,5 to 14,Indoor spraying,44,1,0.026,1.042896,37.768104,9
+Lake Basin,2022,Jan,5 to 14,Vaccinations,170,28,0.164,-0.396664,34.48544,10
+Seasonal,2022,Dec,Above >14,Bed nets,176,74,0.42,0.114748,36.162749,11
+Highland,2022,Jun,Above >14,Vaccinations,474,61,0.129,0.48657,36.413878,12
+Highland,2022,May,Above >14,None,317,22,0.069,0.638758,36.402251,1
+Highland,2022,Sep,Above >14,Bed nets,156,30,0.195,0.429962,36.448705,2
+Low Risk,2022,Dec,Above >14,Indoor spraying,40,2,0.041,1.595042,38.277226,3
+Coastal,2022,May,Above >14,Bed nets,255,88,0.347,-3.142748,39.660745,4
+Seasonal,2022,May,Above >14,Bed nets,276,50,0.182,0.246377,36.350096,5
+Seasonal,2022,Jul,Above >14,None,313,132,0.422,0.608963,36.420128,6
+Lake Basin,2022,Nov,Above >14,None,356,171,0.481,-0.327694,34.81453,7
+Lake Basin,2022,Mar,Above >14,Bed nets,108,49,0.45,-0.286381,34.213871,8
+Highland,2022,Sep,Above >14,Bed nets,214,66,0.306,0.489016,35.621966,9
+Seasonal,2022,Aug,Above >14,Bed nets,315,134,0.426,0.500206,36.315925,10
+Lake Basin,2022,Feb,Above >14,None,321,107,0.332,0.101645,34.888991,11
+Low Risk,2022,Apr,Above >14,None,34,1,0.026,1.669279,38.48383,12
+Lake Basin,2022,Dec,Above >14,Vaccinations,399,101,0.253,-0.277416,34.603462,1
+Low Risk,2022,Dec,Above >14,Indoor spraying,17,0,0.017,1.797145,38.07004,2
+Low Risk,2022,Jan,Above >14,Bed nets,38,0,0.012,1.900882,38.113524,3
+Coastal,2022,Jun,Above >14,Vaccinations,139,64,0.461,-3.970873,40.14047,4
+Low Risk,2022,Oct,Above >14,Vaccinations,27,0,0.011,1.460077,37.969269,5
+Coastal,2022,Mar,Above >14,Bed nets,65,13,0.195,-3.918114,39.688688,6
+Coastal,2022,Dec,Above >14,Bed nets,110,46,0.414,-3.555665,40.433761,7
+Seasonal,2022,Jul,Above >14,Bed nets,95,15,0.162,0.421778,36.595637,8
+Low Risk,2022,Aug,Above >14,Indoor spraying,41,2,0.048,1.531886,37.50783,9
+Coastal,2022,Apr,Above >14,Bed nets,171,41,0.242,-4.108339,39.839417,10
+Lake Basin,2022,Apr,Above >14,None,353,168,0.475,0.227427,34.664741,11
+Coastal,2022,Jul,Above >14,Vaccinations,319,75,0.235,-3.298193,40.38532,12
+Highland,2022,Dec,Above >14,None,221,67,0.302,0.596891,35.502674,1
+Lake Basin,2022,Jan,Above >14,Indoor spraying,94,27,0.288,0.430104,34.161207,2
+Coastal,2022,Nov,Above >14,None,265,105,0.398,-3.823837,40.361119,3
+Lake Basin,2022,Oct,Above >14,None,107,42,0.39,-0.081284,34.734389,4
+Low Risk,2022,Feb,Above >14,Vaccinations,27,1,0.044,1.021039,38.458602,5
+Coastal,2022,Jan,Above >14,Bed nets,102,44,0.433,-3.996962,39.502705,6
+Lake Basin,2022,Mar,Above >14,Bed nets,65,29,0.44,-0.213004,34.538661,7
+Seasonal,2022,Sep,Above >14,Bed nets,278,92,0.332,0.212177,36.122474,8
+Low Risk,2022,May,Above >14,Bed nets,19,1,0.047,1.9259,37.829659,9
+Seasonal,2022,Sep,Above >14,None,123,40,0.327,0.385802,36.799401,10
+Low Risk,2022,Aug,Above >14,None,24,1,0.027,1.633922,37.826004,11
+Highland,2022,Dec,Above >14,None,226,11,0.051,0.306403,36.162577,12
+Low Risk,2022,Apr,Above >14,Bed nets,25,1,0.049,1.264188,38.495767,1
+Seasonal,2022,Nov,Above >14,Vaccinations,289,125,0.434,0.74717,36.329473,2
+Seasonal,2022,Oct,Above >14,None,146,48,0.327,0.116088,36.927067,3
+Coastal,2022,Dec,Above >14,Bed nets,406,178,0.438,-4.059154,40.293267,4
+Lake Basin,2022,Nov,Above >14,None,278,126,0.453,0.020354,34.464137,5
+Coastal,2022,Jan,Above >14,Indoor spraying,348,72,0.207,-3.313444,40.077772,6
+Seasonal,2022,May,Above >14,Indoor spraying,389,121,0.311,0.082401,36.30477,7
+Low Risk,2022,Oct,Above >14,Bed nets,44,2,0.039,1.126944,38.143901,8
+Highland,2022,Jul,Above >14,Bed nets,304,58,0.191,0.573178,35.679738,9
+Highland,2022,Mar,Above >14,Vaccinations,236,61,0.256,0.486488,35.522209,10
+Low Risk,2022,Jun,Above >14,Bed nets,14,0,0.011,1.428987,38.305901,11
+Low Risk,2022,Apr,Above >14,Vaccinations,10,0,0.02,1.101001,37.8831,12
+Seasonal,2022,Feb,Above >14,Bed nets,91,17,0.191,0.278311,36.559333,1
+Seasonal,2022,Feb,Above >14,Vaccinations,263,91,0.346,0.777968,36.565281,2
+Coastal,2022,Sep,Below <5,Indoor spraying,344,160,0.465,-3.838099,40.447948,3
+Low Risk,2022,Apr,Below <5,Vaccinations,16,0,0.012,1.586083,37.509003,4
+Lake Basin,2022,Sep,Below <5,Bed nets,206,27,0.131,0.086402,34.641518,5
+Coastal,2022,Mar,Below <5,Vaccinations,160,73,0.455,-3.323505,40.262624,6
+Low Risk,2022,Nov,Below <5,Vaccinations,11,0,0.024,1.35335,37.600474,7
+Low Risk,2022,Feb,Below <5,Vaccinations,10,0,0.047,1.577578,38.137087,8
+Seasonal,2022,Nov,Below <5,None,306,36,0.119,0.59746,36.278316,9
+Coastal,2022,Oct,Below <5,Vaccinations,438,54,0.123,-4.356603,39.825161,10
+Coastal,2022,Feb,Below <5,Bed nets,191,27,0.141,-3.22834,40.210931,11
+Coastal,2022,Feb,Below <5,Indoor spraying,80,20,0.251,-3.793193,40.150599,12
+Highland,2022,Jun,Below <5,Bed nets,365,111,0.303,0.356592,36.110862,1
+Seasonal,2022,Feb,Below <5,None,125,45,0.359,0.081233,36.743693,2
+Coastal,2022,Mar,Below <5,Vaccinations,290,139,0.478,-3.859,39.988595,3
+Lake Basin,2022,Dec,Below <5,Vaccinations,419,55,0.131,-0.102774,34.886728,4
+Highland,2022,May,Below <5,Bed nets,298,146,0.491,0.563683,35.936608,5
+Low Risk,2022,Mar,Below <5,Indoor spraying,35,1,0.03,1.429312,38.136168,6
+Low Risk,2022,May,Below <5,Indoor spraying,10,0,0.018,1.843713,38.350493,7
+Lake Basin,2022,Aug,Below <5,None,449,150,0.333,-0.287559,34.238383,8
+Lake Basin,2022,Mar,Below <5,None,162,62,0.384,-0.229443,34.951347,9
+Highland,2022,Jan,Below <5,Bed nets,456,114,0.25,0.450398,36.21992,10
+Low Risk,2022,May,Below <5,None,16,0,0.018,1.986003,37.556766,11
+Low Risk,2022,Nov,Below <5,None,17,0,0.027,1.172087,37.821219,12
+Low Risk,2022,Sep,Below <5,Bed nets,28,1,0.05,1.951829,37.603878,1
+Lake Basin,2022,Feb,Below <5,Bed nets,426,89,0.21,0.283619,34.096647,2
+Highland,2022,Nov,Below <5,Vaccinations,162,60,0.373,0.584043,36.025541,3
+Highland,2022,Mar,Below <5,Indoor spraying,154,57,0.373,0.598571,35.502204,4
+Lake Basin,2022,Aug,Below <5,Bed nets,301,72,0.241,-0.179725,34.631349,5
+Coastal,2022,Mar,Below <5,None,158,64,0.406,-3.278443,39.823985,6
+Coastal,2022,May,Below <5,Indoor spraying,448,187,0.417,-4.308071,39.517157,7
+Highland,2022,Nov,Below <5,Indoor spraying,82,8,0.102,0.471568,36.097078,8
+Low Risk,2022,Jan,Below <5,None,45,1,0.02,1.343476,38.261471,9
+Lake Basin,2022,Nov,Below <5,Bed nets,422,113,0.269,-0.145861,34.318456,10
+Highland,2022,Sep,Below <5,Indoor spraying,480,187,0.39,0.325091,35.915309,11
+Highland,2022,Dec,Below <5,Bed nets,285,65,0.227,0.766578,36.317817,12
+Highland,2022,Jun,Below <5,Bed nets,294,49,0.167,0.790527,36.354104,1
+Lake Basin,2022,Jul,Below <5,None,446,165,0.37,0.391738,34.896707,2
+Low Risk,2022,Mar,Below <5,None,44,2,0.035,1.971392,37.668707,3
+Low Risk,2022,Jan,Below <5,Indoor spraying,38,2,0.049,1.680891,38.469918,4
+Lake Basin,2022,Jun,Below <5,Vaccinations,238,16,0.067,0.203462,34.026169,5
+Lake Basin,2022,Jun,Below <5,None,320,121,0.378,0.069714,34.047534,6
+Low Risk,2022,Sep,Below <5,Bed nets,28,1,0.042,1.873895,38.204317,7
+Coastal,2023,Mar,5 to 14,Vaccinations,482,104,0.215,-3.698118,39.871833,8
+Lake Basin,2023,Dec,5 to 14,Indoor spraying,386,79,0.205,0.073858,34.054547,9
+Low Risk,2023,Sep,5 to 14,Vaccinations,25,1,0.049,1.811383,37.546885,10
+Coastal,2023,Aug,5 to 14,None,65,26,0.4,-4.44777,40.18104,11
+Highland,2023,Aug,5 to 14,None,85,37,0.432,0.308707,35.645274,12
+Low Risk,2023,Sep,5 to 14,Indoor spraying,23,1,0.032,1.183982,38.410244,1
+Seasonal,2023,Oct,5 to 14,None,251,50,0.199,0.861866,36.862379,2
+Coastal,2023,Jun,5 to 14,Bed nets,104,26,0.249,-4.370623,39.547283,3
+Lake Basin,2023,Sep,5 to 14,Vaccinations,81,31,0.389,-0.284955,34.674031,4
+Lake Basin,2023,Sep,5 to 14,Vaccinations,481,146,0.304,-0.337027,34.417931,5
+Coastal,2023,Mar,5 to 14,Bed nets,319,30,0.095,-4.4434,39.728577,6
+Seasonal,2023,Mar,5 to 14,Bed nets,210,50,0.237,0.455703,36.130217,7
+Seasonal,2023,Apr,5 to 14,Bed nets,407,43,0.107,0.012605,36.311486,8
+Lake Basin,2023,Mar,5 to 14,Indoor spraying,426,169,0.397,0.044195,34.155744,9
+Coastal,2023,Apr,5 to 14,Indoor spraying,87,21,0.24,-3.603121,40.137126,10
+Coastal,2023,Nov,5 to 14,Bed nets,245,104,0.425,-3.503586,40.469181,11
+Highland,2023,Apr,5 to 14,None,289,80,0.276,0.674121,36.02678,12
+Seasonal,2023,Jun,5 to 14,None,323,123,0.38,0.251942,36.710023,1
+Lake Basin,2023,Mar,5 to 14,Indoor spraying,231,32,0.137,0.348945,34.101036,2
+Coastal,2023,Aug,5 to 14,Vaccinations,387,45,0.117,-4.361465,39.681608,3
+Highland,2023,Sep,5 to 14,None,116,32,0.275,0.55304,36.269685,4
+Coastal,2023,Oct,5 to 14,Indoor spraying,419,205,0.488,-4.475026,39.991576,5
+Highland,2023,Jul,5 to 14,Bed nets,183,14,0.078,0.69861,36.377612,6
+Highland,2023,Jun,5 to 14,Bed nets,468,182,0.389,0.355358,35.879458,7
+Seasonal,2023,Mar,5 to 14,Indoor spraying,122,26,0.213,0.270328,36.128944,8
+Coastal,2023,Jul,5 to 14,Bed nets,496,82,0.166,-3.517081,39.522239,9
+Highland,2023,Sep,5 to 14,Vaccinations,62,5,0.077,0.754074,35.929525,10
+Seasonal,2023,Jun,5 to 14,Bed nets,65,6,0.098,0.033858,36.246594,11
+Highland,2023,May,5 to 14,None,125,54,0.436,0.39846,36.255442,12
+Coastal,2023,Mar,5 to 14,None,153,52,0.343,-3.527778,40.482256,1
+Seasonal,2023,Mar,5 to 14,Indoor spraying,448,220,0.491,0.923572,36.100284,2
+Highland,2023,Aug,5 to 14,None,173,45,0.258,0.53295,36.4536,3
+Coastal,2023,Apr,5 to 14,None,421,113,0.268,-3.886996,40.174289,4
+Highland,2023,Mar,5 to 14,Bed nets,473,167,0.353,0.789038,35.521748,5
+Low Risk,2023,May,5 to 14,Indoor spraying,15,0,0.011,1.430983,38.311611,6
+Low Risk,2023,Sep,5 to 14,Indoor spraying,35,1,0.02,1.852813,37.830771,7
+Low Risk,2023,Feb,5 to 14,Bed nets,31,1,0.025,1.646087,37.754782,8
+Low Risk,2023,Jun,5 to 14,Bed nets,28,0,0.015,1.585216,37.931307,9
+Highland,2023,Mar,5 to 14,None,376,61,0.163,0.379388,35.670708,10
+Coastal,2023,Sep,5 to 14,Bed nets,89,25,0.285,-4.164445,39.624034,11
+Coastal,2023,Nov,5 to 14,Bed nets,465,66,0.143,-4.251549,40.210365,12
+Lake Basin,2023,Aug,5 to 14,Vaccinations,274,125,0.455,0.368178,34.865245,1
+Lake Basin,2023,Feb,5 to 14,Vaccinations,305,124,0.405,-0.366736,34.025717,2
+Low Risk,2023,Nov,Above >14,Indoor spraying,10,0,0.029,1.327488,38.100337,3
+Coastal,2023,May,Above >14,None,239,17,0.071,-3.735665,40.287701,4
+Lake Basin,2023,Jan,Above >14,Indoor spraying,311,36,0.115,-0.174967,34.887918,5
+Seasonal,2023,Jun,Above >14,None,204,102,0.498,0.071576,36.081645,6
+Lake Basin,2023,Apr,Above >14,Indoor spraying,463,126,0.272,0.442985,34.889323,7
+Low Risk,2023,Dec,Above >14,Vaccinations,48,2,0.04,1.747649,37.851786,8
+Coastal,2023,Mar,Above >14,Bed nets,405,42,0.104,-3.13948,39.950069,9
+Lake Basin,2023,Feb,Above >14,Vaccinations,478,67,0.14,-0.158583,34.693885,10
+Lake Basin,2023,May,Above >14,Bed nets,255,70,0.276,-0.483169,34.823226,11
+Highland,2023,Feb,Above >14,None,422,86,0.204,0.485403,35.52477,12
+Highland,2023,Dec,Above >14,Indoor spraying,169,57,0.34,0.414639,36.165412,1
+Lake Basin,2023,Mar,Above >14,Bed nets,399,84,0.211,0.384022,34.027053,2
+Low Risk,2023,Aug,Above >14,Vaccinations,32,1,0.033,1.206849,38.171112,3
+Lake Basin,2023,Jul,Above >14,Indoor spraying,157,51,0.327,-0.057607,34.518467,4
+Lake Basin,2023,Oct,Above >14,None,266,92,0.345,-0.119836,34.734353,5
+Seasonal,2023,Oct,Above >14,Indoor spraying,285,141,0.494,0.671808,36.17935,6
+Coastal,2023,Dec,Above >14,Bed nets,441,75,0.17,-3.851707,39.838004,7
+Highland,2023,Apr,Above >14,None,219,90,0.409,0.400731,36.235333,8
+Coastal,2023,Mar,Above >14,Indoor spraying,83,31,0.378,-3.14856,40.484535,9
+Lake Basin,2023,Feb,Above >14,Vaccinations,394,184,0.468,0.122768,34.448963,10
+Seasonal,2023,Nov,Above >14,Bed nets,421,124,0.295,0.73027,36.906456,11
+Coastal,2023,Oct,Above >14,Bed nets,92,44,0.476,-4.227261,40.323504,12
+Highland,2023,Mar,Above >14,Indoor spraying,350,163,0.465,0.381772,36.248028,1
+Low Risk,2023,May,Above >14,Indoor spraying,22,1,0.042,1.616605,38.376886,2
+Seasonal,2023,Mar,Above >14,Indoor spraying,349,54,0.154,0.956226,36.287784,3
+Highland,2023,Feb,Above >14,Vaccinations,283,117,0.412,0.327209,35.690581,4
+Low Risk,2023,Feb,Above >14,Indoor spraying,22,0,0.02,1.341177,38.309151,5
+Seasonal,2023,Jan,Above >14,Indoor spraying,200,79,0.397,0.460773,36.67118,6
+Highland,2023,Aug,Above >14,Indoor spraying,357,80,0.225,0.736971,35.797571,7
+Coastal,2023,May,Above >14,Bed nets,54,10,0.188,-3.765046,39.73276,8
+Highland,2023,May,Above >14,Bed nets,474,201,0.425,0.665827,35.78382,9
+Highland,2023,Nov,Above >14,None,259,67,0.259,0.372132,36.403404,10
+Low Risk,2023,Jan,Above >14,Bed nets,42,1,0.022,1.830654,38.035009,11
+Lake Basin,2023,Nov,Above >14,Bed nets,480,165,0.345,-0.042386,34.182378,12
+Coastal,2023,Oct,Above >14,Bed nets,345,88,0.255,-3.65562,39.877428,1
+Highland,2023,Feb,Above >14,Vaccinations,128,20,0.156,0.425749,35.969017,2
+Highland,2023,Sep,Above >14,Vaccinations,243,39,0.159,0.726323,35.958315,3
+Coastal,2023,Aug,Above >14,Bed nets,122,17,0.14,-4.120575,39.559418,4
+Coastal,2023,Jul,Above >14,None,408,48,0.119,-4.274869,39.717168,5
+Low Risk,2023,Dec,Above >14,Vaccinations,18,0,0.011,1.335961,37.792025,6
+Lake Basin,2023,Aug,Above >14,Bed nets,95,27,0.282,0.077897,34.819361,7
+Low Risk,2023,Mar,Below <5,None,37,1,0.017,1.489062,38.432644,8
+Highland,2023,Mar,Below <5,None,309,111,0.358,0.713961,35.651553,9
+Seasonal,2023,Apr,Below <5,Vaccinations,428,129,0.301,0.887616,36.835663,10
+Coastal,2023,Nov,Below <5,None,386,145,0.377,-3.532964,40.251694,11
+Seasonal,2023,Jul,Below <5,None,261,108,0.416,0.557169,36.776637,12
+Coastal,2023,Jul,Below <5,Indoor spraying,228,94,0.414,-3.39866,39.525678,1
+Coastal,2023,Oct,Below <5,Vaccinations,359,177,0.492,-3.934235,39.612605,2
+Highland,2023,Apr,Below <5,None,288,121,0.42,0.467812,36.060245,3
+Lake Basin,2023,Dec,Below <5,Bed nets,337,74,0.219,0.24023,34.197606,4
+Lake Basin,2023,Apr,Below <5,Indoor spraying,195,78,0.401,-0.217196,34.811012,5
+Highland,2023,Jul,Below <5,None,84,42,0.498,0.460413,36.319237,6
+Highland,2023,Mar,Below <5,Vaccinations,480,69,0.144,0.768564,36.344489,7
+Seasonal,2023,Jan,Below <5,None,149,34,0.229,0.269988,36.231074,8
+Highland,2023,Jan,Below <5,Vaccinations,404,118,0.293,0.545847,36.086485,9
+Highland,2023,Nov,Below <5,Vaccinations,398,161,0.405,0.471585,35.837908,10
+Low Risk,2023,Sep,Below <5,Bed nets,23,1,0.028,1.431014,37.977605,11
+Seasonal,2023,Feb,Below <5,None,347,24,0.07,0.027566,36.035149,12
+Seasonal,2023,Jun,Below <5,Bed nets,208,87,0.418,0.766869,36.040981,1
+Highland,2023,Dec,Below <5,Indoor spraying,109,8,0.075,0.568697,35.523633,2
+Low Risk,2023,Aug,Below <5,None,42,1,0.018,1.51356,38.198827,3
+Lake Basin,2023,May,Below <5,Vaccinations,349,87,0.25,-0.023826,34.262781,4
+Lake Basin,2023,Sep,Below <5,Vaccinations,205,86,0.418,0.263224,34.192531,5
+Highland,2023,Oct,Below <5,None,399,169,0.425,0.391729,35.971118,6
+Highland,2023,Jul,Below <5,None,62,11,0.182,0.611166,36.107106,7
+Coastal,2023,Mar,Below <5,Indoor spraying,453,203,0.448,-3.61886,39.981758,8
+Seasonal,2023,Oct,Below <5,Bed nets,376,94,0.251,0.718668,36.307086,9
+Coastal,2023,Nov,Below <5,None,314,112,0.356,-3.597481,40.397793,10
+Low Risk,2023,Sep,Below <5,Indoor spraying,35,1,0.018,1.642473,38.280414,11
+Seasonal,2023,Mar,Below <5,Bed nets,249,40,0.161,0.03349,36.297308,12
+Lake Basin,2023,Feb,Below <5,None,188,90,0.481,0.121541,34.91005,1
+Coastal,2023,Dec,Below <5,None,375,55,0.146,-3.406957,40.212529,2
+Low Risk,2023,Jun,Below <5,None,17,1,0.034,1.013245,38.114591,3
+Lake Basin,2023,Nov,Below <5,None,297,44,0.149,0.00829,34.80383,4
+Low Risk,2023,May,Below <5,Vaccinations,34,1,0.037,1.39149,38.237847,5
+Low Risk,2023,Nov,Below <5,Indoor spraying,38,1,0.036,1.516991,38.35188,6
+Coastal,2023,Jun,Below <5,Vaccinations,147,50,0.343,-4.371148,39.727613,7
+Seasonal,2023,Sep,Below <5,Bed nets,183,33,0.179,0.26162,36.213809,8
+Highland,2023,Sep,Below <5,None,248,38,0.155,0.668225,36.221485,9
+Low Risk,2023,Jul,Below <5,Indoor spraying,14,1,0.046,1.274611,37.757764,10
+Low Risk,2023,Feb,Below <5,Indoor spraying,30,1,0.038,1.346044,37.668584,11
+Lake Basin,2023,Nov,Below <5,Vaccinations,187,61,0.329,-0.248427,34.034886,12
+Low Risk,2023,Feb,Below <5,None,44,1,0.032,1.219533,37.731015,1
+Low Risk,2024,May,5 to 14,Indoor spraying,38,1,0.037,1.28032,38.128663,2
+Highland,2024,Nov,5 to 14,None,92,18,0.2,0.766917,35.980976,3
+Lake Basin,2024,Oct,5 to 14,None,498,181,0.363,0.094783,34.334472,4
+Low Risk,2024,Jan,5 to 14,None,47,1,0.015,1.785665,37.871362,5
+Highland,2024,Jul,5 to 14,None,136,62,0.453,0.642201,36.303245,6
+Highland,2024,Jun,5 to 14,Bed nets,272,38,0.141,0.693002,36.17368,7
+Seasonal,2024,Jan,5 to 14,None,441,177,0.401,0.678276,36.916257,8
+Coastal,2024,Dec,5 to 14,None,396,34,0.087,-4.188232,40.112208,9
+Lake Basin,2024,May,5 to 14,Vaccinations,454,100,0.22,-0.301294,34.46,10
+Low Risk,2024,Aug,5 to 14,Vaccinations,34,0,0.012,1.424613,37.511559,11
+Highland,2024,Jul,5 to 14,Bed nets,459,161,0.351,0.321385,36.09142,12
+Seasonal,2024,Feb,5 to 14,Bed nets,210,32,0.153,0.088722,36.8865,1
+Lake Basin,2024,Oct,5 to 14,Vaccinations,330,96,0.29,-0.300284,34.84372,2
+Seasonal,2024,Sep,5 to 14,None,122,42,0.346,0.807134,36.969785,3
+Coastal,2024,Sep,5 to 14,Vaccinations,346,37,0.106,-4.11039,39.67513,4
+Highland,2024,Dec,5 to 14,None,394,156,0.396,0.762215,35.965804,5
+Coastal,2024,Nov,5 to 14,Bed nets,396,98,0.249,-3.863189,39.625788,6
+Highland,2024,May,5 to 14,Vaccinations,139,28,0.204,0.623142,36.063292,7
+Seasonal,2024,Jun,5 to 14,Bed nets,463,112,0.242,0.153436,36.940354,8
+Lake Basin,2024,Aug,5 to 14,Indoor spraying,499,140,0.28,0.060492,34.522314,9
+Low Risk,2024,Dec,5 to 14,Bed nets,29,1,0.025,1.9687,37.802242,10
+Low Risk,2024,Jul,5 to 14,Indoor spraying,39,1,0.023,1.011842,38.30452,11
+Coastal,2024,Nov,5 to 14,Indoor spraying,52,5,0.103,-3.327307,40.398828,12
+Seasonal,2024,Jun,5 to 14,None,449,174,0.387,0.244457,36.129462,1
+Highland,2024,Nov,5 to 14,Bed nets,67,18,0.27,0.755473,36.052757,2
+Seasonal,2024,Mar,5 to 14,Bed nets,101,23,0.231,0.558371,36.260365,3
+Seasonal,2024,Jun,5 to 14,Vaccinations,332,28,0.083,0.887765,36.372747,4
+Highland,2024,Jan,5 to 14,Indoor spraying,354,48,0.135,0.389103,35.734246,5
+Highland,2024,Apr,5 to 14,None,112,19,0.17,0.344416,36.404326,6
+Lake Basin,2024,Feb,5 to 14,Vaccinations,477,128,0.268,0.003536,34.588777,7
+Highland,2024,Apr,5 to 14,Bed nets,443,30,0.068,0.798495,35.578726,8
+Highland,2024,Aug,5 to 14,Bed nets,124,25,0.203,0.716297,36.41512,9
+Lake Basin,2024,Mar,5 to 14,None,127,9,0.074,0.278424,34.378508,10
+Seasonal,2024,Oct,5 to 14,Vaccinations,264,105,0.399,0.674348,36.835842,11
+Lake Basin,2024,Apr,5 to 14,Bed nets,117,15,0.132,0.114445,34.422915,12
+Seasonal,2024,May,5 to 14,Vaccinations,55,14,0.25,0.38202,36.121376,1
+Seasonal,2024,Sep,5 to 14,None,404,134,0.331,0.784125,36.593806,2
+Lake Basin,2024,Aug,5 to 14,Bed nets,136,18,0.134,-0.301647,34.04555,3
+Highland,2024,Mar,5 to 14,Vaccinations,163,58,0.359,0.516859,35.877656,4
+Lake Basin,2024,Mar,5 to 14,Vaccinations,423,150,0.354,0.4943,34.702801,5
+Low Risk,2024,Jan,Above >14,None,10,0,0.023,1.969531,37.687398,6
+Seasonal,2024,Sep,Above >14,Bed nets,289,141,0.487,0.590831,36.077987,7
+Low Risk,2024,Mar,Above >14,None,47,2,0.037,1.604614,38.375612,8
+Low Risk,2024,Oct,Above >14,None,11,0,0.032,1.458297,37.966635,9
+Coastal,2024,Apr,Above >14,Vaccinations,191,68,0.356,-3.456984,39.501327,10
+Low Risk,2024,Feb,Above >14,Vaccinations,23,1,0.038,1.537852,38.155998,11
+Coastal,2024,Aug,Above >14,Bed nets,330,151,0.458,-4.084104,39.520966,12
+Lake Basin,2024,May,Above >14,Indoor spraying,409,70,0.171,-0.341591,34.0267,1
+Seasonal,2024,Jan,Above >14,Bed nets,99,12,0.123,0.233346,36.184408,2
+Low Risk,2024,Dec,Above >14,Indoor spraying,19,0,0.025,1.284939,38.150498,3
+Seasonal,2024,Aug,Above >14,None,164,77,0.468,0.337722,36.972351,4
+Coastal,2024,Feb,Above >14,None,387,83,0.214,-3.146265,40.497218,5
+Coastal,2024,Apr,Above >14,Bed nets,339,38,0.112,-4.03955,40.40932,6
+Lake Basin,2024,Aug,Above >14,Indoor spraying,144,42,0.29,0.193221,34.367734,7
+Highland,2024,Jun,Above >14,Vaccinations,74,26,0.356,0.397252,35.935177,8
+Seasonal,2024,Aug,Above >14,Bed nets,195,91,0.468,0.187812,36.986246,9
+Lake Basin,2024,Jun,Above >14,None,378,177,0.467,-0.293623,34.679386,10
+Seasonal,2024,Dec,Above >14,Bed nets,426,197,0.461,0.805383,36.740763,11
+Coastal,2024,Feb,Above >14,Bed nets,129,33,0.255,-3.78706,39.960677,12
+Coastal,2024,Dec,Above >14,Indoor spraying,153,67,0.436,-3.951122,39.998994,1
+Coastal,2024,Jul,Above >14,Vaccinations,330,148,0.447,-3.799268,39.842708,2
+Lake Basin,2024,Sep,Above >14,Bed nets,120,36,0.299,0.429564,34.202471,3
+Coastal,2024,Dec,Above >14,Indoor spraying,222,52,0.236,-3.177644,39.729793,4
+Highland,2024,Aug,Above >14,Bed nets,407,202,0.497,0.416891,36.185616,5
+Seasonal,2024,Nov,Above >14,Vaccinations,294,33,0.113,0.360816,36.808825,6
+Coastal,2024,Dec,Above >14,Vaccinations,382,67,0.175,-3.807142,40.226254,7
+Seasonal,2024,Mar,Above >14,None,372,140,0.377,0.33685,36.168129,8
+Lake Basin,2024,Dec,Above >14,Indoor spraying,112,19,0.171,-0.35174,34.378422,9
+Seasonal,2024,Dec,Above >14,Indoor spraying,150,21,0.143,0.705014,36.802632,10
+Low Risk,2024,Mar,Above >14,Indoor spraying,48,1,0.02,1.731323,37.559823,11
+Coastal,2024,Dec,Above >14,Bed nets,449,60,0.133,-3.665025,39.830072,12
+Low Risk,2024,Jan,Above >14,Indoor spraying,20,0,0.015,1.420194,38.23574,1
+Highland,2024,Mar,Above >14,None,261,122,0.467,0.388964,36.254465,2
+Low Risk,2024,Dec,Above >14,Vaccinations,49,2,0.047,1.982295,38.450001,3
+Low Risk,2024,Apr,Above >14,Indoor spraying,18,1,0.03,1.87113,37.771518,4
+Coastal,2024,Sep,Above >14,Vaccinations,492,42,0.085,-3.43929,39.883554,5
+Lake Basin,2024,May,Above >14,Vaccinations,85,19,0.223,-0.290393,34.671908,6
+Highland,2024,Nov,Below <5,None,61,16,0.261,0.669081,35.506569,7
+Lake Basin,2024,Feb,Below <5,None,248,101,0.409,-0.234708,34.586604,8
+Coastal,2024,Jul,Below <5,None,153,42,0.272,-3.540926,39.535719,9
+Low Risk,2024,Jul,Below <5,Bed nets,16,1,0.049,1.009216,37.790795,10
+Seasonal,2024,Jul,Below <5,None,257,50,0.194,0.517634,36.716897,11
+Seasonal,2024,Sep,Below <5,Indoor spraying,152,15,0.1,0.321548,36.023999,12
+Lake Basin,2024,Dec,Below <5,Bed nets,394,34,0.086,0.130669,34.668888,1
+Lake Basin,2024,Jan,Below <5,None,447,191,0.428,0.460195,34.82175,2
+Seasonal,2024,Nov,Below <5,Indoor spraying,223,51,0.227,0.908234,36.272658,3
+Lake Basin,2024,Dec,Below <5,Indoor spraying,61,18,0.302,-0.026764,34.064157,4
+Coastal,2024,Sep,Below <5,Indoor spraying,353,123,0.347,-3.239091,39.561568,5
+Highland,2024,Jan,Below <5,Bed nets,454,135,0.297,0.713689,36.161682,6
+Coastal,2024,Oct,Below <5,None,424,172,0.406,-3.145388,39.560464,7
+Lake Basin,2024,Dec,Below <5,Vaccinations,346,126,0.363,-0.069661,34.122104,8
+Highland,2024,May,Below <5,Indoor spraying,125,24,0.193,0.538052,35.720292,9
+Coastal,2024,Oct,Below <5,Vaccinations,94,23,0.24,-3.813874,39.724306,10
+Lake Basin,2024,Sep,Below <5,Vaccinations,469,226,0.482,0.1853,34.586498,11
+Seasonal,2024,Feb,Below <5,Vaccinations,276,89,0.324,0.253883,36.075259,12
+Highland,2024,Jan,Below <5,Bed nets,88,6,0.073,0.707825,36.041863,1
+Lake Basin,2024,Jul,Below <5,None,149,36,0.242,0.47406,34.876465,2
+Lake Basin,2024,Aug,Below <5,Bed nets,366,73,0.198,-0.330029,34.056522,3
+Highland,2024,Oct,Below <5,Indoor spraying,335,141,0.421,0.510726,36.076988,4
+Highland,2024,Jun,Below <5,Bed nets,208,76,0.368,0.543212,35.713239,5
+Highland,2024,Jul,Below <5,Indoor spraying,224,95,0.422,0.344632,36.210402,6
+Lake Basin,2024,Apr,Below <5,None,389,192,0.494,-0.166824,34.355793,7
+Lake Basin,2024,Dec,Below <5,Indoor spraying,306,121,0.394,0.209908,34.075706,8
+Highland,2024,Dec,Below <5,Vaccinations,425,145,0.34,0.546431,35.679353,9
+Coastal,2024,Mar,Below <5,Indoor spraying,291,70,0.242,-3.438159,39.808964,10
+Lake Basin,2024,Dec,Below <5,Bed nets,179,22,0.124,0.280627,34.52202,11
+Coastal,2024,Jan,Below <5,Indoor spraying,124,38,0.308,-3.961191,40.091381,12
+Coastal,2024,Nov,Below <5,None,323,38,0.117,-4.423413,39.738727,1
+Low Risk,2024,Nov,Below <5,Vaccinations,15,0,0.03,1.767791,38.050243,2
+Low Risk,2024,Nov,Below <5,Indoor spraying,48,2,0.034,1.02456,37.861492,3
+Low Risk,2024,May,Below <5,Vaccinations,25,1,0.028,1.65994,37.698313,4
+Low Risk,2024,Oct,Below <5,Bed nets,28,1,0.047,1.706723,37.870464,5
+Highland,2024,Oct,Below <5,Indoor spraying,430,127,0.296,0.434322,35.916464,6
+Highland,2024,Dec,Below <5,Indoor spraying,483,142,0.293,0.781537,35.844206,7
+Coastal,2024,Sep,Below <5,Indoor spraying,410,48,0.117,-3.42372,40.347591,8
+Highland,2024,Aug,Below <5,Indoor spraying,322,134,0.415,0.65854,36.103055,9
+Seasonal,2024,Feb,Below <5,Bed nets,297,69,0.231,0.004881,36.669875,10
+Seasonal,2024,Aug,Below <5,Vaccinations,454,105,0.232,0.865903,36.40217,11
+Seasonal,2024,May,Below <5,Bed nets,185,73,0.393,0.686601,36.532576,12
+Seasonal,2024,Nov,Below <5,Indoor spraying,373,108,0.289,0.00645,36.659593,1
+Lake Basin,2025,Aug,5 to 14,Indoor spraying,146,63,0.428,-0.400119,34.174334,2
+Lake Basin,2025,Aug,5 to 14,None,82,36,0.44,-0.167675,34.17361,3
+Lake Basin,2025,May,5 to 14,None,327,125,0.383,0.003828,34.270049,4
+Coastal,2025,Dec,5 to 14,Bed nets,430,51,0.119,-3.61587,39.860772,5
+Lake Basin,2025,Apr,5 to 14,Indoor spraying,126,56,0.447,-0.289821,34.285417,6
+Seasonal,2025,Oct,5 to 14,Bed nets,122,17,0.143,0.234162,36.011086,7
+Seasonal,2025,Jul,5 to 14,Indoor spraying,323,23,0.07,0.704019,36.88733,8
+Coastal,2025,Jul,5 to 14,Vaccinations,198,38,0.194,-3.604795,40.428619,9
+Seasonal,2025,Aug,5 to 14,Indoor spraying,195,56,0.287,0.543134,36.817048,10
+Coastal,2025,Oct,5 to 14,None,121,51,0.422,-4.299483,39.886939,11
+Coastal,2025,Jul,5 to 14,None,182,51,0.282,-3.257007,39.760329,12
+Lake Basin,2025,Aug,5 to 14,Indoor spraying,194,79,0.408,0.052523,34.591513,1
+Highland,2025,Sep,5 to 14,Bed nets,207,51,0.246,0.68129,35.585292,2
+Seasonal,2025,Nov,5 to 14,Vaccinations,110,32,0.291,0.690538,36.122871,3
+Low Risk,2025,Mar,5 to 14,Bed nets,40,2,0.048,1.851999,38.036597,4
+Lake Basin,2025,Feb,5 to 14,Indoor spraying,135,17,0.128,-0.436294,34.788791,5
+Low Risk,2025,Jul,5 to 14,None,18,1,0.029,1.891496,37.574387,6
+Low Risk,2025,Apr,5 to 14,Vaccinations,17,0,0.01,1.020795,38.24182,7
+Coastal,2025,May,5 to 14,None,211,93,0.443,-4.292576,39.507174,8
+Highland,2025,Jan,5 to 14,Vaccinations,213,29,0.134,0.319673,35.561256,9
+Seasonal,2025,Sep,5 to 14,Vaccinations,231,100,0.433,0.533908,36.04032,10
+Low Risk,2025,Jun,5 to 14,Bed nets,32,1,0.033,1.935804,37.646498,11
+Coastal,2025,Feb,5 to 14,Vaccinations,464,191,0.411,-4.161097,39.755934,12
+Lake Basin,2025,Jul,5 to 14,None,406,57,0.139,-0.384519,34.454761,1
+Coastal,2025,Nov,5 to 14,None,182,41,0.223,-3.592864,40.340191,2
+Lake Basin,2025,Feb,5 to 14,None,480,213,0.443,0.424302,34.297965,3
+Seasonal,2025,Aug,5 to 14,Vaccinations,168,78,0.466,0.896829,36.515762,4
+Low Risk,2025,Aug,5 to 14,None,35,1,0.027,1.495355,37.798918,5
+Highland,2025,Apr,5 to 14,None,134,37,0.273,0.695054,36.341685,6
+Low Risk,2025,Jun,5 to 14,None,34,0,0.013,1.794455,37.864303,7
+Seasonal,2025,Oct,5 to 14,Vaccinations,183,75,0.408,0.707603,36.6512,8
+Low Risk,2025,Mar,5 to 14,Vaccinations,30,1,0.04,1.355811,38.356462,9
+Highland,2025,Jul,5 to 14,None,330,116,0.35,0.766204,35.620038,10
+Lake Basin,2025,Apr,5 to 14,Bed nets,112,20,0.182,-0.297197,34.232889,11
+Seasonal,2025,Jan,5 to 14,None,220,69,0.313,0.586434,36.213654,12
+Seasonal,2025,Jun,5 to 14,Bed nets,124,23,0.187,0.200704,36.953933,1
+Coastal,2025,Aug,5 to 14,Vaccinations,177,38,0.216,-3.674863,40.430205,2
+Lake Basin,2025,Sep,5 to 14,Indoor spraying,449,142,0.316,-0.005672,34.811984,3
+Coastal,2025,Jan,5 to 14,None,338,70,0.207,-3.25161,39.703171,4
+Highland,2025,Dec,5 to 14,Indoor spraying,436,78,0.179,0.579902,35.672024,5
+Low Risk,2025,Jun,5 to 14,None,34,1,0.024,1.107165,37.70726,6
+Seasonal,2025,Feb,5 to 14,Vaccinations,440,58,0.132,0.350794,36.552042,7
+Lake Basin,2025,Sep,5 to 14,Indoor spraying,315,73,0.233,-0.198593,34.510835,8
+Seasonal,2025,Feb,5 to 14,Indoor spraying,378,65,0.171,0.132121,36.43519,9
+Coastal,2025,Apr,Above >14,Vaccinations,363,60,0.166,-4.373175,40.14652,10
+Lake Basin,2025,Aug,Above >14,Vaccinations,348,46,0.132,0.244877,34.763136,11
+Seasonal,2025,Jan,Above >14,Bed nets,324,115,0.356,0.559804,36.547381,12
+Lake Basin,2025,May,Above >14,Vaccinations,373,105,0.283,-0.321175,34.284029,1
+Highland,2025,Apr,Above >14,Indoor spraying,166,35,0.212,0.352409,36.373892,2
+Highland,2025,Dec,Above >14,None,435,98,0.225,0.337701,36.05968,3
+Highland,2025,Aug,Above >14,None,351,126,0.358,0.633225,35.855423,4
+Seasonal,2025,Mar,Above >14,Vaccinations,101,29,0.291,0.712163,36.956772,5
+Highland,2025,Mar,Above >14,Bed nets,413,108,0.262,0.453422,36.278723,6
+Seasonal,2025,May,Above >14,Bed nets,135,32,0.238,0.640133,36.997285,7
+Coastal,2025,Dec,Above >14,Vaccinations,482,109,0.226,-4.263337,40.033355,8
+Lake Basin,2025,Jan,Above >14,None,465,194,0.418,-0.269245,34.879196,9
+Coastal,2025,Mar,Above >14,Bed nets,388,94,0.241,-3.210432,40.488583,10
+Low Risk,2025,Nov,Above >14,Vaccinations,46,2,0.049,1.262156,38.218885,11
+Coastal,2025,Jan,Above >14,None,214,88,0.413,-4.24943,40.260515,12
+Coastal,2025,Nov,Above >14,Indoor spraying,423,165,0.389,-3.80857,40.026253,1
+Highland,2025,Dec,Above >14,Indoor spraying,77,37,0.486,0.60404,35.59817,2
+Seasonal,2025,Nov,Above >14,Vaccinations,168,20,0.122,0.944026,36.027639,3
+Low Risk,2025,Apr,Above >14,None,15,1,0.034,1.29472,38.162612,4
+Highland,2025,Nov,Above >14,Bed nets,434,96,0.222,0.773735,35.822593,5
+Lake Basin,2025,Nov,Above >14,Vaccinations,110,11,0.097,-0.371847,34.31543,6
+Highland,2025,Jun,Above >14,Vaccinations,227,15,0.065,0.67679,35.617385,7
+Coastal,2025,Oct,Above >14,Indoor spraying,321,108,0.337,-3.321565,39.623842,8
+Low Risk,2025,Aug,Above >14,Bed nets,33,1,0.02,1.563246,38.462913,9
+Seasonal,2025,Jul,Above >14,None,239,79,0.332,0.485369,36.315258,10
+Coastal,2025,Dec,Above >14,Vaccinations,76,28,0.373,-3.469377,40.334412,11
+Lake Basin,2025,Oct,Above >14,Bed nets,66,5,0.079,0.182372,34.794147,12
+Seasonal,2025,Jun,Above >14,Indoor spraying,188,81,0.431,0.890096,36.780948,1
+Seasonal,2025,Apr,Above >14,Bed nets,131,38,0.29,0.821119,36.120355,2
+Highland,2025,Dec,Above >14,None,399,88,0.219,0.751534,35.866566,3
+Low Risk,2025,Dec,Above >14,Indoor spraying,17,0,0.012,1.439627,37.533136,4
+Coastal,2025,Dec,Above >14,Indoor spraying,317,62,0.196,-3.735796,40.429831,5
+Coastal,2025,May,Above >14,Indoor spraying,107,12,0.11,-3.696381,40.121836,6
+Seasonal,2025,Oct,Above >14,Indoor spraying,377,22,0.059,0.542925,36.809387,7
+Seasonal,2025,Jan,Above >14,None,383,27,0.071,0.760486,36.986677,8
+Low Risk,2025,Oct,Above >14,Indoor spraying,32,1,0.017,1.835285,38.253043,9
+Seasonal,2025,Mar,Above >14,Indoor spraying,123,12,0.094,0.9368,36.58002,10
+Highland,2025,Aug,Above >14,Bed nets,260,96,0.37,0.644317,35.931124,11
+Coastal,2025,Mar,Above >14,Indoor spraying,70,34,0.49,-4.055167,39.890188,12
+Highland,2025,Sep,Above >14,None,380,26,0.068,0.590951,35.928292,1
+Lake Basin,2025,Oct,Below <5,Bed nets,63,12,0.185,-0.457987,34.77109,2
+Highland,2025,Dec,Below <5,None,166,12,0.072,0.480006,36.374907,3
+Seasonal,2025,Jul,Below <5,None,207,43,0.209,0.384589,36.074663,4
+Coastal,2025,Apr,Below <5,Vaccinations,110,14,0.128,-4.244006,40.104235,5
+Seasonal,2025,May,Below <5,None,395,20,0.051,0.962326,36.90356,6
+Highland,2025,Apr,Below <5,Bed nets,227,16,0.072,0.765459,36.062929,7
+Seasonal,2025,Feb,Below <5,Bed nets,388,124,0.319,0.351863,36.028292,8
+Highland,2025,Apr,Below <5,None,456,52,0.114,0.692534,36.231308,9
+Coastal,2025,Sep,Below <5,Bed nets,78,28,0.36,-3.800521,39.794015,10
+Lake Basin,2025,Dec,Below <5,Indoor spraying,149,73,0.487,0.066219,34.148859,11
+Low Risk,2025,Jun,Below <5,Indoor spraying,36,1,0.03,1.793479,38.181509,12
+Coastal,2025,Aug,Below <5,Vaccinations,347,140,0.403,-4.172818,40.136147,1
+Seasonal,2025,Mar,Below <5,Indoor spraying,393,58,0.147,0.30414,36.382603,2
+Low Risk,2025,May,Below <5,Indoor spraying,40,1,0.035,1.280311,37.530751,3
+Highland,2025,Jan,Below <5,Indoor spraying,257,77,0.3,0.37596,36.459119,4
+Seasonal,2025,Aug,Below <5,Vaccinations,58,8,0.132,0.938565,36.145955,5
+Coastal,2025,Oct,Below <5,Vaccinations,215,29,0.135,-3.65419,39.862383,6
+Lake Basin,2025,Dec,Below <5,Bed nets,404,36,0.088,0.221617,34.245079,7
+Lake Basin,2025,Dec,Below <5,Bed nets,305,127,0.415,-0.409132,34.980902,8
+Lake Basin,2025,May,Below <5,None,425,102,0.239,0.336523,34.398183,9
+Highland,2025,Feb,Below <5,None,185,85,0.459,0.477013,35.549276,10
+Coastal,2025,Feb,Below <5,Vaccinations,486,142,0.292,-4.162723,39.957598,11
+Lake Basin,2025,Aug,Below <5,Indoor spraying,319,150,0.471,-0.469218,34.116913,12
+Coastal,2025,Jan,Below <5,Vaccinations,117,35,0.3,-3.023377,39.811139,1
+Seasonal,2025,May,Below <5,Bed nets,168,54,0.323,0.704437,36.163603,2
+Seasonal,2025,Oct,Below <5,None,93,21,0.225,0.730752,36.575054,3
+Coastal,2025,Sep,Below <5,Bed nets,153,43,0.278,-4.496689,40.252119,4
+Lake Basin,2025,Dec,Below <5,Bed nets,403,99,0.246,-0.415052,34.430685,5
+Low Risk,2025,Nov,Below <5,Indoor spraying,46,2,0.046,1.070752,38.170033,6
+Highland,2025,Mar,Below <5,Bed nets,279,41,0.147,0.341335,35.658562,7
+Highland,2025,Dec,Below <5,Indoor spraying,361,50,0.138,0.754502,35.669536,8
+Seasonal,2025,Apr,Below <5,None,283,21,0.073,0.938827,36.563129,9
+Highland,2025,Sep,Below <5,None,310,26,0.083,0.59286,35.961068,10
+Coastal,2025,Nov,Below <5,Bed nets,51,24,0.462,-3.115557,39.914553,11
+Highland,2025,Apr,Below <5,Vaccinations,446,47,0.106,0.634139,35.8937,12
+Seasonal,2025,Sep,Below <5,Vaccinations,212,83,0.394,0.318151,36.564194,1
+Seasonal,2025,Aug,Below <5,Vaccinations,226,51,0.228,0.863319,36.730278,2
+Highland,2025,Jun,Below <5,Bed nets,412,62,0.151,0.376115,36.463465,3
+Highland,2025,May,Below <5,Vaccinations,126,58,0.462,0.593386,36.264806,4
+Seasonal,2025,Jan,Below <5,Indoor spraying,461,75,0.163,0.82572,36.643692,5
+Lake Basin,2025,Dec,Below <5,Vaccinations,268,43,0.159,0.396701,34.792467,6
+Coastal,2025,Aug,Below <5,Bed nets,247,37,0.15,-4.181601,39.553536,7
+Lake Basin,2025,Aug,Below <5,Bed nets,460,212,0.46,0.332561,34.77379,8
