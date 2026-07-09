@@ -1122,20 +1122,26 @@ def transcript():
 
 def ensure_notes_file_exists(session) -> bool:
     """Ensure session's note file exists on disk, auto-restoring from DB BLOB if missing."""
-    if not session or not session.notes_file_path:
+    if not session:
         return False
-    filename = session.notes_file_path.split("/")[-1]
-    filepath = UPLOADS_DIR / filename
-    if filepath.exists() and filepath.is_file():
-        return True
+    # If we have the binary data in database, the note is available virtually
     if session.notes_file_data:
-        try:
-            UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
-            with open(filepath, "wb") as f:
-                f.write(session.notes_file_data)
-            return True
-        except Exception as e:
-            app.logger.error(f"Failed to auto-restore session note file: {e}")
+        if session.notes_file_path:
+            filename = session.notes_file_path.split("/")[-1]
+            filepath = UPLOADS_DIR / filename
+            if not (filepath.exists() and filepath.is_file()):
+                try:
+                    UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+                    with open(filepath, "wb") as f:
+                        f.write(session.notes_file_data)
+                except Exception:
+                    pass # Ignore write errors on read-only filesystems (e.g. Vercel)
+        return True
+    
+    if session.notes_file_path:
+        filename = session.notes_file_path.split("/")[-1]
+        filepath = UPLOADS_DIR / filename
+        return filepath.exists() and filepath.is_file()
     return False
 
 
@@ -1295,7 +1301,8 @@ def session_detail(slug: str):
 @app.route("/session/<int:session_id>/download")
 @login_required
 def download_notes(session_id: int):
-    from flask import send_from_directory
+    from flask import send_from_directory, send_file
+    from io import BytesIO
     session = db.session.get(Session, session_id)
     if not session or not ensure_notes_file_exists(session):
         flash("Notes file not found.", "error")
@@ -1308,8 +1315,24 @@ def download_notes(session_id: int):
             flash("Access to this note/revision material is restricted for your experience level.", "error")
         return redirect(request.referrer or url_for("student_dashboard"))
     
-    filename = session.notes_file_path.split("/")[-1]
-    return send_from_directory(UPLOADS_DIR, filename, as_attachment=False)
+    # Try serving from disk if the file is available
+    if session.notes_file_path:
+        filename = session.notes_file_path.split("/")[-1]
+        filepath = UPLOADS_DIR / filename
+        if filepath.exists() and filepath.is_file():
+            return send_from_directory(UPLOADS_DIR, filename, as_attachment=False)
+            
+    # Fallback to database BLOB in memory
+    if session.notes_file_data:
+        return send_file(
+            BytesIO(session.notes_file_data),
+            mimetype="application/pdf",
+            as_attachment=False,
+            download_name=session.notes_file_name or "notes.pdf"
+        )
+        
+    flash("Notes file not found.", "error")
+    return redirect(request.referrer or url_for("student_dashboard"))
 
 
 @app.route("/session/<int:session_id>/view")
