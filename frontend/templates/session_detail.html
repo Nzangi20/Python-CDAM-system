@@ -108,11 +108,22 @@
       
       {% if notes_exist %}
         <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
-          <h4 style="font-weight: 700; margin-bottom: 0.75rem;">Session Learning Materials</h4>
-          <a class="btn primary" href="{{ url_for('view_notes', session_id=session.id) }}" target="_blank">
-            <i class="fa-solid fa-eye"></i> View Session Notes / Materials
-          </a>
-          <p class="muted" style="font-size: 0.8rem; margin-top: 0.5rem;"><i class="fa-solid fa-lock" style="margin-right: 0.25rem;"></i> Materials are view-only and cannot be downloaded.</p>
+          <h4 style="font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text); margin-bottom: 0.25rem;">
+            <i class="fa-solid fa-book-open" style="color: var(--red-500);"></i> Session Notes &amp; Study Material
+          </h4>
+          <p class="muted" style="font-size: 0.85rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.35rem;">
+            <i class="fa-solid fa-lock" style="color: var(--purple-brand);"></i> View-only &mdash; downloading and printing are disabled to protect academic content.
+          </p>
+          <div class="card" style="padding: 0; background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius); position: relative; overflow: hidden; height: 75vh;">
+            <iframe id="sessionPdfViewer" src="{{ url_for('download_notes', session_id=session.id) }}#toolbar=0&navpanes=0" style="width: 100%; height: 100%; border: none;" allow="autoplay"></iframe>
+            <!-- Overlay to block right-click saving on the iframe -->
+            <div id="pdfOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; cursor: default; pointer-events: none;"></div>
+          </div>
+          <div style="margin-top: 0.75rem; display: flex; justify-content: flex-end;">
+            <a class="btn ghost" href="{{ url_for('view_notes', session_id=session.id) }}" target="_blank" style="font-size: 0.825rem; padding: 0.4rem 0.8rem;">
+              <i class="fa-solid fa-expand"></i> Open in Full Screen
+            </a>
+          </div>
         </div>
       {% endif %}
 
