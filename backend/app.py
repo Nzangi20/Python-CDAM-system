@@ -486,59 +486,90 @@ def check_session_access(user, display_order, course_type=None):
 
 
 def seed_sessions() -> None:
+    # 0. Check deleted sessions and curriculum version
+    deleted_setting = PlatformSetting.query.filter_by(key="deleted_session_slugs").first()
+    deleted_slugs = set()
+    if deleted_setting and deleted_setting.value:
+        deleted_slugs = {s.strip() for s in deleted_setting.value.split(",") if s.strip()}
+
+    force_update = False
+    version_setting = PlatformSetting.query.filter_by(key="curriculum_version").first()
+    if not version_setting:
+        version_setting = PlatformSetting(key="curriculum_version", value="3")
+        db.session.add(version_setting)
+        db.session.commit()
+        force_update = True
+    elif version_setting.value != "3":
+        version_setting.value = "3"
+        db.session.commit()
+        force_update = True
+
     # 1. Update/insert Python sessions from SESSIONS
     for idx, item in enumerate(SESSIONS, start=1):
+        if item["slug"] in deleted_slugs:
+            continue
         session_obj = Session.query.filter_by(slug=item["slug"]).first()
+        is_new = False
         if not session_obj:
             session_obj = Session(slug=item["slug"])
-        session_obj.title = item["title"]
-        session_obj.description = item["description"]
-        session_obj.content = item.get("content", "")
-        session_obj.objectives = item["objectives"]
-        session_obj.expected_outcomes = item.get("expected_outcomes", "")
-        session_obj.learning_notes = item.get("learning_notes", "")
-        session_obj.instructions = item.get("instructions", "")
-        session_obj.code_examples = item["code_examples"]
-        session_obj.resources = item["resources"]
-        session_obj.quiz_json = json.dumps(item.get("quiz", []))
-        session_obj.duration = item["duration"]
-        session_obj.difficulty = item["difficulty"]
-        session_obj.display_order = idx
-        session_obj.published = True
-        session_obj.course_type = "python"
-        db.session.add(session_obj)
+            is_new = True
+        
+        if is_new or force_update:
+            session_obj.title = item["title"]
+            session_obj.description = item["description"]
+            session_obj.content = item.get("content", "")
+            session_obj.objectives = item["objectives"]
+            session_obj.expected_outcomes = item.get("expected_outcomes", "")
+            session_obj.learning_notes = item.get("learning_notes", "")
+            session_obj.instructions = item.get("instructions", "")
+            session_obj.code_examples = item["code_examples"]
+            session_obj.resources = item["resources"]
+            session_obj.quiz_json = json.dumps(item.get("quiz", []))
+            session_obj.duration = item["duration"]
+            session_obj.difficulty = item["difficulty"]
+            session_obj.display_order = idx
+            session_obj.published = True
+            session_obj.course_type = "python"
+            db.session.add(session_obj)
 
     # 2. Update/insert R sessions from R_SESSIONS
     r_slugs = [item["slug"] for item in R_SESSIONS]
     for idx, item in enumerate(R_SESSIONS, start=1):
+        if item["slug"] in deleted_slugs:
+            continue
         session_obj = Session.query.filter_by(slug=item["slug"]).first()
+        is_new = False
         if not session_obj:
             session_obj = Session(slug=item["slug"])
-        session_obj.title = item["title"]
-        session_obj.description = item["description"]
-        session_obj.content = item.get("content", "")
-        session_obj.objectives = item["objectives"]
-        session_obj.expected_outcomes = item.get("expected_outcomes", "")
-        session_obj.learning_notes = item.get("learning_notes", "")
-        session_obj.instructions = item.get("instructions", "")
-        session_obj.code_examples = item["code_examples"]
-        session_obj.resources = item["resources"]
-        session_obj.quiz_json = json.dumps(item.get("quiz", []))
-        session_obj.duration = item["duration"]
-        session_obj.difficulty = item["difficulty"]
-        session_obj.notes_file_path = item.get("notes_file_path", None)
-        session_obj.display_order = idx
-        session_obj.published = True
-        session_obj.course_type = "r"
-        db.session.add(session_obj)
+            is_new = True
+            
+        if is_new or force_update:
+            session_obj.title = item["title"]
+            session_obj.description = item["description"]
+            session_obj.content = item.get("content", "")
+            session_obj.objectives = item["objectives"]
+            session_obj.expected_outcomes = item.get("expected_outcomes", "")
+            session_obj.learning_notes = item.get("learning_notes", "")
+            session_obj.instructions = item.get("instructions", "")
+            session_obj.code_examples = item["code_examples"]
+            session_obj.resources = item["resources"]
+            session_obj.quiz_json = json.dumps(item.get("quiz", []))
+            session_obj.duration = item["duration"]
+            session_obj.difficulty = item["difficulty"]
+            session_obj.notes_file_path = item.get("notes_file_path", None)
+            session_obj.display_order = idx
+            session_obj.published = True
+            session_obj.course_type = "r"
+            db.session.add(session_obj)
 
-    # 3. Clean up any obsolete seeded R sessions
+    # 3. Clean up any obsolete seeded R sessions (that are not deleted by admin)
     obsolete_r_sessions = Session.query.filter(
         Session.course_type == "r",
         Session.slug.like("r-session-%"),
         ~Session.slug.in_(r_slugs)
     ).all()
     for s in obsolete_r_sessions:
+        # Don't delete again if already gone or skipped
         db.session.delete(s)
 
     db.session.commit()
@@ -2829,6 +2860,19 @@ def admin_session_delete(session_id: int):
     if not session_obj:
         flash("Session not found.", "error")
         return redirect(url_for("admin_panel"))
+    
+    # Save the deleted slug before deleting it to prevent recreation by seed
+    slug = session_obj.slug
+    deleted_setting = PlatformSetting.query.filter_by(key="deleted_session_slugs").first()
+    if not deleted_setting:
+        deleted_setting = PlatformSetting(key="deleted_session_slugs", value=slug)
+        db.session.add(deleted_setting)
+    else:
+        slugs = [s.strip() for s in (deleted_setting.value or "").split(",") if s.strip()]
+        if slug not in slugs:
+            slugs.append(slug)
+            deleted_setting.value = ",".join(slugs)
+            
     UserProgress.query.filter_by(session_id=session_id).delete()
     QuizResult.query.filter_by(session_id=session_id).delete()
     Bookmark.query.filter_by(session_id=session_id).delete()
