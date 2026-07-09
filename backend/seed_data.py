@@ -595,7 +595,7 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'quiz': [],
         'resources': '- [R Data Import/Export Guide](https://cran.r-project.org/doc/manuals/r-release/R-data.html)',
         'slug': 'r-session-2-data-import-eda',
-        'title': 'Session 2: Data Import, Cleaning and EDA'},
+        'title': 'Session 2: Data Importation, Cleaning and EDA'},
     {   'code_examples': 'library(dplyr)\n'
                          '# Create sales data\n'
                          'df <- data.frame(\n'
@@ -670,7 +670,7 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'quiz': [],
         'resources': '- [ggplot2 Elegant Graphics for Data Analysis](https://ggplot2-book.org/)',
         'slug': 'r-session-4-ggplot2-visualization',
-        'title': 'Session 4: Data Visualization with ggplot2'},
+        'title': 'Session 4: Data Visualization in R with ggplot2'},
     {   'code_examples': '# Student scores sample\n'
                          'scores <- c(78, 85, 92, 88, 79, 81, 95, 87)\n'
                          '# Run one-sample t-test\n'
@@ -698,7 +698,7 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'quiz': [],
         'resources': '- [Quick-R t-tests](https://www.statmethods.net/stats/ttests.html)',
         'slug': 'r-session-5-hypothesis-testing',
-        'title': 'Session 5: Hypothesis Testing'},
+        'title': 'Session 5: Hypothesis Testing in R'},
     {   'code_examples': '# Correlation and Regression\n'
                          'hours <- c(2, 4, 6, 8, 10)\n'
                          'scores <- c(55, 65, 75, 80, 95)\n'
@@ -756,7 +756,7 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'quiz': [],
         'resources': '- [ANOVA in R Tutorial](https://www.datanovia.com/en/lessons/anova-in-r/)',
         'slug': 'r-session-7-anova-tests',
-        'title': 'Session 7: ANOVA and Non-Parametric Tests'},
+        'title': 'Session 7: Analysis of Variance and Non-Parametric Tests'},
     {   'code_examples': '# Simulated quarterly sales data over 2 years\n'
                          'sales <- c(100, 120, 110, 150, 105, 125, 115, 160)\n'
                          '# Create ts object starting in 2023\n'
@@ -784,7 +784,7 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'quiz': [],
         'resources': '- [Time Series Analysis with R](https://otexts.com/fpp2/)',
         'slug': 'r-session-8-time-series',
-        'title': 'Session 8: Time Series Analysis'},
+        'title': 'Session 8: Data Visualization with GwalkR in R'},
     {   'code_examples': 'library(dplyr)\n'
                          '# Capstone Simulation\n'
                          'df <- data.frame(\n'
@@ -813,7 +813,7 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'quiz': [],
         'resources': '- [CDAM R Portal](https://cdam.chuka.ac.ke/grad/r/)',
         'slug': 'r-session-9-capstone',
-        'title': 'Session 9: Capstone Projects'},
+        'title': 'Session 9: Capstone Project in R'},
     {   'code_examples': '',
         'content': 'Intermediate to advanced statistical modeling and regression analysis.',
         'description': 'Deep dive into statistical modeling, regression techniques, and predictive analysis.',

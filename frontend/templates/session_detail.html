@@ -112,20 +112,20 @@
           </h4>
           {% if is_external %}
             <p class="muted" style="font-size: 0.85rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.35rem;">
-              <i class="fa-solid fa-lock" style="color: var(--purple-brand);"></i> View-only &mdash; interactive notes hosted on Posit Cloud.
+              <i class="fa-solid fa-cloud" style="color: var(--purple-brand);"></i> Interactive notes hosted on Posit Cloud &mdash; view-only.
             </p>
-            <div class="card" style="padding: 2.5rem 1.5rem; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border); border-radius: var(--radius); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;">
-              <div style="width: 64px; height: 64px; border-radius: 16px; background: rgba(86, 0, 126, 0.08); color: var(--purple-brand); display: grid; place-items: center; font-size: 2rem;">
-                <i class="fa-solid fa-square-rss"></i>
+            <div class="card" style="padding: 1.25rem 1.5rem; border: 1px solid var(--border); border-radius: var(--radius); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; background: rgba(139, 92, 246, 0.03);">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(86, 0, 126, 0.08); color: var(--purple-brand); display: grid; place-items: center; font-size: 1.15rem; flex-shrink: 0;">
+                  <i class="fa-solid fa-file-lines"></i>
+                </div>
+                <div>
+                  <p style="font-weight: 700; font-size: 0.95rem; color: var(--text); margin: 0;">{{ session.clean_title }} &mdash; Notes</p>
+                  <p class="muted" style="font-size: 0.8rem; margin: 0;">Opens in Posit Cloud interactive workspace</p>
+                </div>
               </div>
-              <div>
-                <h5 style="font-weight: 800; font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text);">Access R Session Interactive Notes</h5>
-                <p class="muted" style="font-size: 0.95rem; max-width: 500px; margin: 0 auto;">
-                  This session's study material is hosted on Posit Cloud as an interactive workspace. Click the button below to open the workspace in a new tab.
-                </p>
-              </div>
-              <a class="btn primary" href="{{ session.notes_file_path }}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; font-weight: 700; margin-top: 0.5rem;">
-                <i class="fa-solid fa-up-right-from-square"></i> Open Session Notes on Posit Cloud
+              <a class="btn primary" href="{{ session.notes_file_path }}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.25rem; font-weight: 700; font-size: 0.9rem; white-space: nowrap;">
+                <i class="fa-solid fa-up-right-from-square"></i> View Notes
               </a>
             </div>
           {% else %}
