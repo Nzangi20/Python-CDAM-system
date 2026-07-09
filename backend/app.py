@@ -548,6 +548,7 @@ def seed_sessions() -> None:
         9: "Session Nine Data Visualization with PyGWalker in python.pdf",
         10: "Session Ten Capstone project in Python.pdf",
         11: "Session Eleven_Python_Essentials.pdf",
+        12: "Session Twelve Numerical and Tabular Computing with Numpy and Pandas.pdf",
         13: "Session Thirteen Advanced Data Visualization in Python.pdf",
         14: "Session Fourteen Machine Learning Fundamentals with Scikit-Learn.pdf",
         15: "Session Fifteen Supervised Learning – Classification.pdf",
@@ -3159,7 +3160,7 @@ def initialize():
                 
                 if (r_db_count == len(R_SESSIONS) and 
                     existing_r_slugs == expected_r_slugs and 
-                    python_notes_count >= 17 and 
+                    python_notes_count >= 18 and 
                     global_files_count >= 11):
                     # Database is already seeded and matches expected structure. Skip.
                     return

@@ -6,7 +6,7 @@ Defines 18 comprehensive sessions:
 
 SESSIONS = [
     {
-        "title": "Session 1: Introduction to Python, Jupyter Notebook, and Basic Data Types",
+        "title": "Session 1: Introduction to Python Jupyter Notebook and Basic Data Types",
         "slug": "session-1-intro-to-python-jupyter",
         "description": "Get started with Python syntax, Jupyter Notebook environment, and core variables.",
         "duration": "45 min",
@@ -41,7 +41,7 @@ print(type(name), type(age), type(gpa))""",
         ]
     },
     {
-        "title": "Session 2: Data Import, Cleaning, and Exploratory Data Analysis (EDA)",
+        "title": "Session 2: Data Importation, Cleaning, and Exploratory Data Analysis",
         "slug": "session-2-data-import-eda",
         "description": "Learn how to read CSV files, locate missing values, and execute basic cleaning operations.",
         "duration": "50 min",
@@ -77,7 +77,7 @@ print(df_clean)""",
         ]
     },
     {
-        "title": "Session 3: Data Manipulation with pandas",
+        "title": "Session 3: Data Manipulation in Python",
         "slug": "session-3-pandas-data-manipulation",
         "description": "Filter columns, select rows by condition, and group statistics with pandas.",
         "duration": "60 min",
@@ -109,7 +109,7 @@ print(df.groupby('Region').sum())""",
         ]
     },
     {
-        "title": "Session 4: Data Visualization with matplotlib and seaborn",
+        "title": "Session 4: Data Visualization with Matplotlib and Seaborn Libraries",
         "slug": "session-4-matplotlib-seaborn-viz",
         "description": "Create charts, customize axes labels, and build visual heatmaps for presentations.",
         "duration": "60 min",
@@ -275,7 +275,7 @@ print(ts.rolling(window=2).mean())""",
         ]
     },
     {
-        "title": "Session 9: Reporting with Jupyter Notebook",
+        "title": "Session 9: Data Visualization with PyGWalker in Python",
         "slug": "session-9-jupyter-reporting",
         "description": "Generate clean reports, insert markdown explanations, and configure notebook layouts.",
         "duration": "60 min",
@@ -309,7 +309,7 @@ print(report)""",
         ]
     },
     {
-        "title": "Session 10: Capstone Project",
+        "title": "Session 10: Capstone Project in Python",
         "slug": "session-10-capstone-beginner",
         "description": "Demonstrate your data skills: import, clean, analyze, and present a sample dataset.",
         "duration": "90 min",
@@ -340,7 +340,7 @@ print(summary)""",
         ]
     },
     {
-        "title": "Session 11: Advanced Data Wrangling with pandas",
+        "title": "Session 11: Python Essentials",
         "slug": "session-11-advanced-pandas",
         "description": "Learn multi-index, merge operations, and pivot tables to reshape complex tables.",
         "duration": "60 min",
@@ -370,7 +370,7 @@ print(pivot)""",
         ]
     },
     {
-        "title": "Session 12: Functional Programming & Efficient Coding",
+        "title": "Session 12: Numerical and Tabular Computing with NumPy and Pandas",
         "slug": "session-12-functional-programming",
         "description": "Optimize your loops with lambda, map, filter, and list comprehensions.",
         "duration": "60 min",
@@ -403,7 +403,7 @@ print("Comprehension matches:", comp == squared_evens)""",
         ]
     },
     {
-        "title": "Session 13: Advanced Data Visualization (matplotlib & seaborn)",
+        "title": "Session 13: Advanced Data Visualization in Python",
         "slug": "session-13-advanced-visualization",
         "description": "Build multi-panel grids, style correlation matrices, and customize plot settings.",
         "duration": "75 min",
@@ -438,7 +438,7 @@ print("\\nHeatmap generated successfully.")""",
         ]
     },
     {
-        "title": "Session 14: Statistical Modeling & Hypothesis Testing",
+        "title": "Session 14: Machine Learning Fundamentals with Scikit-Learn",
         "slug": "session-14-statistical-modeling",
         "description": "Construct Ordinary Least Squares (OLS) regression models and evaluate p-values.",
         "duration": "75 min",
@@ -471,7 +471,7 @@ print(model.summary().tables[1])""",
         ]
     },
     {
-        "title": "Session 15: Machine Learning in Python (Supervised Learning)",
+        "title": "Session 15: Supervised Learning – Classification",
         "slug": "session-15-supervised-learning",
         "description": "Train linear classifiers, predict classes, and measure model accuracy.",
         "duration": "75 min",
@@ -504,7 +504,7 @@ print("Predict on study hours [6]:", model.predict([[6.0]]))""",
         ]
     },
     {
-        "title": "Session 16: Unsupervised Learning & Dimensionality Reduction",
+        "title": "Session 16: Supervised Learning – Regression",
         "slug": "session-16-unsupervised-learning",
         "description": "Cluster data with K-Means and simplify columns with Principal Component Analysis.",
         "duration": "75 min",
@@ -537,7 +537,7 @@ print("Labels:", kmeans.labels_)""",
         ]
     },
     {
-        "title": "Session 17: Working with External Data Sources",
+        "title": "Session 17: Unsupervised Learning – K-Means and PCA",
         "slug": "session-17-external-data-sources",
         "description": "Fetch remote JSON data from REST APIs and parse database schemas.",
         "duration": "60 min",
@@ -567,7 +567,7 @@ print("Coach Name:", parsed['data']['users'][0]['name'])""",
         ]
     },
     {
-        "title": "Session 18: Reporting & Reproducibility",
+        "title": "Session 18: Capstone Project in Python",
         "slug": "session-18-reporting-reproducibility",
         "description": "Lock package versions, write requirements files, and package reproducible data reports.",
         "duration": "60 min",
