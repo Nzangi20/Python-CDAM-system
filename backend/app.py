@@ -1196,6 +1196,21 @@ def transcript():
     quiz_results = QuizResult.query.filter_by(user_id=current_user.id).all()
     quiz_map = {q.session_id: q for q in quiz_results}
     
+    user = current_user
+    study_level = getattr(user, "study_level", "Beginner")
+    
+    python_sessions = []
+    if user.enrolled_python:
+        python_sessions_needed = 10 if study_level == "Beginner" else 18
+        python_sessions = Session.query.filter_by(published=True, course_type="python").order_by(Session.display_order).all()
+        python_sessions = python_sessions[:python_sessions_needed]
+        
+    r_sessions = []
+    if user.enrolled_r:
+        r_sessions_needed = 9 if study_level == "Beginner" else 16
+        r_sessions = Session.query.filter_by(published=True, course_type="r").order_by(Session.display_order).all()
+        r_sessions = r_sessions[:r_sessions_needed]
+        
     exams = Exam.query.filter_by(published=True, study_level=current_user.study_level).all()
     exam_attempts = ExamAttemptRecord.query.filter_by(user_id=current_user.id).all()
     
@@ -1203,6 +1218,8 @@ def transcript():
         "transcript.html",
         user=current_user,
         sessions=sessions,
+        python_sessions=python_sessions,
+        r_sessions=r_sessions,
         progress_map=progress_map,
         quiz_map=quiz_map,
         exams=exams,
@@ -1211,6 +1228,7 @@ def transcript():
         completed_at=utc_now(),
         active_track=get_active_track()
     )
+
 
 
 def ensure_notes_file_exists(session) -> bool:

@@ -1267,6 +1267,35 @@ def test_transcript_active_track_display(client):
     assert b"Python for Data Science Masterclass" not in resp_r.data
 
 
+def test_transcript_sessions_grouping(client):
+    # 1. Register a student enrolled in BOTH Python and R
+    client.post(
+        "/register",
+        data={
+            "name": "Dual Student",
+            "reg_number": "EB3/DUAL01/26",
+            "password": "password123",
+            "study_level": "Beginner",
+            "enroll_python": "yes",
+            "enroll_r": "yes"
+        },
+        follow_redirects=True,
+    )
+    
+    resp = client.get("/transcript")
+    assert resp.status_code == 200
+    # The page should show the title for both courses
+    assert b"Master Python and R for Data Science" in resp.data
+    # It should contain headings for both tracks
+    assert b"Python for Data Science Track" in resp.data
+    assert b"R for Data Science Track" in resp.data
+    
+    # It should list the first python session and first R session
+    assert b"Introduction to Python" in resp.data or b"Session 1" in resp.data
+    assert b"Introduction to R" in resp.data or b"Session One" in resp.data
+
+
+
 
 
 

@@ -52,85 +52,62 @@
       </span>
     </div>
 
-    <!-- Results Table: Exams only -->
-    <table class="ts-table">
-      <thead>
-        <tr>
-          <th class="ts-col-no">No.</th>
-          <th>Course Description</th>
-          <th class="ts-col-score">Score</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% set counter = namespace(n=0) %}
-        {% if user.enrolled_python and user.enrolled_r %}
-          {# Show python first #}
-          {% for exam in exams if exam.course_type == 'python' %}
-            {% set counter.n = counter.n + 1 %}
-            {# Find matching attempt records for this exam #}
-            {% set attempts_list = [] %}
-            {% for att in exam_attempts if att.exam_id == exam.id %}
-              {% set _ = attempts_list.append(att) %}
-            {% endfor %}
+    <!-- Results Tables: Sessions grouped by Course Track -->
+    {% if user.enrolled_python %}
+      <div style="font-size: 15px; font-weight: 600; color: var(--ts-maroon-dark); margin-top: 24px; margin-bottom: 8px; border-bottom: 2px solid var(--ts-gold); padding-bottom: 4px;">Python for Data Science Track</div>
+      <table class="ts-table" style="margin-top: 8px;">
+        <thead>
+          <tr>
+            <th class="ts-col-no">No.</th>
+            <th>Session Description</th>
+            <th class="ts-col-score">Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for session in python_sessions %}
             <tr>
-              <td class="ts-col-no">{{ counter.n }}</td>
-              <td>{{ exam.title }}</td>
+              <td class="ts-col-no">{{ loop.index }}</td>
+              <td>{{ session.title }}</td>
               <td class="ts-col-score">
-                {% if attempts_list %}
-                  {% set best_attempt = attempts_list | sort(attribute='score', reverse=True) | first %}
-                  {{ best_attempt.score }}%
+                {% if quiz_map.get(session.id) is not none %}
+                  {{ quiz_map[session.id].score }}%
                 {% else %}
                   —
                 {% endif %}
               </td>
             </tr>
           {% endfor %}
-          {# Show R later #}
-          {% for exam in exams if exam.course_type == 'r' %}
-            {% set counter.n = counter.n + 1 %}
-            {# Find matching attempt records for this exam #}
-            {% set attempts_list = [] %}
-            {% for att in exam_attempts if att.exam_id == exam.id %}
-              {% set _ = attempts_list.append(att) %}
-            {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+    {% if user.enrolled_r %}
+      <div style="font-size: 15px; font-weight: 600; color: var(--ts-maroon-dark); margin-top: 28px; margin-bottom: 8px; border-bottom: 2px solid var(--ts-gold); padding-bottom: 4px;">R for Data Science Track</div>
+      <table class="ts-table" style="margin-top: 8px;">
+        <thead>
+          <tr>
+            <th class="ts-col-no">No.</th>
+            <th>Session Description</th>
+            <th class="ts-col-score">Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for session in r_sessions %}
             <tr>
-              <td class="ts-col-no">{{ counter.n }}</td>
-              <td>{{ exam.title }}</td>
+              <td class="ts-col-no">{{ loop.index }}</td>
+              <td>{{ session.title }}</td>
               <td class="ts-col-score">
-                {% if attempts_list %}
-                  {% set best_attempt = attempts_list | sort(attribute='score', reverse=True) | first %}
-                  {{ best_attempt.score }}%
+                {% if quiz_map.get(session.id) is not none %}
+                  {{ quiz_map[session.id].score }}%
                 {% else %}
                   —
                 {% endif %}
               </td>
             </tr>
           {% endfor %}
-        {% else %}
-          {# Show only active track #}
-          {% for exam in exams if exam.course_type == active_track %}
-            {% set counter.n = counter.n + 1 %}
-            {# Find matching attempt records for this exam #}
-            {% set attempts_list = [] %}
-            {% for att in exam_attempts if att.exam_id == exam.id %}
-              {% set _ = attempts_list.append(att) %}
-            {% endfor %}
-            <tr>
-              <td class="ts-col-no">{{ counter.n }}</td>
-              <td>{{ exam.title }}</td>
-              <td class="ts-col-score">
-                {% if attempts_list %}
-                  {% set best_attempt = attempts_list | sort(attribute='score', reverse=True) | first %}
-                  {{ best_attempt.score }}%
-                {% else %}
-                  —
-                {% endif %}
-              </td>
-            </tr>
-          {% endfor %}
-        {% endif %}
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    {% endif %}
 
     <!-- Overall Result -->
     <div class="ts-result-row">
