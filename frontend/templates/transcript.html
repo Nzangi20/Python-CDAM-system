@@ -13,60 +13,55 @@
     <a class="btn" href="{{ url_for('student_dashboard') }}"><i class="fa-solid fa-house"></i> Return to Dashboard</a>
   </div>
 
-  <!-- Transcript Sheet (mirrors transcript_generator.html design) -->
+  <!-- Transcript Sheet -->
   <div class="transcript-sheet" id="transcriptSheet">
-
+    
     <!-- Letterhead -->
     <div class="ts-letterhead">
-      <img src="{{ cdam_logo }}" alt="Chuka University letterhead" style="width: 420px; max-width:100%; display:block; margin:0 auto;" />
+      <img class="ts-letterhead-img" src="{{ url_for('static', filename='assets/cdam/chuka_letterhead_decoded.jpg') }}" alt="Chuka University Letterhead">
     </div>
 
-    <p class="ts-motto">Knowledge is Wealth (<em>Sapientia divitia est</em>) Akili ni Mali)</p>
-    <div class="ts-dept">Center for Data Science and Analytics</div>
-    <div class="ts-doctitle">OFFICIAL ACADEMIC TRANSCRIPT</div>
-    <!-- Official Academic Transcript -->
+    <div class="ts-doctitle">TRANSCRIPT</div>
 
     <!-- Candidate Fields -->
     <div class="ts-field-row">
       <span class="ts-field-label">Candidate Name:</span>
       <span class="ts-field-value">{{ user.name }}</span>
     </div>
+    
     <div class="ts-field-row">
       <span class="ts-field-label">Admission No:</span>
-      <span class="ts-field-value">{{ user.reg_number or 'N/A' }}</span>
+      <span class="ts-field-value">{{ user.reg_number or 'e.g. CDS/00123/2026' }}</span>
     </div>
+    
     <div class="ts-field-row">
       <span class="ts-field-label">Short Course Name:</span>
       <span class="ts-field-value">
         {% if user.enrolled_python and user.enrolled_r %}
           Master Python and R for Data Science
-          <!-- Python for Data Science Masterclass -->
-          <!-- R for Data Science (Statistical Computing & Data Analysis) -->
         {% elif user.enrolled_r %}
           Master R for Data Science
-          <!-- R for Data Science (Statistical Computing & Data Analysis) -->
         {% else %}
           Master Python for Data Science
-          <!-- Python for Data Science Masterclass -->
         {% endif %}
       </span>
     </div>
 
-    <!-- Results Tables: Sessions grouped by Course Track -->
-    {% if user.enrolled_python %}
-      <div style="font-size: 15px; font-weight: 600; color: var(--ts-maroon-dark); margin-top: 24px; margin-bottom: 8px; border-bottom: 2px solid var(--ts-gold); padding-bottom: 4px;">Python for Data Science Track</div>
-      <table class="ts-table" style="margin-top: 8px;">
-        <thead>
-          <tr>
-            <th class="ts-col-no">No.</th>
-            <th>Session Description</th>
-            <th class="ts-col-score">Score</th>
-          </tr>
-        </thead>
-        <tbody>
+    <!-- Combined Results Table -->
+    <table class="ts-table">
+      <thead>
+        <tr>
+          <th class="ts-col-no">No.</th>
+          <th>Course Description</th>
+          <th class="ts-col-score">Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set row_counter = namespace(value=1) %}
+        {% if user.enrolled_python %}
           {% for session in python_sessions %}
             <tr>
-              <td class="ts-col-no">{{ loop.index }}</td>
+              <td class="ts-col-no">{{ row_counter.value }}</td>
               <td>{{ session.title }}</td>
               <td class="ts-col-score">
                 {% if quiz_map.get(session.id) is not none %}
@@ -76,25 +71,13 @@
                 {% endif %}
               </td>
             </tr>
+            {% set row_counter.value = row_counter.value + 1 %}
           {% endfor %}
-        </tbody>
-      </table>
-    {% endif %}
-
-    {% if user.enrolled_r %}
-      <div style="font-size: 15px; font-weight: 600; color: var(--ts-maroon-dark); margin-top: 28px; margin-bottom: 8px; border-bottom: 2px solid var(--ts-gold); padding-bottom: 4px;">R for Data Science Track</div>
-      <table class="ts-table" style="margin-top: 8px;">
-        <thead>
-          <tr>
-            <th class="ts-col-no">No.</th>
-            <th>Session Description</th>
-            <th class="ts-col-score">Score</th>
-          </tr>
-        </thead>
-        <tbody>
+        {% endif %}
+        {% if user.enrolled_r %}
           {% for session in r_sessions %}
             <tr>
-              <td class="ts-col-no">{{ loop.index }}</td>
+              <td class="ts-col-no">{{ row_counter.value }}</td>
               <td>{{ session.title }}</td>
               <td class="ts-col-score">
                 {% if quiz_map.get(session.id) is not none %}
@@ -104,180 +87,166 @@
                 {% endif %}
               </td>
             </tr>
+            {% set row_counter.value = row_counter.value + 1 %}
           {% endfor %}
-        </tbody>
-      </table>
-    {% endif %}
+        {% endif %}
+      </tbody>
+    </table>
 
     <!-- Overall Result -->
     <div class="ts-result-row">
       <span class="ts-field-label">Overall Result:</span>
-      <span class="ts-field-value" style="max-width:160px; flex:none;">
-        {% if certificate_ready %}PASS (COMPLETED){% else %}IN PROGRESS{% endif %}
+      <span class="ts-field-value ts-result-value">
+        {% if certificate_ready %}PASS{% else %}IN PROGRESS{% endif %}
       </span>
     </div>
 
     <!-- Date -->
-    <div class="ts-footer-fields">
-      <div class="ts-field-row">
-        <span class="ts-field-label">Date:</span>
-        <span class="ts-field-value" style="max-width:220px; flex:none;">{{ completed_at.strftime('%d %B, %Y') }}</span>
-      </div>
+    <div class="ts-date-row">
+      <span class="ts-field-label">Date:</span>
+      <span class="ts-field-value">{{ completed_at.strftime('%d %B %Y') }}</span>
     </div>
 
-    <!-- Stamp / Signature -->
-    <div class="ts-stamp-area">
-      <div class="ts-stamp-box">
-        <div class="ts-stamp-line"></div>
-        Course Coordinator
-      </div>
+    <!-- Course Coordinator -->
+    <div class="ts-coord-area">
+      <div class="ts-coord-line"></div>
+      <div class="ts-coord-label">Course Coordinator</div>
     </div>
 
+    <!-- Note -->
     <div class="ts-note">Note: System generated Transcript for this course.</div>
 
   </div><!-- /transcript-sheet -->
 </div>
 
 <style>
-  /* ===== Transcript Sheet Styles (matching transcript_generator.html) ===== */
+  /* ===== Transcript Sheet Styles - EXACT MATCH TO PROVIDED TEMPLATE ===== */
   :root {
-    --ts-paper: #FFFBF4;
-    --ts-ink: #1E1A15;
-    --ts-maroon: #5B2A86;
-    --ts-maroon-dark: #3C1A5E;
-    --ts-gold: #C8A23C;
-    --ts-gold-soft: rgba(200,162,60,.12);
-    --ts-line: #D4C7B5;
-    --ts-muted: #8A8078;
+    --ts-paper: #ffffff;
+    --ts-ink: #222222;
+    --ts-chuka-red: #9E1B32;
+    --ts-chuka-gold: #C8A23C;
+    --ts-line: #888888;
   }
 
   .transcript-sheet {
-    max-width: 794px;
+    width: 100%;
+    max-width: 700px;
     margin: 0 auto 3rem;
-    padding: 56px 54px 48px;
+    padding: 40px 50px 60px;
     background: var(--ts-paper);
-    border: 4px solid var(--ts-maroon);
-    border-radius: var(--radius, 12px);
-    box-shadow: var(--shadow, 0 4px 24px rgba(0,0,0,.08));
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     position: relative;
-    overflow: hidden;
     color: var(--ts-ink);
-    font-family: 'Georgia', 'Times New Roman', serif;
+    font-family: 'Times New Roman', serif;
   }
 
+  /* Letterhead */
   .ts-letterhead {
     text-align: center;
-    margin-bottom: 6px;
+    margin-bottom: 20px;
   }
 
-  .ts-motto {
-    text-align: center;
-    font-size: 13px;
-    color: #2b2b2b;
-    margin: 6px 0 0;
-    line-height: 1.4;
-  }
-  .ts-motto em { font-style: italic; }
-
-  .ts-dept {
-    text-align: center;
-    color: #5B2A86;
-    font-size: 19px;
-    font-weight: 700;
-    margin: 22px 0 2px;
-    letter-spacing: .2px;
+  .ts-letterhead-img {
+    width: 100%;
+    max-width: 650px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
   }
 
   .ts-doctitle {
     text-align: center;
-    font-size: 13.5px;
-    letter-spacing: 3px;
-    color: var(--ts-ink);
-    font-weight: 600;
-    margin-bottom: 26px;
-  }
-  .ts-doctitle::after {
-    content: "";
-    display: block;
-    width: 64px;
-    height: 2px;
-    background: var(--ts-gold);
-    margin: 8px auto 0;
+    font-size: 14px;
+    color: #4B0082;
+    font-weight: 700;
+    margin-bottom: 30px;
   }
 
   .ts-field-row {
     display: flex;
     gap: 6px;
     font-size: 14px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     align-items: baseline;
   }
+
   .ts-field-label {
     font-weight: 600;
-    color: var(--ts-maroon-dark);
+    color: var(--ts-ink);
     white-space: nowrap;
   }
+
   .ts-field-value {
     flex: 1;
     border-bottom: 1px solid var(--ts-line);
-    padding: 0 4px 3px;
-    min-height: 20px;
+    padding: 0 5px 2px;
   }
 
   .ts-table {
     width: 100%;
     border-collapse: collapse;
-    margin: 18px 0 6px;
-    font-size: 13.5px;
+    margin: 25px 0 20px;
+    font-size: 13px;
   }
+
   .ts-table th {
-    background: var(--ts-maroon);
+    background: var(--ts-chuka-red);
     color: #fff;
     text-align: left;
-    padding: 8px 10px;
-    font-weight: 600;
+    padding: 10px 12px;
+    font-weight: 700;
+    border: 1px solid #777;
   }
-  .ts-table th.ts-col-no { width: 44px; text-align: center; }
+
+  .ts-table th.ts-col-no { width: 50px; text-align: center; }
   .ts-table th.ts-col-score { width: 100px; text-align: center; }
+
   .ts-table td {
-    border: 1px solid var(--ts-line);
-    padding: 7px 10px;
+    border: 1px solid #777;
+    padding: 8px 12px;
     vertical-align: top;
-    background: rgba(255,255,255,.72);
+    background: #fff;
   }
-  .ts-table td.ts-col-no { text-align: center; color: var(--ts-muted); }
+
+  .ts-table td.ts-col-no { text-align: center; color: #333; }
   .ts-table td.ts-col-score { text-align: center; }
 
-  .ts-result-row {
+  .ts-result-row, .ts-date-row {
     display: flex;
     gap: 6px;
     font-size: 14px;
-    margin-top: 16px;
+    margin-top: 20px;
     align-items: baseline;
   }
 
-  .ts-footer-fields { margin-top: 34px; }
+  .ts-result-value {
+    font-weight: 600;
+  }
 
-  .ts-stamp-area {
-    margin-top: 44px;
+  .ts-coord-area {
+    margin-top: 60px;
     display: flex;
     justify-content: flex-end;
+    flex-direction: column;
+    align-items: flex-end;
   }
-  .ts-stamp-box {
-    text-align: center;
-    font-size: 12px;
-    color: var(--ts-muted);
+
+  .ts-coord-line {
+    width: 220px;
+    border-top: 1px solid #222;
+    margin-bottom: 4px;
   }
-  .ts-stamp-line {
-    width: 190px;
-    border-top: 1px solid var(--ts-ink);
-    margin-bottom: 5px;
+
+  .ts-coord-label {
+    font-size: 13px;
+    color: #333;
   }
 
   .ts-note {
-    margin-top: 30px;
-    font-size: 11.5px;
-    color: var(--ts-muted);
+    margin-top: 40px;
+    font-size: 12px;
+    color: #555;
     font-style: italic;
   }
 
@@ -286,11 +255,11 @@
     body { background: white !important; color: black !important; }
     .no-print { display: none !important; }
     .transcript-sheet {
-      border-color: #5B2A86 !important;
       box-shadow: none !important;
       background: white !important;
       color: black !important;
-      padding: 1rem 0 !important;
+      max-width: 100%;
+      width: 100%;
     }
   }
 </style>
@@ -300,7 +269,7 @@
   function downloadPDF() {
     const element = document.getElementById('transcriptSheet');
     const opt = {
-      margin:       0,
+      margin:       10,
       filename:     'Transcript_{{ (user.name or "Candidate") | replace(" ", "_") }}{% if user.reg_number %}_{{ user.reg_number | replace("/", "_") | replace(" ", "_") }}{% endif %}.pdf',
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true },
