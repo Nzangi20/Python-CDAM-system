@@ -1519,25 +1519,78 @@ def run_code():
     temp_script_path = None
     if active_track == "r":
         temp_script_path = os.path.join(workspace_dir, f"script_{current_user.id}.R")
+        # Prepend setup code to load common R libraries
+        r_setup_code = '''
+# Load common tidyverse and data science libraries
+tryCatch({
+  library(tidyverse)
+  library(dplyr)
+  library(ggplot2)
+  library(tidyr)
+  library(readr)
+  library(purrr)
+  library(tibble)
+  library(stringr)
+  library(forcats)
+  library(lubridate)
+  library(caret)
+  library(rpart)
+  library(randomForest)
+}, error = function(e) {
+  # Ignore errors if packages aren't installed
+  invisible()
+})
+'''
         with open(temp_script_path, "w", encoding="utf-8") as f:
+            f.write(r_setup_code)
             f.write(code)
         
         # Check standard installation paths for Rscript on Windows
         rscript_bin = "Rscript"
-        possible_paths = [
+        possible_paths = []
+        # Find all R versions in C:\Program Files\R
+        r_base_dir = r"C:\Program Files\R"
+        if os.path.exists(r_base_dir):
+            for item in os.listdir(r_base_dir):
+                r_version_dir = os.path.join(r_base_dir, item)
+                if os.path.isdir(r_version_dir):
+                    # Check both x64 and standard bin paths
+                    for subdir in ["bin\\x64", "bin"]:
+                        candidate = os.path.join(r_version_dir, subdir, "Rscript.exe")
+                        if os.path.exists(candidate):
+                            possible_paths.append(candidate)
+        # Also add default just in case
+        possible_paths.extend([
             r"C:\Program Files\R\R-4.6.0\bin\x64\Rscript.exe",
             r"C:\Program Files\R\R-4.6.0\bin\Rscript.exe",
             r"C:\Program Files\R\R-4.5.0\bin\x64\Rscript.exe",
             r"C:\Program Files\R\R-4.4.0\bin\x64\Rscript.exe",
             r"C:\Program Files\R\R-4.3.0\bin\x64\Rscript.exe",
-        ]
+        ])
+        # Check possible paths, pick first existing one
         for path in possible_paths:
             if os.path.exists(path):
                 rscript_bin = path
                 break
         cmd = [rscript_bin, temp_script_path]
     else:
-        cmd = [sys.executable, "-c", code]
+        # Prepend setup code to load common Python libraries
+        python_setup_code = '''
+# Load common data science libraries
+try:
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import sklearn
+    import scipy
+    import statsmodels.api as sm
+except ImportError:
+    # Ignore errors if packages aren't installed
+    pass
+'''
+        full_python_code = python_setup_code + code
+        cmd = [sys.executable, "-c", full_python_code]
 
     try:
         # Run code in a subprocess inside the user's workspace directory
