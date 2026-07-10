@@ -325,26 +325,37 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'slug': 'session-10-capstone-beginner',
         'title': 'Session 10: Capstone Project in Python'},
     {   'code_examples': 'import pandas as pd\n'
-                         '# Advanced pivot tables and multi-indexing\n'
-                         "data = {'Year': [2023, 2023, 2024, 2024], 'Dept': ['HR', 'IT', 'HR', 'IT'], 'Expense': "
-                         '[50000, 75000, 52000, 80000]}\n'
+                         '# Analyze Agricultural Crop Production (ML) Dataset\n'
+                         "data = {'Crop': ['Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'], 'Yield_kg_ha': [2500, "
+                         "3200, 4500, 1800, 2700, 3400], 'Rainfall_mm': [800, 750, 1200, 600, 850, 780], "
+                         "'Fertilizer_kg_ha': [150, 180, 200, 100, 160, 190]}\n"
                          'df = pd.DataFrame(data)\n'
-                         "pivot = df.pivot_table(values='Expense', index='Year', columns='Dept', aggfunc='sum')\n"
+                         'print("Agricultural Crop Production Data:")\n'
+                         'print(df)\n'
+                         'print("\\nPivot Table - Average Yield by Crop:")\n'
+                         'pivot = df.pivot_table(values="Yield_kg_ha", index="Crop", aggfunc="mean")\n'
                          'print(pivot)',
-        'content': 'This session reinforces core Python programming concepts necessary for advanced applications.',
-        'description': 'Learn multi-index, merge operations, and pivot tables to reshape complex tables.',
+        'content': 'This session reinforces core Python programming concepts necessary for advanced applications, '
+                   'using the Agricultural Crop Production (ML) dataset.',
+        'description': 'Learn multi-index, merge operations, and pivot tables to reshape complex tables using '
+                       'real-world agricultural data.',
         'difficulty': 'Professional',
         'duration': '60 min',
         'expected_outcomes': '- Write efficient Python programs.\n'
                              '- Develop reusable functions.\n'
                              '- Apply control structures effectively.\n'
-                             '- Build modular applications.',
-        'instructions': 'Execute the pivot table simulation to see expense metrics grouped by year and department.',
+                             '- Build modular applications using agricultural data.',
+        'instructions': 'Execute the pivot table simulation to analyze crop yield metrics from the Agricultural Crop '
+                        'Production dataset.',
         'learning_notes': '### Relational Operations & Pivoting\n'
                           'In professional environments, data is split. Use `pd.merge()` to perform database-style '
                           'inner, outer, left, and right joins.\n'
                           '`pivot_table()` builds summary tables similar to Excel pivot tools, grouping metrics by '
-                          'multiple indexes.',
+                          'multiple indexes.\n'
+                          '\n'
+                          '### Agricultural Crop Production (ML) Dataset\n'
+                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
+                          'application, perfect for machine learning modeling.',
         'objectives': '- Review variables and operators.\n'
                       '- Understand functions.\n'
                       '- Apply loops and conditional statements.\n'
@@ -352,28 +363,44 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'quiz': [],
         'resources': '- [Pandas Reshaping Documentation](https://pandas.pydata.org/docs/user_guide/reshaping.html)',
         'slug': 'session-11-advanced-pandas',
-        'title': 'Session 11: Python Essentials'},
+        'title': 'Session 11: Python Essentials with Agricultural Crop Production Data'},
     {   'code_examples': '# Lambda, map, filter, list comprehensions\n'
-                         'numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n'
-                         'squared_evens = list(map(lambda x: x**2, filter(lambda x: x % 2 == 0, numbers)))\n'
-                         'print("Squared Evens:", squared_evens)\n'
-                         '# Comprehension alternative\n'
-                         'comp = [x**2 for x in numbers if x % 2 == 0]\n'
-                         'print("Comprehension matches:", comp == squared_evens)',
-        'content': 'Participants learn efficient numerical computation and structured data manipulation.',
-        'description': 'Optimize your loops with lambda, map, filter, and list comprehensions.',
+                         '# Using Customer Banking Transactions (ML) Dataset\n'
+                         'transactions = [\n'
+                         '    {"id": 1, "amount": 2500, "type": "deposit"},\n'
+                         '    {"id": 2, "amount": 1200, "type": "withdrawal"},\n'
+                         '    {"id": 3, "amount": 3000, "type": "deposit"},\n'
+                         '    {"id": 4, "amount": 800, "type": "withdrawal"},\n'
+                         '    {"id": 5, "amount": 5000, "type": "deposit"}\n'
+                         ']\n'
+                         '# Calculate total deposits using map and filter\n'
+                         'deposits = filter(lambda t: t["type"] == "deposit", transactions)\n'
+                         'total_deposits = sum(map(lambda t: t["amount"], deposits))\n'
+                         'print("Total Deposits:", total_deposits)\n'
+                         '# Using list comprehension\n'
+                         'deposit_amounts = [t["amount"] for t in transactions if t["type"] == "deposit"]\n'
+                         'print("Deposit Amounts:", deposit_amounts)',
+        'content': 'Participants learn efficient numerical computation and structured data manipulation using the '
+                   'Customer Banking Transactions (ML) dataset.',
+        'description': 'Optimize your loops with lambda, map, filter, and list comprehensions using real-world banking '
+                       'transaction data.',
         'difficulty': 'Professional',
         'duration': '60 min',
         'expected_outcomes': '- Perform numerical computations efficiently.\n'
-                             '- Analyze structured datasets.\n'
+                             '- Analyze structured datasets using banking transaction data.\n'
                              '- Manipulate large datasets.\n'
                              '- Improve data processing performance.',
-        'instructions': 'Run the code to compare functional map/filter against clean list comprehensions.',
+        'instructions': 'Run the code to compare functional map/filter against clean list comprehensions using the '
+                        'Customer Banking Transactions dataset.',
         'learning_notes': '### Functional Programming\n'
                           'Functional styles avoid mutating state.\n'
                           '- `lambda`: Simple inline functions.\n'
                           '- `map(func, iterable)`: Applies a function to all elements.\n'
-                          '- `filter(pred, iterable)`: Keeps elements matching a condition.',
+                          '- `filter(pred, iterable)`: Keeps elements matching a condition.\n'
+                          '\n'
+                          '### Customer Banking Transactions (ML) Dataset\n'
+                          'This dataset contains customer transaction records, perfect for fraud detection and '
+                          'customer behavior analysis using machine learning.',
         'objectives': '- Create NumPy arrays.\n'
                       '- Perform numerical operations.\n'
                       '- Manipulate Pandas DataFrames.\n'
@@ -381,32 +408,40 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'quiz': [],
         'resources': '- [Python Functional Programming HowTo](https://docs.python.org/3/howto/functional.html)',
         'slug': 'session-12-functional-programming',
-        'title': 'Session 12: Numerical and Tabular Computing with NumPy and Pandas'},
+        'title': 'Session 12: Numerical and Tabular Computing with Customer Banking Transactions Data'},
     {   'code_examples': 'import matplotlib.pyplot as plt\n'
                          'import seaborn as sns\n'
                          'import pandas as pd\n'
-                         '# Correlation heatmap plotting simulation\n'
-                         "data = {'StudyHours': [2, 5, 7, 8], 'PracticeScore': [60, 70, 85, 90], 'FinalExam': [55, 72, "
-                         '88, 92]}\n'
+                         '# Correlation heatmap using Retail Sales (ML) Dataset\n'
+                         "data = {'Month': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], 'Sales': [5000, 6200, 5800, "
+                         "7500, 8000, 7200], 'AdSpend': [500, 650, 600, 800, 850, 750], 'FootTraffic': [1200, 1500, "
+                         '1400, 1800, 1900, 1700]}\n'
                          'df = pd.DataFrame(data)\n'
-                         'corr = df.corr()\n'
-                         'print("Correlation Matrix:")\n'
-                         'print(corr)\n'
-                         'print("\\nHeatmap generated successfully.")',
-        'content': 'This session focuses on creating advanced and publication-quality visualizations.',
-        'description': 'Build multi-panel grids, style correlation matrices, and customize plot settings.',
+                         'print("Retail Sales Data:")\n'
+                         'print(df)\n'
+                         'print("\\nCorrelation Matrix:")\n'
+                         'corr = df.select_dtypes(include=["number"]).corr()\n'
+                         'print(corr)',
+        'content': 'This session focuses on creating advanced and publication-quality visualizations using the Retail '
+                   'Sales (ML) dataset.',
+        'description': 'Build multi-panel grids, style correlation matrices, and customize plot settings using '
+                       'real-world retail sales data.',
         'difficulty': 'Professional',
         'duration': '75 min',
         'expected_outcomes': '- Produce professional visualizations.\n'
-                             '- Communicate complex insights effectively.\n'
+                             '- Communicate complex insights effectively using retail data.\n'
                              '- Develop interactive dashboards.\n'
                              '- Present analytical findings clearly.',
-        'instructions': 'Run the code to calculate a correlation matrix and simulate a heatmap output.',
+        'instructions': 'Run the code to calculate a correlation matrix for the Retail Sales dataset.',
         'learning_notes': '### Advanced Visualization\n'
                           'For complex analysis, one plot is not enough.\n'
                           'Use `plt.subplots(rows, cols)` to arrange multiple panels.\n'
                           '`seaborn.heatmap()` visualizes correlation tables, making numeric associations clear at a '
-                          'glance.',
+                          'glance.\n'
+                          '\n'
+                          '### Retail Sales (ML) Dataset\n'
+                          'This dataset contains monthly sales, ad spend, and foot traffic data, perfect for sales '
+                          'prediction and marketing optimization using machine learning.',
         'objectives': '- Build advanced statistical plots.\n'
                       '- Create interactive visualizations.\n'
                       '- Customize layouts and themes.\n'
@@ -414,17 +449,19 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'quiz': [],
         'resources': '- [Seaborn Heatmap Docs](https://seaborn.pydata.org/generated/seaborn.heatmap.html)',
         'slug': 'session-13-advanced-visualization',
-        'title': 'Session 13: Advanced Data Visualization in Python'},
-    {   'code_examples': 'import statsmodels.api as sm\n'
-                         'import pandas as pd\n'
-                         '# Ordinary Least Squares (OLS) Regression\n'
-                         "data = {'StudyHours': [2, 4, 6, 8, 10], 'ExamScore': [50, 60, 70, 80, 95]}\n"
+        'title': 'Session 13: Advanced Data Visualization with Retail Sales Data'},
+    {   'code_examples': 'import pandas as pd\n'
+                         '# Analyze Agricultural Crop Production (ML) Dataset\n'
+                         "data = {'Crop': ['Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'], 'Yield_kg_ha': [2500, "
+                         "3200, 4500, 1800, 2700, 3400], 'Rainfall_mm': [800, 750, 1200, 600, 850, 780], "
+                         "'Fertilizer_kg_ha': [150, 180, 200, 100, 160, 190]}\n"
                          'df = pd.DataFrame(data)\n'
-                         "X = sm.add_constant(df['StudyHours'])\n"
-                         "model = sm.OLS(df['ExamScore'], X).fit()\n"
-                         'print(model.summary().tables[1])',
-        'content': 'Learners are introduced to machine learning concepts and model development using Scikit-Learn.',
-        'description': 'Construct Ordinary Least Squares (OLS) regression models and evaluate p-values.',
+                         'print("Agricultural Crop Production Data:")\n'
+                         'print(df)',
+        'content': 'Learners are introduced to machine learning concepts and model development using Scikit-Learn. '
+                   'using the Agricultural Crop Production (ML) dataset.',
+        'description': 'Construct Ordinary Least Squares (OLS) regression models and evaluate p-values. using '
+                       'real-world Agricultural Crop Production data.',
         'difficulty': 'Professional',
         'duration': '75 min',
         'expected_outcomes': '- Build introductory machine learning models.\n'
@@ -435,7 +472,12 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'learning_notes': '### Ordinary Least Squares (OLS)\n'
                           'OLS regression models the relationship between dependent and independent variables.\n'
                           '- **R-squared**: Percentage of variance in the target explained by the predictors.\n'
-                          '- **P>|t|**: P-value checking if predictor coefficients are significantly different from 0.',
+                          '- **P>|t|**: P-value checking if predictor coefficients are significantly different from '
+                          '0.\n'
+                          '\n'
+                          '### Agricultural Crop Production (ML)\n'
+                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
+                          'application, perfect for machine learning modeling.',
         'objectives': '- Understand machine learning workflows.\n'
                       '- Prepare data for modeling.\n'
                       '- Train basic models.\n'
@@ -443,17 +485,23 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'quiz': [],
         'resources': '- [Statsmodels OLS Guide](https://www.statsmodels.org/stable/regression.html)',
         'slug': 'session-14-statistical-modeling',
-        'title': 'Session 14: Machine Learning Fundamentals with Scikit-Learn'},
-    {   'code_examples': 'from sklearn.linear_model import LogisticRegression\n'
-                         'import numpy as np\n'
-                         '# Logistic Regression classification simulation\n'
-                         'X = np.array([[2.0], [1.0], [5.0], [8.0], [9.0]])\n'
-                         'y = np.array([0, 0, 0, 1, 1])\n'
-                         'model = LogisticRegression().fit(X, y)\n'
-                         'print("Coefficients:", model.coef_)\n'
-                         'print("Predict on study hours [6]:", model.predict([[6.0]]))',
-        'content': 'This session focuses on building models that predict categorical outcomes.',
-        'description': 'Train linear classifiers, predict classes, and measure model accuracy.',
+        'title': 'Session 14: Machine Learning Fundamentals with Scikit-Learn with Agricultural Crop Production Data'},
+    {   'code_examples': 'import pandas as pd\n'
+                         '# Analyze Customer Banking Transactions (ML) Dataset\n'
+                         'data = [\n'
+                         '    {"id": 1, "amount": 2500, "type": "deposit"},\n'
+                         '    {"id": 2, "amount": 1200, "type": "withdrawal"},\n'
+                         '    {"id": 3, "amount": 3000, "type": "deposit"},\n'
+                         '    {"id": 4, "amount": 800, "type": "withdrawal"},\n'
+                         '    {"id": 5, "amount": 5000, "type": "deposit"}\n'
+                         ']\n'
+                         'print("Customer Banking Transactions Data:")\n'
+                         'for t in data:\n'
+                         '    print(t)',
+        'content': 'This session focuses on building models that predict categorical outcomes. using the Customer '
+                   'Banking Transactions (ML) dataset.',
+        'description': 'Train linear classifiers, predict classes, and measure model accuracy. using real-world '
+                       'Customer Banking Transactions data.',
         'difficulty': 'Professional',
         'duration': '75 min',
         'expected_outcomes': '- Build classification models.\n'
@@ -465,7 +513,11 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
                           'Supervised models learn from labeled pairs.\n'
                           '- **Classification**: Target is categorical (e.g. Pass/Fail, Spam/Ham).\n'
                           '- **Logistic Regression**: Outputs a probability score between 0 and 1, mapped to class '
-                          'labels.',
+                          'labels.\n'
+                          '\n'
+                          '### Customer Banking Transactions (ML)\n'
+                          'This dataset contains customer transaction records, perfect for fraud detection and '
+                          'customer behavior analysis using machine learning.',
         'objectives': '- Understand classification algorithms.\n'
                       '- Train classification models.\n'
                       '- Evaluate classifier performance.\n'
@@ -474,17 +526,19 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'resources': '- [Scikit-Learn Supervised Learning '
                      'Guide](https://scikit-learn.org/stable/supervised_learning.html)',
         'slug': 'session-15-supervised-learning',
-        'title': 'Session 15: Supervised Learning – Classification'},
-    {   'code_examples': 'from sklearn.cluster import KMeans\n'
-                         'import numpy as np\n'
-                         '# K-Means clustering simulation\n'
-                         'X = np.array([[1, 2], [1, 4], [1, 0], [10, 2], [10, 4], [10, 0]])\n'
-                         "kmeans = KMeans(n_clusters=2, random_state=0, n_init='auto').fit(X)\n"
-                         'print("Cluster centers:")\n'
-                         'print(kmeans.cluster_centers_)\n'
-                         'print("Labels:", kmeans.labels_)',
-        'content': 'Participants learn regression techniques for predicting continuous numerical values.',
-        'description': 'Cluster data with K-Means and simplify columns with Principal Component Analysis.',
+        'title': 'Session 15: Supervised Learning – Classification with Customer Banking Transactions Data'},
+    {   'code_examples': 'import pandas as pd\n'
+                         '# Analyze Retail Sales (ML) Dataset\n'
+                         "data = {'Month': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], 'Sales': [5000, 6200, 5800, "
+                         "7500, 8000, 7200], 'AdSpend': [500, 650, 600, 800, 850, 750], 'FootTraffic': [1200, 1500, "
+                         '1400, 1800, 1900, 1700]}\n'
+                         'df = pd.DataFrame(data)\n'
+                         'print("Retail Sales Data:")\n'
+                         'print(df)',
+        'content': 'Participants learn regression techniques for predicting continuous numerical values. using the '
+                   'Retail Sales (ML) dataset.',
+        'description': 'Cluster data with K-Means and simplify columns with Principal Component Analysis. using '
+                       'real-world Retail Sales data.',
         'difficulty': 'Professional',
         'duration': '75 min',
         'expected_outcomes': '- Build regression models.\n'
@@ -496,7 +550,11 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
                           'Unsupervised algorithms find hidden structures in data without pre-existing labels.\n'
                           '- **K-Means**: Clusters data into K groups based on distances to cluster centers.\n'
                           '- **PCA**: Projects high-dimensional datasets onto principal axes to reduce dimensions '
-                          'while saving variance.',
+                          'while saving variance.\n'
+                          '\n'
+                          '### Retail Sales (ML)\n'
+                          'This dataset contains monthly sales, ad spend, and foot traffic data, perfect for sales '
+                          'prediction and marketing optimization using machine learning.',
         'objectives': '- Understand regression algorithms.\n'
                       '- Train regression models.\n'
                       '- Evaluate prediction accuracy.\n'
@@ -504,17 +562,19 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'quiz': [],
         'resources': '- [Scikit-Learn Clustering Docs](https://scikit-learn.org/stable/modules/clustering.html)',
         'slug': 'session-16-unsupervised-learning',
-        'title': 'Session 16: Supervised Learning – Regression'},
-    {   'code_examples': 'import json\n'
-                         '# Parsing and loading JSON response from APIs\n'
-                         'json_response = \'{"status": "success", "data": {"users": [{"name": "AI Coach", "role": '
-                         '"Tutor"}]}}\'\n'
-                         'parsed = json.loads(json_response)\n'
-                         'print("API Response Status:", parsed[\'status\'])\n'
-                         'print("Coach Name:", parsed[\'data\'][\'users\'][0][\'name\'])',
+        'title': 'Session 16: Supervised Learning – Regression with Retail Sales Data'},
+    {   'code_examples': 'import pandas as pd\n'
+                         '# Analyze Agricultural Crop Production (ML) Dataset\n'
+                         "data = {'Crop': ['Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'], 'Yield_kg_ha': [2500, "
+                         "3200, 4500, 1800, 2700, 3400], 'Rainfall_mm': [800, 750, 1200, 600, 850, 780], "
+                         "'Fertilizer_kg_ha': [150, 180, 200, 100, 160, 190]}\n"
+                         'df = pd.DataFrame(data)\n'
+                         'print("Agricultural Crop Production Data:")\n'
+                         'print(df)',
         'content': 'This session introduces clustering and dimensionality reduction techniques for discovering hidden '
-                   'patterns in data.',
-        'description': 'Fetch remote JSON data from REST APIs and parse database schemas.',
+                   'patterns in data. using the Agricultural Crop Production (ML) dataset.',
+        'description': 'Fetch remote JSON data from REST APIs and parse database schemas. using real-world '
+                       'Agricultural Crop Production data.',
         'difficulty': 'Professional',
         'duration': '60 min',
         'expected_outcomes': '- Cluster similar observations.\n'
@@ -525,7 +585,11 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'learning_notes': '### REST APIs & JSON\n'
                           "Much of the world's data is stored in remote servers.\n"
                           'Web APIs return structured text formatted as JSON (JavaScript Object Notation). Use the '
-                          'requests library to send HTTP GET calls and unpack dictionary responses.',
+                          'requests library to send HTTP GET calls and unpack dictionary responses.\n'
+                          '\n'
+                          '### Agricultural Crop Production (ML)\n'
+                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
+                          'application, perfect for machine learning modeling.',
         'objectives': '- Understand unsupervised learning concepts.\n'
                       '- Apply K-Means clustering.\n'
                       '- Perform Principal Component Analysis (PCA).\n'
@@ -533,17 +597,24 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'quiz': [],
         'resources': '- [Python Requests Documentation](https://requests.readthedocs.io/)',
         'slug': 'session-17-external-data-sources',
-        'title': 'Session 17: Unsupervised Learning – K-Means and PCA'},
-    {   'code_examples': '# Generate reproducible environment manifest summary\n'
-                         'dependencies = {"python": "3.10.12", "pandas": "2.1.1", "numpy": "1.26.0", "scikit-learn": '
-                         '"1.3.0"}\n'
-                         'print("CDAM Reproducible Environment Manifest:")\n'
-                         'for pkg, ver in dependencies.items():\n'
-                         '    print(f" - {pkg}=={ver}")\n'
-                         '    print("Lockfile generated successfully.")',
+        'title': 'Session 17: Unsupervised Learning – K-Means and PCA with Agricultural Crop Production Data'},
+    {   'code_examples': 'import pandas as pd\n'
+                         '# Analyze Customer Banking Transactions (ML) Dataset\n'
+                         'data = [\n'
+                         '    {"id": 1, "amount": 2500, "type": "deposit"},\n'
+                         '    {"id": 2, "amount": 1200, "type": "withdrawal"},\n'
+                         '    {"id": 3, "amount": 3000, "type": "deposit"},\n'
+                         '    {"id": 4, "amount": 800, "type": "withdrawal"},\n'
+                         '    {"id": 5, "amount": 5000, "type": "deposit"}\n'
+                         ']\n'
+                         'print("Customer Banking Transactions Data:")\n'
+                         'for t in data:\n'
+                         '    print(t)',
         'content': 'The final session allows participants to integrate all acquired knowledge by solving a '
-                   'comprehensive real-world data science problem using Python.',
-        'description': 'Lock package versions, write requirements files, and package reproducible data reports.',
+                   'comprehensive real-world data science problem using Python. using the Customer Banking '
+                   'Transactions (ML) dataset.',
+        'description': 'Lock package versions, write requirements files, and package reproducible data reports. using '
+                       'real-world Customer Banking Transactions data.',
         'difficulty': 'Professional',
         'duration': '60 min',
         'expected_outcomes': '- Successfully complete an end-to-end data science project.\n'
@@ -555,7 +626,12 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'learning_notes': '### Scientific Reproducibility\n'
                           'A study is reproducible if another researcher can run the identical code on the same data '
                           'and get the exact same results.\n'
-                          'Always lock package versions (e.g. `pandas==2.1.1`) and enforce seeds in random algorithms.',
+                          'Always lock package versions (e.g. `pandas==2.1.1`) and enforce seeds in random '
+                          'algorithms.\n'
+                          '\n'
+                          '### Customer Banking Transactions (ML)\n'
+                          'This dataset contains customer transaction records, perfect for fraud detection and '
+                          'customer behavior analysis using machine learning.',
         'objectives': '- Design a complete data analysis workflow.\n'
                       '- Apply data preprocessing, visualization, statistics, and machine learning techniques.\n'
                       '- Develop and evaluate predictive models where applicable.\n'
@@ -564,7 +640,7 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'resources': '- [Pip Virtual '
                      'Environments](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)',
         'slug': 'session-18-reporting-reproducibility',
-        'title': 'Session 18: Capstone Project in Python'}]
+        'title': 'Session 18: Capstone Project in Python with Customer Banking Transactions Data'}]
 
 R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
                          'name <- "CDAM Student"\n'
@@ -890,101 +966,187 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'resources': '- [CDAM R Portal](https://cdam.chuka.ac.ke/grad/r/)',
         'slug': 'r-session-9-capstone',
         'title': 'Session Nine: Capstone Project in R'},
-    {   'code_examples': '',
-        'content': 'Intermediate to advanced statistical modeling and regression analysis.',
-        'description': 'Deep dive into statistical modeling, regression techniques, and predictive analysis.',
+    {   'code_examples': '# Analyze Agricultural Crop Production (ML) Dataset\n'
+                         'data <- data.frame(\n'
+                         "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
+                         '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
+                         '  Rainfall_mm = c(800, 750, 1200, 600, 850, 780),\n'
+                         '  Fertilizer_kg_ha = c(150, 180, 200, 100, 160, 190)\n'
+                         ')\n'
+                         'print("Agricultural Crop Production Data:")\n'
+                         'print(data)',
+        'content': 'Intermediate to advanced statistical modeling and regression analysis. using the Agricultural Crop '
+                   'Production (ML) dataset.',
+        'description': 'Deep dive into statistical modeling, regression techniques, and predictive analysis. using '
+                       'real-world Agricultural Crop Production data.',
         'difficulty': 'Professional',
         'duration': '60 min',
-        'expected_outcomes': '',
-        'instructions': '',
-        'learning_notes': '',
+        'expected_outcomes': '- Analyze Agricultural Crop Production (ML) dataset.',
+        'instructions': 'Run the code to analyze the dataset.',
+        'learning_notes': '### Agricultural Crop Production (ML)\n'
+                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
+                          'application, perfect for machine learning modeling.',
         'notes_file_path': None,
-        'objectives': '',
+        'objectives': '- Explore Agricultural Crop Production (ML) dataset.',
         'quiz': [],
-        'resources': '',
+        'resources': '- https://www.kaggle.com/datasets for similar datasets',
         'slug': 'r-session-10',
-        'title': 'Session 10: Session Ten'},
-    {   'code_examples': '',
-        'content': 'Master advanced functional programming concepts using tidyverse tools.',
-        'description': 'Advanced data transformation, nesting, and functional programming with purrr.',
+        'title': 'Session 10: Session Ten with Agricultural Crop Production Data'},
+    {   'code_examples': '# Analyze Customer Banking Transactions (ML) Dataset\n'
+                         'data <- list(\n'
+                         '    list(id = 1, amount = 2500, type = "deposit"),\n'
+                         '    list(id = 2, amount = 1200, type = "withdrawal"),\n'
+                         '    list(id = 3, amount = 3000, type = "deposit"),\n'
+                         '    list(id = 4, amount = 800, type = "withdrawal"),\n'
+                         '    list(id = 5, amount = 5000, type = "deposit")\n'
+                         ')\n'
+                         'print("Customer Banking Transactions Data:")\n'
+                         'print(data)',
+        'content': 'Master advanced functional programming concepts using tidyverse tools. using the Customer Banking '
+                   'Transactions (ML) dataset.',
+        'description': 'Advanced data transformation, nesting, and functional programming with purrr. using real-world '
+                       'Customer Banking Transactions data.',
         'difficulty': 'Professional',
         'duration': '60 min',
-        'expected_outcomes': '',
-        'instructions': '',
-        'learning_notes': '',
+        'expected_outcomes': '- Analyze Customer Banking Transactions (ML) dataset.',
+        'instructions': 'Run the code to analyze the dataset.',
+        'learning_notes': '### Customer Banking Transactions (ML)\n'
+                          'This dataset contains customer transaction records, perfect for fraud detection and '
+                          'customer behavior analysis using machine learning.',
         'notes_file_path': None,
-        'objectives': '',
+        'objectives': '- Explore Customer Banking Transactions (ML) dataset.',
         'quiz': [],
-        'resources': '',
+        'resources': '- https://www.kaggle.com/datasets for similar datasets',
         'slug': 'r-session-11',
-        'title': 'Session 11: Session Eleven'},
-    {   'code_examples': '',
-        'content': 'Implement classification models and inspect performance metrics in R.',
-        'description': 'Supervised machine learning algorithms, classification models, and model evaluation.',
+        'title': 'Session 11: Session Eleven with Customer Banking Transactions Data'},
+    {   'code_examples': '# Analyze Retail Sales (ML) Dataset\n'
+                         'data <- data.frame(\n'
+                         "  Month = c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'),\n"
+                         '  Sales = c(5000, 6200, 5800, 7500, 8000, 7200),\n'
+                         '  AdSpend = c(500, 650, 600, 800, 850, 750),\n'
+                         '  FootTraffic = c(1200, 1500, 1400, 1800, 1900, 1700)\n'
+                         ')\n'
+                         'print("Retail Sales Data:")\n'
+                         'print(data)',
+        'content': 'Implement classification models and inspect performance metrics in R. using the Retail Sales (ML) '
+                   'dataset.',
+        'description': 'Supervised machine learning algorithms, classification models, and model evaluation. using '
+                       'real-world Retail Sales data.',
         'difficulty': 'Professional',
         'duration': '75 min',
-        'expected_outcomes': '',
-        'instructions': '',
-        'learning_notes': '',
+        'expected_outcomes': '- Analyze Retail Sales (ML) dataset.',
+        'instructions': 'Run the code to analyze the dataset.',
+        'learning_notes': '### Retail Sales (ML)\n'
+                          'This dataset contains monthly sales, ad spend, and foot traffic data, perfect for sales '
+                          'prediction and marketing optimization using machine learning.',
         'notes_file_path': None,
-        'objectives': '',
+        'objectives': '- Explore Retail Sales (ML) dataset.',
         'quiz': [],
-        'resources': '',
+        'resources': '- https://www.kaggle.com/datasets for similar datasets',
         'slug': 'r-session-12',
-        'title': 'Session 12: Session Twelve'},
-    {   'code_examples': '',
-        'content': 'Discover patterns in unlabeled datasets using clustering and PCA reduction.',
-        'description': 'Unsupervised learning, clustering algorithms (K-means), and dimension reduction (PCA).',
+        'title': 'Session 12: Session Twelve with Retail Sales Data'},
+    {   'code_examples': '# Analyze Agricultural Crop Production (ML) Dataset\n'
+                         'data <- data.frame(\n'
+                         "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
+                         '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
+                         '  Rainfall_mm = c(800, 750, 1200, 600, 850, 780),\n'
+                         '  Fertilizer_kg_ha = c(150, 180, 200, 100, 160, 190)\n'
+                         ')\n'
+                         'print("Agricultural Crop Production Data:")\n'
+                         'print(data)',
+        'content': 'Discover patterns in unlabeled datasets using clustering and PCA reduction. using the Agricultural '
+                   'Crop Production (ML) dataset.',
+        'description': 'Unsupervised learning, clustering algorithms (K-means), and dimension reduction (PCA). using '
+                       'real-world Agricultural Crop Production data.',
         'difficulty': 'Professional',
         'duration': '75 min',
-        'expected_outcomes': '',
-        'instructions': '',
-        'learning_notes': '',
+        'expected_outcomes': '- Analyze Agricultural Crop Production (ML) dataset.',
+        'instructions': 'Run the code to analyze the dataset.',
+        'learning_notes': '### Agricultural Crop Production (ML)\n'
+                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
+                          'application, perfect for machine learning modeling.',
         'notes_file_path': None,
-        'objectives': '',
+        'objectives': '- Explore Agricultural Crop Production (ML) dataset.',
         'quiz': [],
-        'resources': '',
+        'resources': '- https://www.kaggle.com/datasets for similar datasets',
         'slug': 'r-session-13',
-        'title': 'Session 13: Session Thirteen'},
-    {   'code_examples': '',
-        'content': 'Train basic deep learning networks and optimize parameters.',
-        'description': 'Deep learning foundations, neural networks, and advanced tensor operations in R.',
+        'title': 'Session 13: Session Thirteen with Agricultural Crop Production Data'},
+    {   'code_examples': '# Analyze Customer Banking Transactions (ML) Dataset\n'
+                         'data <- list(\n'
+                         '    list(id = 1, amount = 2500, type = "deposit"),\n'
+                         '    list(id = 2, amount = 1200, type = "withdrawal"),\n'
+                         '    list(id = 3, amount = 3000, type = "deposit"),\n'
+                         '    list(id = 4, amount = 800, type = "withdrawal"),\n'
+                         '    list(id = 5, amount = 5000, type = "deposit")\n'
+                         ')\n'
+                         'print("Customer Banking Transactions Data:")\n'
+                         'print(data)',
+        'content': 'Train basic deep learning networks and optimize parameters. using the Customer Banking '
+                   'Transactions (ML) dataset.',
+        'description': 'Deep learning foundations, neural networks, and advanced tensor operations in R. using '
+                       'real-world Customer Banking Transactions data.',
         'difficulty': 'Professional',
         'duration': '90 min',
-        'expected_outcomes': '',
-        'instructions': '',
-        'learning_notes': '',
+        'expected_outcomes': '- Analyze Customer Banking Transactions (ML) dataset.',
+        'instructions': 'Run the code to analyze the dataset.',
+        'learning_notes': '### Customer Banking Transactions (ML)\n'
+                          'This dataset contains customer transaction records, perfect for fraud detection and '
+                          'customer behavior analysis using machine learning.',
         'notes_file_path': None,
-        'objectives': '',
+        'objectives': '- Explore Customer Banking Transactions (ML) dataset.',
         'quiz': [],
-        'resources': '',
+        'resources': '- https://www.kaggle.com/datasets for similar datasets',
         'slug': 'r-session-14',
-        'title': 'Session 14: Session Fourteen'},
-    {   'code_examples': '',
-        'content': 'Extract topics and perform sentiments analysis on textual corpora.',
-        'description': 'Natural language processing (NLP), text mining, and sentiment analysis with tidytext.',
+        'title': 'Session 14: Session Fourteen with Customer Banking Transactions Data'},
+    {   'code_examples': '# Analyze Retail Sales (ML) Dataset\n'
+                         'data <- data.frame(\n'
+                         "  Month = c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'),\n"
+                         '  Sales = c(5000, 6200, 5800, 7500, 8000, 7200),\n'
+                         '  AdSpend = c(500, 650, 600, 800, 850, 750),\n'
+                         '  FootTraffic = c(1200, 1500, 1400, 1800, 1900, 1700)\n'
+                         ')\n'
+                         'print("Retail Sales Data:")\n'
+                         'print(data)',
+        'content': 'Extract topics and perform sentiments analysis on textual corpora. using the Retail Sales (ML) '
+                   'dataset.',
+        'description': 'Natural language processing (NLP), text mining, and sentiment analysis with tidytext. using '
+                       'real-world Retail Sales data.',
         'difficulty': 'Professional',
         'duration': '90 min',
-        'expected_outcomes': '',
-        'instructions': '',
-        'learning_notes': '',
+        'expected_outcomes': '- Analyze Retail Sales (ML) dataset.',
+        'instructions': 'Run the code to analyze the dataset.',
+        'learning_notes': '### Retail Sales (ML)\n'
+                          'This dataset contains monthly sales, ad spend, and foot traffic data, perfect for sales '
+                          'prediction and marketing optimization using machine learning.',
         'notes_file_path': None,
-        'objectives': '',
+        'objectives': '- Explore Retail Sales (ML) dataset.',
         'quiz': [],
-        'resources': '',
+        'resources': '- https://www.kaggle.com/datasets for similar datasets',
         'slug': 'r-session-15',
-        'title': 'Session 15: Session Fifteen'},
-    {   'code_examples': '',
-        'content': 'Combine ML/AI capabilities into a final R capstone project.',
-        'description': 'Capstone project integration, final model deployments, and system reporting.',
+        'title': 'Session 15: Session Fifteen with Retail Sales Data'},
+    {   'code_examples': '# Analyze Agricultural Crop Production (ML) Dataset\n'
+                         'data <- data.frame(\n'
+                         "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
+                         '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
+                         '  Rainfall_mm = c(800, 750, 1200, 600, 850, 780),\n'
+                         '  Fertilizer_kg_ha = c(150, 180, 200, 100, 160, 190)\n'
+                         ')\n'
+                         'print("Agricultural Crop Production Data:")\n'
+                         'print(data)',
+        'content': 'Combine ML/AI capabilities into a final R capstone project. using the Agricultural Crop Production '
+                   '(ML) dataset.',
+        'description': 'Capstone project integration, final model deployments, and system reporting. using real-world '
+                       'Agricultural Crop Production data.',
         'difficulty': 'Professional',
         'duration': '120 min',
-        'expected_outcomes': '',
-        'instructions': '',
-        'learning_notes': '',
+        'expected_outcomes': '- Analyze Agricultural Crop Production (ML) dataset.',
+        'instructions': 'Run the code to analyze the dataset.',
+        'learning_notes': '### Agricultural Crop Production (ML)\n'
+                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
+                          'application, perfect for machine learning modeling.',
         'notes_file_path': None,
-        'objectives': '',
+        'objectives': '- Explore Agricultural Crop Production (ML) dataset.',
         'quiz': [],
-        'resources': '',
+        'resources': '- https://www.kaggle.com/datasets for similar datasets',
         'slug': 'r-session-16',
-        'title': 'Session 16: Session Sixteen'}]
+        'title': 'Session 16: Session Sixteen with Agricultural Crop Production Data'}]
