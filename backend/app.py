@@ -3163,6 +3163,53 @@ def admin_student_detail(user_id: int):
     )
 
 
+@app.route("/admin/users/<int:user_id>/transcript")
+@login_required
+@admin_required
+def admin_student_transcript(user_id: int):
+    user = db.session.get(User, user_id)
+    if not user or user.is_admin:
+        flash("User not found.", "error")
+        return redirect(url_for("admin_panel"))
+    
+    # Replicate the logic of the /transcript route but for this user
+    ctx = dashboard_context(user.id)
+    quiz_results = QuizResult.query.filter_by(user_id=user.id).all()
+    quiz_map = {q.session_id: q for q in quiz_results}
+    
+    study_level = getattr(user, "study_level", "Beginner")
+    
+    python_sessions = []
+    if user.enrolled_python:
+        python_sessions_needed = 10 if study_level == "Beginner" else 18
+        python_sessions = Session.query.filter_by(published=True, course_type="python").order_by(Session.display_order).all()
+        python_sessions = python_sessions[:python_sessions_needed]
+        
+    r_sessions = []
+    if user.enrolled_r:
+        r_sessions_needed = 9 if study_level == "Beginner" else 16
+        r_sessions = Session.query.filter_by(published=True, course_type="r").order_by(Session.display_order).all()
+        r_sessions = r_sessions[:r_sessions_needed]
+        
+    exams = Exam.query.filter_by(published=True, study_level=study_level).all()
+    exam_attempts = ExamAttemptRecord.query.filter_by(user_id=user.id).all()
+    
+    return render_template(
+        "transcript.html",
+        user=user,
+        sessions=ctx["sessions"],
+        python_sessions=python_sessions,
+        r_sessions=r_sessions,
+        progress_map=ctx["progress_map"],
+        quiz_map=quiz_map,
+        exams=exams,
+        exam_attempts=exam_attempts,
+        certificate_ready=ctx["certificate_ready"],
+        completed_at=utc_now(),
+        active_track=get_active_track()
+    )
+
+
 @app.post("/admin/attempts/<int:attempt_id>/action")
 @login_required
 @admin_required
