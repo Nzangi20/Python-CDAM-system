@@ -331,10 +331,7 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
                          "'Fertilizer_kg_ha': [150, 180, 200, 100, 160, 190]}\n"
                          'df = pd.DataFrame(data)\n'
                          'print("Agricultural Crop Production Data:")\n'
-                         'print(df)\n'
-                         'print("\\nPivot Table - Average Yield by Crop:")\n'
-                         'pivot = df.pivot_table(values="Yield_kg_ha", index="Crop", aggfunc="mean")\n'
-                         'print(pivot)',
+                         'print(df)',
         'content': 'This session reinforces core Python programming concepts necessary for advanced applications, '
                    'using the Agricultural Crop Production (ML) dataset.',
         'description': 'Learn multi-index, merge operations, and pivot tables to reshape complex tables using '
@@ -364,22 +361,18 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'resources': '- [Pandas Reshaping Documentation](https://pandas.pydata.org/docs/user_guide/reshaping.html)',
         'slug': 'session-11-advanced-pandas',
         'title': 'Session 11: Python Essentials with Agricultural Crop Production Data'},
-    {   'code_examples': '# Lambda, map, filter, list comprehensions\n'
-                         '# Using Customer Banking Transactions (ML) Dataset\n'
-                         'transactions = [\n'
+    {   'code_examples': 'import pandas as pd\n'
+                         '# Analyze Customer Banking Transactions (ML) Dataset\n'
+                         'data = [\n'
                          '    {"id": 1, "amount": 2500, "type": "deposit"},\n'
                          '    {"id": 2, "amount": 1200, "type": "withdrawal"},\n'
                          '    {"id": 3, "amount": 3000, "type": "deposit"},\n'
                          '    {"id": 4, "amount": 800, "type": "withdrawal"},\n'
                          '    {"id": 5, "amount": 5000, "type": "deposit"}\n'
                          ']\n'
-                         '# Calculate total deposits using map and filter\n'
-                         'deposits = filter(lambda t: t["type"] == "deposit", transactions)\n'
-                         'total_deposits = sum(map(lambda t: t["amount"], deposits))\n'
-                         'print("Total Deposits:", total_deposits)\n'
-                         '# Using list comprehension\n'
-                         'deposit_amounts = [t["amount"] for t in transactions if t["type"] == "deposit"]\n'
-                         'print("Deposit Amounts:", deposit_amounts)',
+                         'print("Customer Banking Transactions Data:")\n'
+                         'for t in data:\n'
+                         '    print(t)',
         'content': 'Participants learn efficient numerical computation and structured data manipulation using the '
                    'Customer Banking Transactions (ML) dataset.',
         'description': 'Optimize your loops with lambda, map, filter, and list comprehensions using real-world banking '
@@ -409,19 +402,14 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'resources': '- [Python Functional Programming HowTo](https://docs.python.org/3/howto/functional.html)',
         'slug': 'session-12-functional-programming',
         'title': 'Session 12: Numerical and Tabular Computing with Customer Banking Transactions Data'},
-    {   'code_examples': 'import matplotlib.pyplot as plt\n'
-                         'import seaborn as sns\n'
-                         'import pandas as pd\n'
-                         '# Correlation heatmap using Retail Sales (ML) Dataset\n'
+    {   'code_examples': 'import pandas as pd\n'
+                         '# Analyze Retail Sales (ML) Dataset\n'
                          "data = {'Month': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], 'Sales': [5000, 6200, 5800, "
                          "7500, 8000, 7200], 'AdSpend': [500, 650, 600, 800, 850, 750], 'FootTraffic': [1200, 1500, "
                          '1400, 1800, 1900, 1700]}\n'
                          'df = pd.DataFrame(data)\n'
                          'print("Retail Sales Data:")\n'
-                         'print(df)\n'
-                         'print("\\nCorrelation Matrix:")\n'
-                         'corr = df.select_dtypes(include=["number"]).corr()\n'
-                         'print(corr)',
+                         'print(df)',
         'content': 'This session focuses on creating advanced and publication-quality visualizations using the Retail '
                    'Sales (ML) dataset.',
         'description': 'Build multi-panel grids, style correlation matrices, and customize plot settings using '
@@ -932,20 +920,20 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'resources': '- [Time Series Analysis with R](https://otexts.com/fpp2/)',
         'slug': 'r-session-8-time-series',
         'title': 'Session Eight: Data Visualization with GwalkR in R'},
-    {   'code_examples': 'library(dplyr)\n'
-                         '# Capstone Simulation\n'
-                         'df <- data.frame(\n'
-                         '  ID = 1:4,\n'
-                         '  Level = c("Beginner", "Beginner", "Advanced", "Advanced"),\n'
-                         '  Score = c(85, 78, 92, 88)\n'
+    {   'code_examples': '# Analyze Agricultural Crop Production (ML) Dataset\n'
+                         'data <- data.frame(\n'
+                         "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
+                         '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
+                         '  Rainfall_mm = c(800, 750, 1200, 600, 850, 780),\n'
+                         '  Fertilizer_kg_ha = c(150, 180, 200, 100, 160, 190)\n'
                          ')\n'
-                         'summary <- df %>% group_by(Level) %>% summarize(MeanScore = mean(Score))\n'
-                         'print("CDAM Capstone Executive Summary:")\n'
-                         'print(summary)',
+                         'print("Agricultural Crop Production Data:")\n'
+                         'print(data)',
         'content': 'The final session provides participants with an opportunity to integrate the concepts and '
                    'techniques learned throughout the course by completing a comprehensive data science project using '
                    'R.',
-        'description': 'Apply all your R data science skills to real-world capstone projects.',
+        'description': 'Apply all your R data science skills to real-world capstone projects. using real-world '
+                       'Agricultural Crop Production data.',
         'difficulty': 'Beginner',
         'duration': '90 min',
         'expected_outcomes': '- Successfully complete an end-to-end data science project using R.\n'
@@ -956,7 +944,11 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'instructions': 'Execute the R code to run the capstone performance pipeline.',
         'learning_notes': '### Capstone Integration\n'
                           "Bring together everything you've learned: data frame instantiation, dplyr aggregation "
-                          'verbs, stats, plotting, and reporting.',
+                          'verbs, stats, plotting, and reporting.\n'
+                          '\n'
+                          '### Agricultural Crop Production (ML)\n'
+                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
+                          'application, perfect for machine learning modeling.',
         'notes_file_path': 'https://019f413a-2978-f27d-2314-c298cdb340e7.share.connect.posit.cloud/',
         'objectives': '- Design and implement a complete data analysis workflow.\n'
                       '- Apply data cleaning, manipulation, visualization, and statistical analysis techniques.\n'
@@ -965,15 +957,16 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'quiz': [],
         'resources': '- [CDAM R Portal](https://cdam.chuka.ac.ke/grad/r/)',
         'slug': 'r-session-9-capstone',
-        'title': 'Session Nine: Capstone Project in R'},
-    {   'code_examples': '# Analyze Agricultural Crop Production (ML) Dataset\n'
-                         'data <- data.frame(\n'
-                         "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
-                         '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
-                         '  Rainfall_mm = c(800, 750, 1200, 600, 850, 780),\n'
-                         '  Fertilizer_kg_ha = c(150, 180, 200, 100, 160, 190)\n'
+        'title': 'Session Nine: Capstone Project in R with Agricultural Crop Production Data'},
+    {   'code_examples': '# Analyze Customer Banking Transactions (ML) Dataset\n'
+                         'data <- list(\n'
+                         '    list(id = 1, amount = 2500, type = "deposit"),\n'
+                         '    list(id = 2, amount = 1200, type = "withdrawal"),\n'
+                         '    list(id = 3, amount = 3000, type = "deposit"),\n'
+                         '    list(id = 4, amount = 800, type = "withdrawal"),\n'
+                         '    list(id = 5, amount = 5000, type = "deposit")\n'
                          ')\n'
-                         'print("Agricultural Crop Production Data:")\n'
+                         'print("Customer Banking Transactions Data:")\n'
                          'print(data)',
         'content': 'Intermediate to advanced statistical modeling and regression analysis. using the Agricultural Crop '
                    'Production (ML) dataset.',
@@ -985,22 +978,25 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'instructions': 'Run the code to analyze the dataset.',
         'learning_notes': '### Agricultural Crop Production (ML)\n'
                           'This dataset contains crop yield data with factors like rainfall and fertilizer '
-                          'application, perfect for machine learning modeling.',
+                          'application, perfect for machine learning modeling.\n'
+                          '\n'
+                          '### Customer Banking Transactions (ML)\n'
+                          'This dataset contains customer transaction records, perfect for fraud detection and '
+                          'customer behavior analysis using machine learning.',
         'notes_file_path': None,
         'objectives': '- Explore Agricultural Crop Production (ML) dataset.',
         'quiz': [],
         'resources': '- https://www.kaggle.com/datasets for similar datasets',
         'slug': 'r-session-10',
         'title': 'Session 10: Session Ten with Agricultural Crop Production Data'},
-    {   'code_examples': '# Analyze Customer Banking Transactions (ML) Dataset\n'
-                         'data <- list(\n'
-                         '    list(id = 1, amount = 2500, type = "deposit"),\n'
-                         '    list(id = 2, amount = 1200, type = "withdrawal"),\n'
-                         '    list(id = 3, amount = 3000, type = "deposit"),\n'
-                         '    list(id = 4, amount = 800, type = "withdrawal"),\n'
-                         '    list(id = 5, amount = 5000, type = "deposit")\n'
+    {   'code_examples': '# Analyze Retail Sales (ML) Dataset\n'
+                         'data <- data.frame(\n'
+                         "  Month = c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'),\n"
+                         '  Sales = c(5000, 6200, 5800, 7500, 8000, 7200),\n'
+                         '  AdSpend = c(500, 650, 600, 800, 850, 750),\n'
+                         '  FootTraffic = c(1200, 1500, 1400, 1800, 1900, 1700)\n'
                          ')\n'
-                         'print("Customer Banking Transactions Data:")\n'
+                         'print("Retail Sales Data:")\n'
                          'print(data)',
         'content': 'Master advanced functional programming concepts using tidyverse tools. using the Customer Banking '
                    'Transactions (ML) dataset.',
@@ -1012,21 +1008,25 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'instructions': 'Run the code to analyze the dataset.',
         'learning_notes': '### Customer Banking Transactions (ML)\n'
                           'This dataset contains customer transaction records, perfect for fraud detection and '
-                          'customer behavior analysis using machine learning.',
+                          'customer behavior analysis using machine learning.\n'
+                          '\n'
+                          '### Retail Sales (ML)\n'
+                          'This dataset contains monthly sales, ad spend, and foot traffic data, perfect for sales '
+                          'prediction and marketing optimization using machine learning.',
         'notes_file_path': None,
         'objectives': '- Explore Customer Banking Transactions (ML) dataset.',
         'quiz': [],
         'resources': '- https://www.kaggle.com/datasets for similar datasets',
         'slug': 'r-session-11',
         'title': 'Session 11: Session Eleven with Customer Banking Transactions Data'},
-    {   'code_examples': '# Analyze Retail Sales (ML) Dataset\n'
+    {   'code_examples': '# Analyze Agricultural Crop Production (ML) Dataset\n'
                          'data <- data.frame(\n'
-                         "  Month = c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'),\n"
-                         '  Sales = c(5000, 6200, 5800, 7500, 8000, 7200),\n'
-                         '  AdSpend = c(500, 650, 600, 800, 850, 750),\n'
-                         '  FootTraffic = c(1200, 1500, 1400, 1800, 1900, 1700)\n'
+                         "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
+                         '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
+                         '  Rainfall_mm = c(800, 750, 1200, 600, 850, 780),\n'
+                         '  Fertilizer_kg_ha = c(150, 180, 200, 100, 160, 190)\n'
                          ')\n'
-                         'print("Retail Sales Data:")\n'
+                         'print("Agricultural Crop Production Data:")\n'
                          'print(data)',
         'content': 'Implement classification models and inspect performance metrics in R. using the Retail Sales (ML) '
                    'dataset.',
@@ -1038,21 +1038,26 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'instructions': 'Run the code to analyze the dataset.',
         'learning_notes': '### Retail Sales (ML)\n'
                           'This dataset contains monthly sales, ad spend, and foot traffic data, perfect for sales '
-                          'prediction and marketing optimization using machine learning.',
+                          'prediction and marketing optimization using machine learning.\n'
+                          '\n'
+                          '### Agricultural Crop Production (ML)\n'
+                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
+                          'application, perfect for machine learning modeling.',
         'notes_file_path': None,
         'objectives': '- Explore Retail Sales (ML) dataset.',
         'quiz': [],
         'resources': '- https://www.kaggle.com/datasets for similar datasets',
         'slug': 'r-session-12',
         'title': 'Session 12: Session Twelve with Retail Sales Data'},
-    {   'code_examples': '# Analyze Agricultural Crop Production (ML) Dataset\n'
-                         'data <- data.frame(\n'
-                         "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
-                         '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
-                         '  Rainfall_mm = c(800, 750, 1200, 600, 850, 780),\n'
-                         '  Fertilizer_kg_ha = c(150, 180, 200, 100, 160, 190)\n'
+    {   'code_examples': '# Analyze Customer Banking Transactions (ML) Dataset\n'
+                         'data <- list(\n'
+                         '    list(id = 1, amount = 2500, type = "deposit"),\n'
+                         '    list(id = 2, amount = 1200, type = "withdrawal"),\n'
+                         '    list(id = 3, amount = 3000, type = "deposit"),\n'
+                         '    list(id = 4, amount = 800, type = "withdrawal"),\n'
+                         '    list(id = 5, amount = 5000, type = "deposit")\n'
                          ')\n'
-                         'print("Agricultural Crop Production Data:")\n'
+                         'print("Customer Banking Transactions Data:")\n'
                          'print(data)',
         'content': 'Discover patterns in unlabeled datasets using clustering and PCA reduction. using the Agricultural '
                    'Crop Production (ML) dataset.',
@@ -1064,22 +1069,25 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'instructions': 'Run the code to analyze the dataset.',
         'learning_notes': '### Agricultural Crop Production (ML)\n'
                           'This dataset contains crop yield data with factors like rainfall and fertilizer '
-                          'application, perfect for machine learning modeling.',
+                          'application, perfect for machine learning modeling.\n'
+                          '\n'
+                          '### Customer Banking Transactions (ML)\n'
+                          'This dataset contains customer transaction records, perfect for fraud detection and '
+                          'customer behavior analysis using machine learning.',
         'notes_file_path': None,
         'objectives': '- Explore Agricultural Crop Production (ML) dataset.',
         'quiz': [],
         'resources': '- https://www.kaggle.com/datasets for similar datasets',
         'slug': 'r-session-13',
         'title': 'Session 13: Session Thirteen with Agricultural Crop Production Data'},
-    {   'code_examples': '# Analyze Customer Banking Transactions (ML) Dataset\n'
-                         'data <- list(\n'
-                         '    list(id = 1, amount = 2500, type = "deposit"),\n'
-                         '    list(id = 2, amount = 1200, type = "withdrawal"),\n'
-                         '    list(id = 3, amount = 3000, type = "deposit"),\n'
-                         '    list(id = 4, amount = 800, type = "withdrawal"),\n'
-                         '    list(id = 5, amount = 5000, type = "deposit")\n'
+    {   'code_examples': '# Analyze Retail Sales (ML) Dataset\n'
+                         'data <- data.frame(\n'
+                         "  Month = c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'),\n"
+                         '  Sales = c(5000, 6200, 5800, 7500, 8000, 7200),\n'
+                         '  AdSpend = c(500, 650, 600, 800, 850, 750),\n'
+                         '  FootTraffic = c(1200, 1500, 1400, 1800, 1900, 1700)\n'
                          ')\n'
-                         'print("Customer Banking Transactions Data:")\n'
+                         'print("Retail Sales Data:")\n'
                          'print(data)',
         'content': 'Train basic deep learning networks and optimize parameters. using the Customer Banking '
                    'Transactions (ML) dataset.',
@@ -1091,21 +1099,25 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'instructions': 'Run the code to analyze the dataset.',
         'learning_notes': '### Customer Banking Transactions (ML)\n'
                           'This dataset contains customer transaction records, perfect for fraud detection and '
-                          'customer behavior analysis using machine learning.',
+                          'customer behavior analysis using machine learning.\n'
+                          '\n'
+                          '### Retail Sales (ML)\n'
+                          'This dataset contains monthly sales, ad spend, and foot traffic data, perfect for sales '
+                          'prediction and marketing optimization using machine learning.',
         'notes_file_path': None,
         'objectives': '- Explore Customer Banking Transactions (ML) dataset.',
         'quiz': [],
         'resources': '- https://www.kaggle.com/datasets for similar datasets',
         'slug': 'r-session-14',
         'title': 'Session 14: Session Fourteen with Customer Banking Transactions Data'},
-    {   'code_examples': '# Analyze Retail Sales (ML) Dataset\n'
+    {   'code_examples': '# Analyze Agricultural Crop Production (ML) Dataset\n'
                          'data <- data.frame(\n'
-                         "  Month = c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'),\n"
-                         '  Sales = c(5000, 6200, 5800, 7500, 8000, 7200),\n'
-                         '  AdSpend = c(500, 650, 600, 800, 850, 750),\n'
-                         '  FootTraffic = c(1200, 1500, 1400, 1800, 1900, 1700)\n'
+                         "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
+                         '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
+                         '  Rainfall_mm = c(800, 750, 1200, 600, 850, 780),\n'
+                         '  Fertilizer_kg_ha = c(150, 180, 200, 100, 160, 190)\n'
                          ')\n'
-                         'print("Retail Sales Data:")\n'
+                         'print("Agricultural Crop Production Data:")\n'
                          'print(data)',
         'content': 'Extract topics and perform sentiments analysis on textual corpora. using the Retail Sales (ML) '
                    'dataset.',
@@ -1117,21 +1129,26 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'instructions': 'Run the code to analyze the dataset.',
         'learning_notes': '### Retail Sales (ML)\n'
                           'This dataset contains monthly sales, ad spend, and foot traffic data, perfect for sales '
-                          'prediction and marketing optimization using machine learning.',
+                          'prediction and marketing optimization using machine learning.\n'
+                          '\n'
+                          '### Agricultural Crop Production (ML)\n'
+                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
+                          'application, perfect for machine learning modeling.',
         'notes_file_path': None,
         'objectives': '- Explore Retail Sales (ML) dataset.',
         'quiz': [],
         'resources': '- https://www.kaggle.com/datasets for similar datasets',
         'slug': 'r-session-15',
         'title': 'Session 15: Session Fifteen with Retail Sales Data'},
-    {   'code_examples': '# Analyze Agricultural Crop Production (ML) Dataset\n'
-                         'data <- data.frame(\n'
-                         "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
-                         '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
-                         '  Rainfall_mm = c(800, 750, 1200, 600, 850, 780),\n'
-                         '  Fertilizer_kg_ha = c(150, 180, 200, 100, 160, 190)\n'
+    {   'code_examples': '# Analyze Customer Banking Transactions (ML) Dataset\n'
+                         'data <- list(\n'
+                         '    list(id = 1, amount = 2500, type = "deposit"),\n'
+                         '    list(id = 2, amount = 1200, type = "withdrawal"),\n'
+                         '    list(id = 3, amount = 3000, type = "deposit"),\n'
+                         '    list(id = 4, amount = 800, type = "withdrawal"),\n'
+                         '    list(id = 5, amount = 5000, type = "deposit")\n'
                          ')\n'
-                         'print("Agricultural Crop Production Data:")\n'
+                         'print("Customer Banking Transactions Data:")\n'
                          'print(data)',
         'content': 'Combine ML/AI capabilities into a final R capstone project. using the Agricultural Crop Production '
                    '(ML) dataset.',
@@ -1143,7 +1160,11 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'instructions': 'Run the code to analyze the dataset.',
         'learning_notes': '### Agricultural Crop Production (ML)\n'
                           'This dataset contains crop yield data with factors like rainfall and fertilizer '
-                          'application, perfect for machine learning modeling.',
+                          'application, perfect for machine learning modeling.\n'
+                          '\n'
+                          '### Customer Banking Transactions (ML)\n'
+                          'This dataset contains customer transaction records, perfect for fraud detection and '
+                          'customer behavior analysis using machine learning.',
         'notes_file_path': None,
         'objectives': '- Explore Agricultural Crop Production (ML) dataset.',
         'quiz': [],
