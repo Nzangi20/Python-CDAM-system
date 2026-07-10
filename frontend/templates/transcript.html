@@ -59,6 +59,9 @@
       <tbody>
         {% set row_counter = namespace(value=1) %}
         {% if user.enrolled_python %}
+          <tr class="ts-section-header">
+            <td colspan="3"><strong>Master Python for Data Science</strong></td>
+          </tr>
           {% for session in python_sessions %}
             <tr>
               <td class="ts-col-no">{{ row_counter.value }}</td>
@@ -75,6 +78,9 @@
           {% endfor %}
         {% endif %}
         {% if user.enrolled_r %}
+          <tr class="ts-section-header">
+            <td colspan="3"><strong>Master R for Data Science</strong></td>
+          </tr>
           {% for session in r_sessions %}
             <tr>
               <td class="ts-col-no">{{ row_counter.value }}</td>
@@ -211,6 +217,14 @@
 
   .ts-table td.ts-col-no { text-align: center; color: #333; }
   .ts-table td.ts-col-score { text-align: center; }
+
+  .ts-section-header td {
+    background-color: #f0f0f0;
+    font-weight: 700;
+    color: #333;
+    text-align: left;
+    padding: 8px 12px;
+  }
 
   .ts-result-row, .ts-date-row {
     display: flex;
