@@ -18,9 +18,15 @@
     
     <!-- Letterhead -->
     <div class="ts-letterhead">
-      <img class="ts-letterhead-img" src="{{ url_for('static', filename='assets/cdam/chuka_letterhead_decoded.jpg') }}" alt="Chuka University Letterhead">
+      <div class="ts-logo-container">
+        <span class="ts-univ-name ts-chuka">CHUKA</span>
+        <img class="ts-univ-seal" src="{{ url_for('static', filename='assets/cdam/chuka-uni-logo-HD-1.jpg') }}" alt="Chuka University Seal">
+        <span class="ts-univ-name ts-univ">UNIVERSITY</span>
+      </div>
+      <p class="ts-motto">Knowledge is Wealth (Sapientia divitia est) Akili ni Mali</p>
     </div>
 
+    <div class="ts-dept">Center for Data Science and Analytics</div>
     <div class="ts-doctitle">TRANSCRIPT</div>
 
     <!-- Candidate Fields -->
@@ -150,15 +156,43 @@
   /* Letterhead */
   .ts-letterhead {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
 
-  .ts-letterhead-img {
-    width: 100%;
-    max-width: 650px;
-    height: auto;
-    display: block;
-    margin: 0 auto;
+  .ts-logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 8px;
+  }
+
+  .ts-univ-name {
+    font-size: 28px;
+    font-weight: 800;
+    color: #9E1B32;
+    letter-spacing: 1px;
+  }
+
+  .ts-univ-seal {
+    height: 60px;
+    width: auto;
+  }
+
+  .ts-motto {
+    text-align: center;
+    font-size: 12px;
+    color: #333;
+    margin: 0;
+    font-style: normal;
+  }
+
+  .ts-dept {
+    text-align: center;
+    color: #4B0082;
+    font-size: 16px;
+    font-weight: 700;
+    margin: 20px 0 5px;
   }
 
   .ts-doctitle {
