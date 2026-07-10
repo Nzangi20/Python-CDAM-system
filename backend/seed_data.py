@@ -1024,7 +1024,7 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'quiz': [],
         'resources': '- https://purrr.tidyverse.org/',
         'slug': 'r-session-11',
-        'title': 'Session 11: Functional Programming in R with purrr with Customer Banking Transactions Data'},
+        'title': 'Session 11: Functional Programming in R with Customer Banking Transactions Data'},
     {   'code_examples': '# Analyze Agricultural Crop Production (ML) Dataset\n'
                          'data <- data.frame(\n'
                          "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
