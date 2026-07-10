@@ -166,7 +166,9 @@ function initCodeBlocks() {
   const outputText = document.getElementById("runOutputText");
   const btnReset = document.getElementById("btnResetCode");
   const btnDownloadNotebook = document.getElementById("btnDownloadNotebook");
-  const btnDownloadPy = document.getElementById("btnDownloadPy");
+  const btnDownloadScript = document.getElementById("btnDownloadScript");
+  const codePanel = document.getElementById("code");
+  const courseType = codePanel ? codePanel.dataset.courseType : "python";
 
   if (btnRun && codeEditor && output && outputText) {
     const originalCode = codeEditor.value;
@@ -191,7 +193,10 @@ function initCodeBlocks() {
           outputText.textContent = (data.output ? data.output + "\n" : "") + "--- ERROR ---\n" + data.error;
           showToast("Code completed with error.", "error");
         } else {
-          outputText.textContent = data.output || ">>> Execution finished (no standard output to show).\n\nHint: Use the print() function to display results, values, or dataframe contents in the console.\nExample: print(df.head())";
+          const hint = courseType === "python" 
+            ? ">>> Execution finished (no standard output to show).\n\nHint: Use the print() function to display results, values, or dataframe contents in the console.\nExample: print(df.head())"
+            : ">>> Execution finished (no standard output to show).\n\nHint: Use the print() or cat() function to display results, values, or dataframe contents in the console.\nExample: print(head(df))";
+          outputText.textContent = data.output || hint;
           showToast("Execution completed successfully.", "success");
         }
       } catch (err) {
@@ -254,19 +259,19 @@ function initCodeBlocks() {
       });
     }
 
-    if (btnDownloadPy) {
-      btnDownloadPy.addEventListener("click", () => {
+    if (btnDownloadScript) {
+      btnDownloadScript.addEventListener("click", () => {
         const code = codeEditor.value;
         const blob = new Blob([code], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "sandbox_code.py";
+        a.download = courseType === "python" ? "sandbox_code.py" : "sandbox_code.R";
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        showToast("Python script (.py) downloaded.", "success");
+        showToast(courseType === "python" ? "Python script (.py) downloaded." : "R script (.R) downloaded.", "success");
       });
     }
 
@@ -424,10 +429,13 @@ function initAIPanel() {
       const history = await response.json();
       
       if (history.length === 0) {
+        const codePanel = document.getElementById("code");
+        const courseType = codePanel ? codePanel.dataset.courseType : "python";
+        const langName = courseType === "python" ? "Python" : "R";
         responseContent.innerHTML = `
           <div id="aiChatWelcome" style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
             <i class="fa-solid fa-robot" style="font-size: 2.25rem; margin-bottom: 0.5rem; opacity: 0.3; display: block;"></i>
-            <p>Type a question in the box below to ask the AI agent about Python, coding errors, or concept explanations.</p>
+            <p>Type a question in the box below to ask the AI agent about ${langName}, coding errors, or concept explanations.</p>
           </div>
         `;
         if (copyBtn) copyBtn.style.display = "none";

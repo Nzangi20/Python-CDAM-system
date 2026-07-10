@@ -223,7 +223,7 @@
       </div>
     </section>
 
-    <section class="tab-panel" id="code" data-session-id="{{ session.id }}" style="padding: 0; background: transparent; border: none; box-shadow: none;">
+    <section class="tab-panel" id="code" data-session-id="{{ session.id }}" data-course-type="{{ session.course_type }}" style="padding: 0; background: transparent; border: none; box-shadow: none;">
       <div class="simulator-layout">
         <!-- Left Column: Interactive Code Simulator -->
         <div class="card simulator-column" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; border-top: 4px solid var(--red-500);">
@@ -233,17 +233,21 @@
           
           <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
             <button class="btn primary" id="btnRunCode" style="padding: 0.6rem 1.25rem; flex: 2; min-width: 130px;"><i class="fa-solid fa-play"></i> Run Code</button>
+            {% if session.course_type == 'python' %}
             <button class="btn secondary" id="btnDownloadNotebook" style="padding: 0.6rem 1rem; flex: 1; min-width: 130px; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;" title="Download as Jupyter Notebook (.ipynb)"><i class="fa-solid fa-download"></i> Notebook (.ipynb)</button>
-            <button class="btn secondary" id="btnDownloadPy" style="padding: 0.6rem 1rem; flex: 1; min-width: 130px; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;" title="Download as Python Script (.py)"><i class="fa-solid fa-file-arrow-down"></i> Script (.py)</button>
+            <button class="btn secondary" id="btnDownloadScript" style="padding: 0.6rem 1rem; flex: 1; min-width: 130px; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;" title="Download as Python Script (.py)"><i class="fa-solid fa-file-arrow-down"></i> Script (.py)</button>
+            {% else %}
+            <button class="btn secondary" id="btnDownloadScript" style="padding: 0.6rem 1rem; flex: 1; min-width: 130px; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;" title="Download as R Script (.R)"><i class="fa-solid fa-file-arrow-down"></i> Script (.R)</button>
+            {% endif %}
             <button class="btn ghost" id="btnResetCode" style="padding: 0.6rem 1rem;" title="Reset Editor"><i class="fa-solid fa-rotate-left"></i> Reset</button>
           </div>
 
           <div class="editor-wrapper" style="position: relative; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 320px;">
             <div style="background: rgba(86, 0, 126, 0.08); color: var(--text-muted); padding: 10px 16px; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); font-weight: 600;">
-              <span><i class="fa-solid fa-file-code" style="color: var(--red-500); margin-right: 0.4rem;"></i> main.py</span>
-              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--red-500);">Python Sandbox</span>
+              <span><i class="fa-solid fa-file-code" style="color: var(--red-500); margin-right: 0.4rem;"></i> {% if session.course_type == 'python' %}main.py{% else %}main.R{% endif %}</span>
+              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--red-500);">{% if session.course_type == 'python' %}Python Sandbox{% else %}R Sandbox{% endif %}</span>
             </div>
-            <textarea id="codeEditor" style="width: 100%; flex: 1; min-height: 220px; font-family: 'Fira Code', 'Courier New', monospace; font-size: 0.95rem; background: #090514; color: #f2eefc; border: none; padding: 1.25rem; resize: vertical; line-height: 1.6; outline: none; display: block; tab-size: 4; -moz-tab-size: 4;" placeholder="Write your Python code here...">{{ session.code_examples }}</textarea>
+            <textarea id="codeEditor" style="width: 100%; flex: 1; min-height: 220px; font-family: 'Fira Code', 'Courier New', monospace; font-size: 0.95rem; background: #090514; color: #f2eefc; border: none; padding: 1.25rem; resize: vertical; line-height: 1.6; outline: none; display: block; tab-size: 4; -moz-tab-size: 4;" placeholder="{% if session.course_type == 'python' %}Write your Python code here...{% else %}Write your R code here...{% endif %}">{{ session.code_examples }}</textarea>
           </div>
           
           <div class="run-output card" id="runOutput" hidden style="margin-top: 0.5rem; padding: 1rem; border-color: rgba(16, 185, 129, 0.2); background: rgba(16, 185, 129, 0.02);">
