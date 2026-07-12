@@ -71,7 +71,7 @@
           {% for session in python_sessions %}
             <tr>
               <td class="ts-col-no">{{ row_counter.value }}</td>
-              <td>{{ session.title }}</td>
+              <td>Session {{ session.display_order }}: {{ session.clean_title }}</td>
               <td class="ts-col-score">
                 {% if quiz_map.get(session.id) is not none %}
                   {{ quiz_map[session.id].score }}%
@@ -90,7 +90,7 @@
           {% for session in r_sessions %}
             <tr>
               <td class="ts-col-no">{{ row_counter.value }}</td>
-              <td>{{ session.title }}</td>
+              <td>Session {{ session.display_order }}: {{ session.clean_title }}</td>
               <td class="ts-col-score">
                 {% if quiz_map.get(session.id) is not none %}
                   {{ quiz_map[session.id].score }}%
