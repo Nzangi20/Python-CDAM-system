@@ -1550,7 +1550,7 @@ def run_code():
     temp_script_path = None
     if active_track == "r":
         temp_script_path = os.path.join(workspace_dir, f"script_{current_user.id}.R")
-        # Prepend setup code to load common R libraries
+        # Prepend setup code to load common R libraries and auto-load workspace CSV datasets
         r_setup_code = '''
 # Load common tidyverse and data science libraries
 tryCatch({
@@ -1567,6 +1567,13 @@ tryCatch({
   library(caret)
   library(rpart)
   library(randomForest)
+  
+  # Automatically load all CSV files in the workspace as R data frames
+  for (file in list.files(pattern = "\\\\.csv$")) {
+    var_name <- gsub("\\\\.csv$", "", file)
+    var_name <- gsub("[ -]", "_", var_name)
+    assign(var_name, read.csv(file), envir = .GlobalEnv)
+  }
 }, error = function(e) {
   # Ignore errors if packages aren't installed
   invisible()
@@ -1576,28 +1583,38 @@ tryCatch({
             f.write(r_setup_code)
             f.write(code)
         
-        # Check standard installation paths for Rscript on Windows
+        # Check standard installation paths for Rscript
         rscript_bin = "Rscript"
         possible_paths = []
-        # Find all R versions in C:\Program Files\R
-        r_base_dir = r"C:\Program Files\R"
-        if os.path.exists(r_base_dir):
-            for item in os.listdir(r_base_dir):
-                r_version_dir = os.path.join(r_base_dir, item)
-                if os.path.isdir(r_version_dir):
-                    # Check both x64 and standard bin paths
-                    for subdir in ["bin\\x64", "bin"]:
-                        candidate = os.path.join(r_version_dir, subdir, "Rscript.exe")
-                        if os.path.exists(candidate):
-                            possible_paths.append(candidate)
-        # Also add default just in case
-        possible_paths.extend([
-            r"C:\Program Files\R\R-4.6.0\bin\x64\Rscript.exe",
-            r"C:\Program Files\R\R-4.6.0\bin\Rscript.exe",
-            r"C:\Program Files\R\R-4.5.0\bin\x64\Rscript.exe",
-            r"C:\Program Files\R\R-4.4.0\bin\x64\Rscript.exe",
-            r"C:\Program Files\R\R-4.3.0\bin\x64\Rscript.exe",
-        ])
+        if os.name == "nt":
+            # Find all R versions in C:\Program Files\R
+            r_base_dir = r"C:\Program Files\R"
+            if os.path.exists(r_base_dir):
+                for item in os.listdir(r_base_dir):
+                    r_version_dir = os.path.join(r_base_dir, item)
+                    if os.path.isdir(r_version_dir):
+                        # Check both x64 and standard bin paths
+                        for subdir in ["bin\\x64", "bin"]:
+                            candidate = os.path.join(r_version_dir, subdir, "Rscript.exe")
+                            if os.path.exists(candidate):
+                                possible_paths.append(candidate)
+            # Also add default just in case
+            possible_paths.extend([
+                r"C:\Program Files\R\R-4.6.0\bin\x64\Rscript.exe",
+                r"C:\Program Files\R\R-4.6.0\bin\Rscript.exe",
+                r"C:\Program Files\R\R-4.5.0\bin\x64\Rscript.exe",
+                r"C:\Program Files\R\R-4.4.0\bin\x64\Rscript.exe",
+                r"C:\Program Files\R\R-4.3.0\bin\x64\Rscript.exe",
+            ])
+        else:
+            # Check standard Linux locations for Rscript
+            possible_paths.extend([
+                "/usr/bin/Rscript",
+                "/usr/local/bin/Rscript",
+                "/usr/lib/R/bin/Rscript",
+                "/usr/bin/R",
+                "/usr/local/bin/R",
+            ])
         # Check possible paths, pick first existing one
         for path in possible_paths:
             if os.path.exists(path):
@@ -1605,7 +1622,7 @@ tryCatch({
                 break
         cmd = [rscript_bin, temp_script_path]
     else:
-        # Prepend setup code to load common Python libraries
+        # Prepend setup code to load common Python libraries and auto-load workspace CSV datasets
         python_setup_code = '''
 # Load common data science libraries
 try:
@@ -1616,6 +1633,16 @@ try:
     import sklearn
     import scipy
     import statsmodels.api as sm
+    import os
+    # Automatically load all CSV files in the workspace as pandas DataFrames
+    for _fname in os.listdir('.'):
+        if _fname.endswith('.csv'):
+            _varname = _fname.replace('.csv', '').replace(' ', '_').replace('-', '_')
+            if _varname.isidentifier():
+                try:
+                    globals()[_varname] = pd.read_csv(_fname)
+                except Exception:
+                    pass
 except ImportError:
     # Ignore errors if packages aren't installed
     pass
@@ -3453,15 +3480,24 @@ def check_and_install_packages_async():
         try:
             rscript_bin = "Rscript"
             possible_paths = []
-            r_base_dir = r"C:\Program Files\R"
-            if os.path.exists(r_base_dir):
-                for item in os.listdir(r_base_dir):
-                    r_version_dir = os.path.join(r_base_dir, item)
-                    if os.path.isdir(r_version_dir):
-                        for subdir in ["bin\\x64", "bin"]:
-                            candidate = os.path.join(r_version_dir, subdir, "Rscript.exe")
-                            if os.path.exists(candidate):
-                                possible_paths.append(candidate)
+            if os.name == "nt":
+                r_base_dir = r"C:\Program Files\R"
+                if os.path.exists(r_base_dir):
+                    for item in os.listdir(r_base_dir):
+                        r_version_dir = os.path.join(r_base_dir, item)
+                        if os.path.isdir(r_version_dir):
+                            for subdir in ["bin\\x64", "bin"]:
+                                candidate = os.path.join(r_version_dir, subdir, "Rscript.exe")
+                                if os.path.exists(candidate):
+                                    possible_paths.append(candidate)
+            else:
+                possible_paths.extend([
+                    "/usr/bin/Rscript",
+                    "/usr/local/bin/Rscript",
+                    "/usr/lib/R/bin/Rscript",
+                    "/usr/bin/R",
+                    "/usr/local/bin/R",
+                ])
             for path in possible_paths:
                 if os.path.exists(path):
                     rscript_bin = path
