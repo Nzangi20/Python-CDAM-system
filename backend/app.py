@@ -393,6 +393,7 @@ def inject_globals():
         "to_local_datetime_str": to_local_datetime_str,
         "active_track": active_track,
         "get_active_track": get_active_track,
+        "current_year": datetime.now().year,
     }
 
 
