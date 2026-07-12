@@ -3427,7 +3427,72 @@ def migrate_schema() -> None:
                 conn.execute(text("ALTER TABLE user_sandbox_files ADD COLUMN is_global BOOLEAN DEFAULT FALSE"))
 
 
+def check_and_install_packages_async():
+    def task():
+        import sys
+        import subprocess
+        import os
+        
+        # 1. Install missing Python packages
+        python_packages = ["pandas", "numpy", "matplotlib", "seaborn", "sklearn", "scipy", "statsmodels"]
+        for pkg in python_packages:
+            try:
+                import_name = "sklearn" if pkg == "sklearn" else pkg
+                import_name = "statsmodels" if pkg == "statsmodels" else import_name
+                __import__(import_name)
+            except ImportError:
+                try:
+                    install_name = "scikit-learn" if pkg == "sklearn" else pkg
+                    install_name = "statsmodels" if pkg == "statsmodels" else install_name
+                    print(f"[Self-Healing] Installing missing Python package: {install_name}")
+                    subprocess.run([sys.executable, "-m", "pip", "install", install_name], capture_output=True)
+                except Exception as e:
+                    print(f"[Self-Healing] Failed to install Python package {pkg}: {e}")
+                    
+        # 2. Install missing R packages
+        try:
+            rscript_bin = "Rscript"
+            possible_paths = []
+            r_base_dir = r"C:\Program Files\R"
+            if os.path.exists(r_base_dir):
+                for item in os.listdir(r_base_dir):
+                    r_version_dir = os.path.join(r_base_dir, item)
+                    if os.path.isdir(r_version_dir):
+                        for subdir in ["bin\\x64", "bin"]:
+                            candidate = os.path.join(r_version_dir, subdir, "Rscript.exe")
+                            if os.path.exists(candidate):
+                                possible_paths.append(candidate)
+            for path in possible_paths:
+                if os.path.exists(path):
+                    rscript_bin = path
+                    break
+            
+            res = subprocess.run([rscript_bin, "--version"], capture_output=True)
+            if res.returncode == 0:
+                r_packages = [
+                    "tidyverse", "dplyr", "ggplot2", "tidyr", "readr", "purrr", 
+                    "tibble", "stringr", "forcats", "lubridate", "caret", "rpart", "randomForest"
+                ]
+                for pkg in r_packages:
+                    try:
+                        check_cmd = [rscript_bin, "-e", f"if (!require('{pkg}', quietly=TRUE)) quit(status=1)"]
+                        check_res = subprocess.run(check_cmd, capture_output=True)
+                        if check_res.returncode != 0:
+                            print(f"[Self-Healing] Installing missing R package: {pkg}")
+                            install_cmd = [rscript_bin, "-e", f"install.packages('{pkg}', repos='https://cloud.r-project.org')"]
+                            subprocess.run(install_cmd, capture_output=True)
+                    except Exception as e:
+                        print(f"[Self-Healing] Failed to check/install R package {pkg}: {e}")
+        except Exception as e:
+            print(f"[Self-Healing] Rscript check skipped or failed: {e}")
+
+    import threading
+    t = threading.Thread(target=task, daemon=True)
+    t.start()
+
+
 def initialize():
+    check_and_install_packages_async()
     with app.app_context():
         # Unconditionally run create_all and migrate_schema to ensure schema is up-to-date
         db.create_all()
