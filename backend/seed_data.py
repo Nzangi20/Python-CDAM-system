@@ -270,7 +270,7 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
                          '--- CDAM ACADEMIC REPORT ---\n'
                          'Total Students Evaluated: {student_count}\n'
                          'Curriculum Completion Rate: {passing_pct}%\n'
-                         'Recommendation: Advance to Professional module.\n'
+                         'Recommendation: Advance to Machine Learning module.\n'
                          "'''\n"
                          'print(report)',
         'content': 'This session introduces PyGWalker for interactive, no-code data exploration and visualization.',
@@ -920,7 +920,7 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'resources': '- [Time Series Analysis with R](https://otexts.com/fpp2/)',
         'slug': 'r-session-8-time-series',
         'title': 'Session 8: Data Visualization with GwalkR in R'},
-    {   'code_examples': '# Analyze Agricultural Crop Production Dataset\n'
+    {   'code_examples': '# Analyze Agricultural Crop Production (ML) Dataset\n'
                          'data <- data.frame(\n'
                          "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
                          '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
@@ -946,9 +946,9 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
                           "Bring together everything you've learned: data frame instantiation, dplyr aggregation "
                           'verbs, stats, plotting, and reporting.\n'
                           '\n'
-                          '### Agricultural Crop Production\n'
+                          '### Agricultural Crop Production (ML)\n'
                           'This dataset contains crop yield data with factors like rainfall and fertilizer '
-                          'application, perfect for statistical modeling.',
+                          'application, perfect for machine learning modeling.',
         'notes_file_path': 'https://019f413a-2978-f27d-2314-c298cdb340e7.share.connect.posit.cloud/',
         'objectives': '- Design and implement a complete data analysis workflow.\n'
                       '- Apply data cleaning, manipulation, visualization, and statistical analysis techniques.\n'

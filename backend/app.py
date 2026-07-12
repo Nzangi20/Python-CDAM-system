@@ -499,12 +499,12 @@ def seed_sessions() -> None:
     force_update = False
     version_setting = PlatformSetting.query.filter_by(key="curriculum_version").first()
     if not version_setting:
-        version_setting = PlatformSetting(key="curriculum_version", value="5")
+        version_setting = PlatformSetting(key="curriculum_version", value="6")
         db.session.add(version_setting)
         db.session.commit()
         force_update = True
-    elif version_setting.value != "5":
-        version_setting.value = "5"
+    elif version_setting.value != "6":
+        version_setting.value = "6"
         db.session.commit()
         force_update = True
 
@@ -1416,7 +1416,15 @@ def session_detail(slug: str):
         upcoming=upcoming,
         available=available,
         exam_attempts=exam_attempts,
-        datasets=DATASETS,
+        datasets=[
+            ds for ds in DATASETS 
+            if getattr(current_user, "study_level", "Beginner") == "Professional" 
+            or ds["filename"] not in [
+                "Customer_Banking_Transactions_Machine_Learning_Dataset.csv",
+                "Agricultural_Crop_Production_Machine_Learning_Dataset.csv",
+                "Retail_Sales_Machine_Learning_Dataset.csv"
+            ]
+        ],
     )
 
 
@@ -1501,6 +1509,23 @@ def run_code():
         global_files = UserSandboxFile.query.options(defer(UserSandboxFile.file_data)).filter_by(is_global=True).all()
         private_files = UserSandboxFile.query.options(defer(UserSandboxFile.file_data)).filter_by(user_id=current_user.id, is_global=False).all()
         
+        # Filter global files for beginners and purge them from the workspace dir
+        is_professional = getattr(current_user, "study_level", "Beginner") == "Professional"
+        restricted_filenames = {
+            "Customer_Banking_Transactions_Machine_Learning_Dataset.csv",
+            "Agricultural_Crop_Production_Machine_Learning_Dataset.csv",
+            "Retail_Sales_Machine_Learning_Dataset.csv"
+        }
+        if not is_professional:
+            global_files = [f for f in global_files if f.filename not in restricted_filenames]
+            for fname in restricted_filenames:
+                local_path = os.path.join(workspace_dir, fname)
+                if os.path.exists(local_path):
+                    try:
+                        os.remove(local_path)
+                    except Exception:
+                        pass
+                        
         for db_file in global_files:
             local_path = os.path.join(workspace_dir, db_file.filename)
             if not os.path.exists(local_path):
@@ -1724,6 +1749,23 @@ def sandbox_list_files():
         private_files = UserSandboxFile.query.filter_by(user_id=current_user.id, is_global=False).all()
         global_files = UserSandboxFile.query.filter_by(is_global=True).all()
         
+        # Filter global files for beginners and clean workspace
+        is_professional = getattr(current_user, "study_level", "Beginner") == "Professional"
+        restricted_filenames = {
+            "Customer_Banking_Transactions_Machine_Learning_Dataset.csv",
+            "Agricultural_Crop_Production_Machine_Learning_Dataset.csv",
+            "Retail_Sales_Machine_Learning_Dataset.csv"
+        }
+        if not is_professional:
+            global_files = [f for f in global_files if f.filename not in restricted_filenames]
+            for fname in restricted_filenames:
+                local_path = os.path.join(workspace_dir, fname)
+                if os.path.exists(local_path):
+                    try:
+                        os.remove(local_path)
+                    except Exception:
+                        pass
+                        
         # Restore files that are missing on disk
         for db_file in global_files:
             local_path = os.path.join(workspace_dir, db_file.filename)
@@ -3406,7 +3448,7 @@ def initialize():
                     existing_r_slugs == expected_r_slugs and 
                     python_notes_count >= 18 and 
                     global_files_count >= 11 and
-                    version_setting and version_setting.value == "5"):
+                    version_setting and version_setting.value == "6"):
                     # Database is already seeded and matches expected structure. Skip.
                     return
         except Exception as e:
