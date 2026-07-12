@@ -1665,34 +1665,14 @@ def run_code():
     temp_script_path = None
     if active_track == "r":
         temp_script_path = os.path.join(workspace_dir, f"script_{current_user.id}.R")
-        # Prepend setup code to load common R libraries and auto-load workspace CSV datasets
+        # Prepend setup code to auto-load workspace CSV datasets (no slow package loading!)
         r_setup_code = '''
-# Load common tidyverse and data science libraries
-tryCatch({
-  library(tidyverse)
-  library(dplyr)
-  library(ggplot2)
-  library(tidyr)
-  library(readr)
-  library(purrr)
-  library(tibble)
-  library(stringr)
-  library(forcats)
-  library(lubridate)
-  library(caret)
-  library(rpart)
-  library(randomForest)
-  
-  # Automatically load all CSV files in the workspace as R data frames
-  for (file in list.files(pattern = "\\\\.csv$")) {
-    var_name <- gsub("\\\\.csv$", "", file)
-    var_name <- gsub("[ -]", "_", var_name)
-    assign(var_name, read.csv(file), envir = .GlobalEnv)
-  }
-}, error = function(e) {
-  # Ignore errors if packages aren't installed
-  invisible()
-})
+# Automatically load all CSV files in the workspace as R data frames
+for (file in list.files(pattern = "\\\\.csv$")) {
+  var_name <- gsub("\\\\.csv$", "", file)
+  var_name <- gsub("[ -]", "_", var_name)
+  assign(var_name, read.csv(file), envir = .GlobalEnv)
+}
 '''
         with open(temp_script_path, "w", encoding="utf-8") as f:
             f.write(r_setup_code)
@@ -1774,7 +1754,7 @@ except ImportError:
             cmd,
             capture_output=True,
             text=True,
-            timeout=15.0,
+            timeout=30.0,
             cwd=workspace_dir,
             env=env
         )
