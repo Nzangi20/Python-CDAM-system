@@ -1656,6 +1656,20 @@ def ensure_sandbox_files(workspace_dir, current_user):
         print(f"Database error checking private files: {e}")
 
 
+def clean_stderr(stderr_str):
+    if not stderr_str:
+        return ""
+    lines = stderr_str.split("\n")
+    cleaned_lines = []
+    for line in lines:
+        if "joblib" in line and ("UserWarning" in line or "serial mode" in line):
+            continue
+        if "multiprocessing_helpers.py" in line:
+            continue
+        cleaned_lines.append(line)
+    return "\n".join(cleaned_lines).strip()
+
+
 @app.route("/api/run-code", methods=["POST"])
 def run_code():
     if not current_user.is_authenticated:
@@ -1765,7 +1779,7 @@ except ImportError:
     pass
 '''
         full_python_code = python_setup_code + code
-        cmd = [sys.executable, "-c", full_python_code]
+        cmd = [sys.executable, "-W", "ignore", "-c", full_python_code]
 
     try:
         env = os.environ.copy()
@@ -1787,7 +1801,7 @@ except ImportError:
                 pass
         return jsonify({
             "output": process.stdout,
-            "error": process.stderr,
+            "error": clean_stderr(process.stderr),
             "exit_code": process.returncode
         })
     except subprocess.TimeoutExpired:
@@ -1836,7 +1850,7 @@ except ImportError:
                 full_python_code = python_setup_code_emulation + translated_py_code
                 
                 process = subprocess.run(
-                    [sys.executable, "-c", full_python_code],
+                    [sys.executable, "-W", "ignore", "-c", full_python_code],
                     capture_output=True,
                     text=True,
                     timeout=15.0,
@@ -1846,7 +1860,7 @@ except ImportError:
                 output_prefix = "[Note: R script executed successfully via sandbox emulation]\n\n"
                 return jsonify({
                     "output": output_prefix + process.stdout,
-                    "error": process.stderr,
+                    "error": clean_stderr(process.stderr),
                     "exit_code": process.returncode
                 })
             except Exception as ex:
