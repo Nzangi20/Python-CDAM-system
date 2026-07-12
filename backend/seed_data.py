@@ -270,7 +270,7 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
                          '--- CDAM ACADEMIC REPORT ---\n'
                          'Total Students Evaluated: {student_count}\n'
                          'Curriculum Completion Rate: {passing_pct}%\n'
-                         'Recommendation: Advance to Machine Learning module.\n'
+                         'Recommendation: Advance to Professional module.\n'
                          "'''\n"
                          'print(report)',
         'content': 'This session introduces PyGWalker for interactive, no-code data exploration and visualization.',
@@ -920,20 +920,20 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'resources': '- [Time Series Analysis with R](https://otexts.com/fpp2/)',
         'slug': 'r-session-8-time-series',
         'title': 'Session 8: Data Visualization with GwalkR in R'},
-    {   'code_examples': '# Analyze Agricultural Crop Production (ML) Dataset\n'
+    {   'code_examples': '# Analyze Agricultural Production Capstone Dataset\n'
                          'data <- data.frame(\n'
                          "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
                          '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
                          '  Rainfall_mm = c(800, 750, 1200, 600, 850, 780),\n'
                          '  Fertilizer_kg_ha = c(150, 180, 200, 100, 160, 190)\n'
                          ')\n'
-                         'print("Agricultural Crop Production Data:")\n'
+                         'print("Agricultural Production Capstone Data:")\n'
                          'print(data)',
         'content': 'The final session provides participants with an opportunity to integrate the concepts and '
                    'techniques learned throughout the course by completing a comprehensive data science project using '
                    'R.',
         'description': 'Apply all your R data science skills to real-world capstone projects. using real-world '
-                       'Agricultural Crop Production data.',
+                       'Agricultural Production Capstone data.',
         'difficulty': 'Beginner',
         'duration': '90 min',
         'expected_outcomes': '- Successfully complete an end-to-end data science project using R.\n'
@@ -946,9 +946,9 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
                           "Bring together everything you've learned: data frame instantiation, dplyr aggregation "
                           'verbs, stats, plotting, and reporting.\n'
                           '\n'
-                          '### Agricultural Crop Production (ML)\n'
+                          '### Agricultural Production Capstone\n'
                           'This dataset contains crop yield data with factors like rainfall and fertilizer '
-                          'application, perfect for machine learning modeling.',
+                          'application, perfect for statistical modeling.',
         'notes_file_path': 'https://019f413a-2978-f27d-2314-c298cdb340e7.share.connect.posit.cloud/',
         'objectives': '- Design and implement a complete data analysis workflow.\n'
                       '- Apply data cleaning, manipulation, visualization, and statistical analysis techniques.\n'
@@ -957,7 +957,7 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'quiz': [],
         'resources': '- [CDAM R Portal](https://cdam.chuka.ac.ke/grad/r/)',
         'slug': 'r-session-9-capstone',
-        'title': 'Session 9: Capstone Project in R with Agricultural Crop Production Data'},
+        'title': 'Session 9: Capstone Project in R with Agricultural Production Capstone Data'},
     {   'code_examples': '# Analyze Customer Banking Transactions (ML) Dataset\n'
                          'data <- list(\n'
                          '    list(id = 1, amount = 2500, type = "deposit"),\n'

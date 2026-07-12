@@ -499,12 +499,12 @@ def seed_sessions() -> None:
     force_update = False
     version_setting = PlatformSetting.query.filter_by(key="curriculum_version").first()
     if not version_setting:
-        version_setting = PlatformSetting(key="curriculum_version", value="6")
+        version_setting = PlatformSetting(key="curriculum_version", value="7")
         db.session.add(version_setting)
         db.session.commit()
         force_update = True
-    elif version_setting.value != "6":
-        version_setting.value = "6"
+    elif version_setting.value != "7":
+        version_setting.value = "7"
         db.session.commit()
         force_update = True
 
@@ -1418,12 +1418,14 @@ def session_detail(slug: str):
         exam_attempts=exam_attempts,
         datasets=[
             ds for ds in DATASETS 
-            if getattr(current_user, "study_level", "Beginner") == "Professional" 
-            or ds["filename"] not in [
+            if ds["filename"] not in [
                 "Customer_Banking_Transactions_Machine_Learning_Dataset.csv",
                 "Agricultural_Crop_Production_Machine_Learning_Dataset.csv",
                 "Retail_Sales_Machine_Learning_Dataset.csv"
-            ]
+            ] or (
+                session.difficulty == "Professional" 
+                and getattr(current_user, "study_level", "Beginner") == "Professional"
+            )
         ],
     )
 
@@ -3448,7 +3450,7 @@ def initialize():
                     existing_r_slugs == expected_r_slugs and 
                     python_notes_count >= 18 and 
                     global_files_count >= 11 and
-                    version_setting and version_setting.value == "6"):
+                    version_setting and version_setting.value == "7"):
                     # Database is already seeded and matches expected structure. Skip.
                     return
         except Exception as e:
