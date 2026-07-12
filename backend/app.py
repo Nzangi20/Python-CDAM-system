@@ -1624,13 +1624,17 @@ except ImportError:
         cmd = [sys.executable, "-c", full_python_code]
 
     try:
+        env = os.environ.copy()
+        env["PYTHONPATH"] = os.pathsep.join(sys.path)
+        
         # Run code in a subprocess inside the user's workspace directory
         process = subprocess.run(
             cmd,
             capture_output=True,
             text=True,
             timeout=15.0,
-            cwd=workspace_dir
+            cwd=workspace_dir,
+            env=env
         )
         if temp_script_path and os.path.exists(temp_script_path):
             try:
