@@ -1546,7 +1546,7 @@ def run_code():
     except Exception:
         pass
     
-    active_track = get_active_track()
+    active_track = payload.get("track", get_active_track())
     temp_script_path = None
     if active_track == "r":
         temp_script_path = os.path.join(workspace_dir, f"script_{current_user.id}.R")
