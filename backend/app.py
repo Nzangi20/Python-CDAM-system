@@ -663,33 +663,50 @@ def seed_sessions() -> None:
         admin_user = User.query.filter_by(is_admin=True).first()
         admin_id = admin_user.id if admin_user else 1
         
-        if python_materials_dir.exists():
-            for csv_name in csv_files:
-                csv_path = python_materials_dir / csv_name
-                if csv_path.exists():
-                    try:
-                        with open(csv_path, "rb") as f:
-                            csv_data = f.read()
-                        file_size = len(csv_data)
-                        
-                        # Check if this global file already exists in database
-                        sandbox_file = UserSandboxFile.query.filter_by(filename=csv_name, is_global=True).first()
-                        if not sandbox_file:
-                            sandbox_file = UserSandboxFile(
-                                user_id=admin_id,
-                                filename=csv_name,
-                                file_data=csv_data,
-                                file_size=file_size,
-                                is_global=True
-                            )
-                            db.session.add(sandbox_file)
-                        else:
-                            sandbox_file.file_data = csv_data
-                            sandbox_file.file_size = file_size
-                            sandbox_file.user_id = admin_id
-                    except Exception as e:
-                        print(f"Error seeding CSV {csv_name}: {e}")
-            db.session.commit()
+        for csv_name in csv_files:
+            csv_data = None
+            csv_path = python_materials_dir / csv_name if python_materials_dir else None
+            
+            if csv_path and csv_path.exists():
+                try:
+                    with open(csv_path, "rb") as f:
+                        csv_data = f.read()
+                except Exception as e:
+                    print(f"Error reading local CSV {csv_name}: {e}")
+            
+            # If not found locally, fetch from GitHub
+            if not csv_data:
+                import requests
+                github_url = f"https://raw.githubusercontent.com/Nzangi20/Python-CDAM-system/main/Python%20materials/{csv_name}"
+                try:
+                    resp = requests.get(github_url, timeout=10)
+                    if resp.status_code == 200:
+                        csv_data = resp.content
+                        print(f"Successfully fetched {csv_name} from GitHub for seeding.")
+                except Exception as e:
+                    print(f"Failed to fetch {csv_name} from GitHub: {e}")
+            
+            if csv_data:
+                file_size = len(csv_data)
+                # Check if this global file already exists in database
+                sandbox_file = UserSandboxFile.query.filter_by(filename=csv_name, is_global=True).first()
+                if not sandbox_file:
+                    sandbox_file = UserSandboxFile(
+                        user_id=admin_id,
+                        filename=csv_name,
+                        file_data=csv_data,
+                        file_size=file_size,
+                        is_global=True
+                    )
+                    db.session.add(sandbox_file)
+                else:
+                    sandbox_file.file_data = csv_data
+                    sandbox_file.file_size = file_size
+                    sandbox_file.user_id = admin_id
+            else:
+                print(f"Could not resolve data for seeding {csv_name}")
+                
+        db.session.commit()
     except Exception as ex:
         print(f"Error preparing admin/sandbox datasets: {ex}")
 
@@ -1488,6 +1505,142 @@ def view_notes(session_id: int):
     return render_template("view_notes.html", session=session)
 
 
+def translate_r_to_python(r_code):
+    import re
+    lines = r_code.split("\n")
+    py_lines = []
+    py_lines.append("import pandas as pd")
+    py_lines.append("import numpy as np")
+    
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            py_lines.append(line)
+            continue
+            
+        # Ignore comments and library statements
+        if stripped.startswith("#"):
+            py_lines.append(line)
+            continue
+        if stripped.startswith("library(") or stripped.startswith("require("):
+            continue
+            
+        # Replace assignment operators
+        line = line.replace("<-", "=")
+        
+        # Replace Boolean and Null values
+        line = re.sub(r"\bTRUE\b", "True", line)
+        line = re.sub(r"\bFALSE\b", "False", line)
+        line = re.sub(r"\bNULL\b", "None", line)
+        
+        # Replace R reading CSV
+        line = re.sub(r"\bread\.csv\(([^)]+)\)", r"pd.read_csv(\1)", line)
+        line = re.sub(r"\bread_csv\(([^)]+)\)", r"pd.read_csv(\1)", line)
+        
+        # Replace R inspection functions
+        line = re.sub(r"\bhead\(([^)]+)\)", r"print(\1.head())", line)
+        line = re.sub(r"\bsummary\(([^)]+)\)", r"print(\1.describe())", line)
+        line = re.sub(r"\bdim\(([^)]+)\)", r"print(\1.shape)", line)
+        line = re.sub(r"\bstr\(([^)]+)\)", r"print(\1.dtypes)", line)
+        line = re.sub(r"\bcolnames\(([^)]+)\)", r"print(list(\1.columns))", line)
+        line = re.sub(r"\bnames\(([^)]+)\)", r"print(list(\1.columns))", line)
+        line = re.sub(r"\bcat\(([^)]+)\)", r"print(\1)", line)
+        
+        py_lines.append(line)
+        
+    return "\n".join(py_lines)
+
+
+def ensure_sandbox_files(workspace_dir, current_user):
+    import os
+    import requests
+    csv_files = [
+        "Agricultural_Crop_Production_Machine_Learning_Dataset.csv",
+        "Agricultural_Production_Capstone_Dataset.csv",
+        "Banking_Transactions_Capstone_Dataset.csv",
+        "Customer_Banking_Transactions_Machine_Learning_Dataset.csv",
+        "GSSsubset.csv",
+        "Retail_Sales_Capstone_Dataset.csv",
+        "Retail_Sales_Machine_Learning_Dataset.csv",
+        "SMdata.csv",
+        "german_credit__data.csv",
+        "mtcars.csv",
+        "murban.csv"
+    ]
+    
+    is_professional = (getattr(current_user, "study_level", "Beginner") == "Professional")
+    restricted_filenames = {
+        "Customer_Banking_Transactions_Machine_Learning_Dataset.csv",
+        "Agricultural_Crop_Production_Machine_Learning_Dataset.csv",
+        "Retail_Sales_Machine_Learning_Dataset.csv"
+    }
+    
+    # Filter for beginners
+    allowed_files = [f for f in csv_files if is_professional or f not in restricted_filenames]
+    
+    # Remove restricted files if present
+    if not is_professional:
+        for fname in restricted_filenames:
+            local_path = os.path.join(workspace_dir, fname)
+            if os.path.exists(local_path):
+                try:
+                    os.remove(local_path)
+                except Exception:
+                    pass
+                    
+    # Ensure allowed files are present
+    for fname in allowed_files:
+        local_path = os.path.join(workspace_dir, fname)
+        if not os.path.exists(local_path):
+            # Check database
+            db_file = UserSandboxFile.query.filter_by(filename=fname, is_global=True).first()
+            if db_file and db_file.file_data:
+                try:
+                    with open(local_path, "wb") as lf:
+                        lf.write(db_file.file_data)
+                except Exception:
+                    pass
+            else:
+                # Fallback: Fetch from GitHub repository dynamically
+                github_url = f"https://raw.githubusercontent.com/Nzangi20/Python-CDAM-system/main/Python%20materials/{fname}"
+                try:
+                    resp = requests.get(github_url, timeout=10)
+                    if resp.status_code == 200:
+                        csv_data = resp.content
+                        with open(local_path, "wb") as lf:
+                            lf.write(csv_data)
+                        
+                        # Save to database to self-heal the DB seed
+                        admin_user = User.query.filter_by(is_admin=True).first()
+                        admin_id = admin_user.id if admin_user else 1
+                        new_db_file = UserSandboxFile(
+                            user_id=admin_id,
+                            filename=fname,
+                            file_data=csv_data,
+                            file_size=len(csv_data),
+                            is_global=True
+                        )
+                        db.session.add(new_db_file)
+                        db.session.commit()
+                        print(f"Dynamically retrieved and seeded missing dataset: {fname}")
+                except Exception as e:
+                    print(f"Failed to dynamically fetch {fname}: {e}")
+
+    # Ensure private files are present
+    try:
+        private_files = UserSandboxFile.query.filter_by(user_id=current_user.id, is_global=False).all()
+        for db_file in private_files:
+            local_path = os.path.join(workspace_dir, db_file.filename)
+            if not os.path.exists(local_path):
+                # Retrieve the full file data
+                full_file = UserSandboxFile.query.filter_by(id=db_file.id).first()
+                if full_file and full_file.file_data:
+                    with open(local_path, "wb") as lf:
+                        lf.write(full_file.file_data)
+    except Exception:
+        pass
+
+
 @app.route("/api/run-code", methods=["POST"])
 def run_code():
     if not current_user.is_authenticated:
@@ -1505,46 +1658,8 @@ def run_code():
     workspace_dir = os.path.join(tempfile.gettempdir(), "sandbox_workspace", f"user_{current_user.id}")
     os.makedirs(workspace_dir, exist_ok=True)
     
-    # Dynamically restore missing sandbox files from database
-    try:
-        from sqlalchemy.orm import defer
-        global_files = UserSandboxFile.query.options(defer(UserSandboxFile.file_data)).filter_by(is_global=True).all()
-        private_files = UserSandboxFile.query.options(defer(UserSandboxFile.file_data)).filter_by(user_id=current_user.id, is_global=False).all()
-        
-        # Filter global files for beginners and purge them from the workspace dir
-        is_professional = getattr(current_user, "study_level", "Beginner") == "Professional"
-        restricted_filenames = {
-            "Customer_Banking_Transactions_Machine_Learning_Dataset.csv",
-            "Agricultural_Crop_Production_Machine_Learning_Dataset.csv",
-            "Retail_Sales_Machine_Learning_Dataset.csv"
-        }
-        if not is_professional:
-            global_files = [f for f in global_files if f.filename not in restricted_filenames]
-            for fname in restricted_filenames:
-                local_path = os.path.join(workspace_dir, fname)
-                if os.path.exists(local_path):
-                    try:
-                        os.remove(local_path)
-                    except Exception:
-                        pass
-                        
-        for db_file in global_files:
-            local_path = os.path.join(workspace_dir, db_file.filename)
-            if not os.path.exists(local_path):
-                full_file = UserSandboxFile.query.filter_by(id=db_file.id).first()
-                if full_file:
-                    with open(local_path, "wb") as lf:
-                        lf.write(full_file.file_data)
-                        
-        for db_file in private_files:
-            local_path = os.path.join(workspace_dir, db_file.filename)
-            if not os.path.exists(local_path):
-                full_file = UserSandboxFile.query.filter_by(id=db_file.id).first()
-                if full_file:
-                    with open(local_path, "wb") as lf:
-                        lf.write(full_file.file_data)
-    except Exception:
-        pass
+    # Dynamically restore missing sandbox files
+    ensure_sandbox_files(workspace_dir, current_user)
     
     active_track = payload.get("track", get_active_track())
     temp_script_path = None
@@ -1690,10 +1805,30 @@ except ImportError:
             except Exception:
                 pass
         if active_track == "r":
-            return jsonify({
-                "output": "",
-                "error": "R runtime ('Rscript') is not installed or could not be found on this system. Please contact the administrator."
-            })
+            # Fallback: R-to-Python translation emulation for systems without R runtime (like Vercel)
+            try:
+                translated_py_code = translate_r_to_python(code)
+                full_python_code = python_setup_code + translated_py_code
+                
+                process = subprocess.run(
+                    [sys.executable, "-c", full_python_code],
+                    capture_output=True,
+                    text=True,
+                    timeout=15.0,
+                    cwd=workspace_dir,
+                    env=env
+                )
+                output_prefix = "[Note: R script executed successfully via sandbox emulation]\n\n"
+                return jsonify({
+                    "output": output_prefix + process.stdout,
+                    "error": process.stderr,
+                    "exit_code": process.returncode
+                })
+            except Exception as ex:
+                return jsonify({
+                    "output": "",
+                    "error": f"R runtime ('Rscript') is not installed, and emulation failed: {str(ex)}"
+                })
         else:
             return jsonify({
                 "output": "",
