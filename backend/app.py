@@ -1536,7 +1536,7 @@ def translate_r_to_python(r_code):
         
         # Replace R reading CSV
         line = re.sub(r"\bread\.csv\(([^)]+)\)", r"pd.read_csv(\1)", line)
-        line = re.sub(r"\bread_csv\(([^)]+)\)", r"pd.read_csv(\1)", line)
+        line = re.sub(r"(?<!pd\.)\bread_csv\(([^)]+)\)", r"pd.read_csv(\1)", line)
         
         # Replace R inspection functions
         line = re.sub(r"\bhead\(([^)]+)\)", r"print(\1.head())", line)
@@ -1550,7 +1550,6 @@ def translate_r_to_python(r_code):
         py_lines.append(line)
         
     return "\n".join(py_lines)
-
 
 def ensure_sandbox_files(workspace_dir, current_user):
     import os
@@ -1593,39 +1592,50 @@ def ensure_sandbox_files(workspace_dir, current_user):
     for fname in allowed_files:
         local_path = os.path.join(workspace_dir, fname)
         if not os.path.exists(local_path):
-            # Check database
-            db_file = UserSandboxFile.query.filter_by(filename=fname, is_global=True).first()
-            if db_file and db_file.file_data:
+            try:
+                # Check database
+                db_file = UserSandboxFile.query.filter_by(filename=fname, is_global=True).first()
+                if db_file and db_file.file_data:
+                    try:
+                        with open(local_path, "wb") as lf:
+                            lf.write(db_file.file_data)
+                    except Exception:
+                        pass
+                else:
+                    # Fallback: Fetch from GitHub repository dynamically
+                    github_url = f"https://raw.githubusercontent.com/Nzangi20/Python-CDAM-system/main/Python%20materials/{fname}"
+                    try:
+                        resp = requests.get(github_url, timeout=10)
+                        if resp.status_code == 200:
+                            csv_data = resp.content
+                            with open(local_path, "wb") as lf:
+                                lf.write(csv_data)
+                            
+                            # Save to database to self-heal the DB seed
+                            admin_user = User.query.filter_by(is_admin=True).first()
+                            admin_id = admin_user.id if admin_user else 1
+                            new_db_file = UserSandboxFile(
+                                user_id=admin_id,
+                                filename=fname,
+                                file_data=csv_data,
+                                file_size=len(csv_data),
+                                is_global=True
+                            )
+                            db.session.add(new_db_file)
+                            db.session.commit()
+                            print(f"Dynamically retrieved and seeded missing dataset: {fname}")
+                    except Exception as e:
+                        try:
+                            db.session.rollback()
+                        except Exception:
+                            pass
+                        print(f"Failed to dynamically fetch {fname}: {e}")
+            except Exception as e:
                 try:
-                    with open(local_path, "wb") as lf:
-                        lf.write(db_file.file_data)
+                    db.session.rollback()
                 except Exception:
                     pass
-            else:
-                # Fallback: Fetch from GitHub repository dynamically
-                github_url = f"https://raw.githubusercontent.com/Nzangi20/Python-CDAM-system/main/Python%20materials/{fname}"
-                try:
-                    resp = requests.get(github_url, timeout=10)
-                    if resp.status_code == 200:
-                        csv_data = resp.content
-                        with open(local_path, "wb") as lf:
-                            lf.write(csv_data)
-                        
-                        # Save to database to self-heal the DB seed
-                        admin_user = User.query.filter_by(is_admin=True).first()
-                        admin_id = admin_user.id if admin_user else 1
-                        new_db_file = UserSandboxFile(
-                            user_id=admin_id,
-                            filename=fname,
-                            file_data=csv_data,
-                            file_size=len(csv_data),
-                            is_global=True
-                        )
-                        db.session.add(new_db_file)
-                        db.session.commit()
-                        print(f"Dynamically retrieved and seeded missing dataset: {fname}")
-                except Exception as e:
-                    print(f"Failed to dynamically fetch {fname}: {e}")
+                print(f"Database error checking/seeding global file {fname}: {e}")
 
     # Ensure private files are present
     try:
@@ -1638,8 +1648,12 @@ def ensure_sandbox_files(workspace_dir, current_user):
                 if full_file and full_file.file_data:
                     with open(local_path, "wb") as lf:
                         lf.write(full_file.file_data)
-    except Exception:
-        pass
+    except Exception as e:
+        try:
+            db.session.rollback()
+        except Exception:
+            pass
+        print(f"Database error checking private files: {e}")
 
 
 @app.route("/api/run-code", methods=["POST"])
@@ -1660,7 +1674,14 @@ def run_code():
     os.makedirs(workspace_dir, exist_ok=True)
     
     # Dynamically restore missing sandbox files
-    ensure_sandbox_files(workspace_dir, current_user)
+    try:
+        ensure_sandbox_files(workspace_dir, current_user)
+    except Exception as e:
+        try:
+            db.session.rollback()
+        except Exception:
+            pass
+        print(f"Error checking sandbox files: {e}")
     
     active_track = payload.get("track", get_active_track())
     temp_script_path = None
@@ -1777,7 +1798,7 @@ except ImportError:
                 pass
         return jsonify({
             "output": "",
-            "error": "Execution timed out (15 seconds limit)."
+            "error": "Execution timed out (30 seconds limit)."
         })
     except FileNotFoundError as e:
         if temp_script_path and os.path.exists(temp_script_path):
@@ -1789,7 +1810,30 @@ except ImportError:
             # Fallback: R-to-Python translation emulation for systems without R runtime (like Vercel)
             try:
                 translated_py_code = translate_r_to_python(code)
-                full_python_code = python_setup_code + translated_py_code
+                python_setup_code_emulation = '''
+# Load common data science libraries
+try:
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import sklearn
+    import scipy
+    import statsmodels.api as sm
+    import os
+    # Automatically load all CSV files in the workspace as pandas DataFrames
+    for _fname in os.listdir('.'):
+        if _fname.endswith('.csv'):
+            _varname = _fname.replace('.csv', '').replace(' ', '_').replace('-', '_')
+            if _varname.isidentifier():
+                try:
+                    globals()[_varname] = pd.read_csv(_fname)
+                except Exception:
+                    pass
+except ImportError:
+    pass
+'''
+                full_python_code = python_setup_code_emulation + translated_py_code
                 
                 process = subprocess.run(
                     [sys.executable, "-c", full_python_code],
