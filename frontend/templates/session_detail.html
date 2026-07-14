@@ -436,7 +436,7 @@
                 </ul>
               </div>
               {% if current_user.is_admin %}
-                <a class="btn secondary" href="{{ url_for('exam_take', exam_id=exam.id) }}" style="width: 100%; text-align: center;"><i class="fa-solid fa-eye"></i> Preview Assessment</a>
+                <a class="btn secondary" href="{{ url_for('admin_exam_edit', exam_id=exam.id) }}" style="width: 100%; text-align: center;"><i class="fa-solid fa-eye"></i> Preview / Edit Assessment</a>
               {% else %}
                 <a class="btn primary" href="{{ url_for('exam_take', exam_id=exam.id) }}" style="width: 100%; text-align: center;"><i class="fa-solid fa-circle-play"></i> Start Assessment</a>
               {% endif %}

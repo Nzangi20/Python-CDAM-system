@@ -1144,7 +1144,20 @@ def resources():
 def exams_dashboard():
     now = utc_now()
     active_track = get_active_track()
-    exams = Exam.query.filter_by(published=True, study_level=current_user.study_level, course_type=active_track, session_id=None).all()
+    if current_user.study_level == "Professional":
+        exams = Exam.query.filter(
+            Exam.published == True,
+            Exam.study_level.in_(["Beginner", "Professional"]),
+            Exam.course_type == active_track,
+            Exam.session_id == None
+        ).all()
+    else:
+        exams = Exam.query.filter_by(
+            published=True,
+            study_level="Beginner",
+            course_type=active_track,
+            session_id=None
+        ).all()
     upcoming = [e for e in exams if e.start_time and to_naive(e.start_time) > now]
     available = [
         e
@@ -1235,7 +1248,13 @@ def transcript():
         r_sessions = Session.query.filter_by(published=True, course_type="r").order_by(Session.display_order).all()
         r_sessions = r_sessions[:r_sessions_needed]
         
-    exams = Exam.query.filter_by(published=True, study_level=current_user.study_level).all()
+    if current_user.study_level == "Professional":
+        exams = Exam.query.filter(
+            Exam.published == True,
+            Exam.study_level.in_(["Beginner", "Professional"])
+        ).all()
+    else:
+        exams = Exam.query.filter_by(published=True, study_level="Beginner").all()
     exam_attempts = ExamAttemptRecord.query.filter_by(user_id=current_user.id).all()
     
     return render_template(
@@ -1408,8 +1427,14 @@ def session_detail(slug: str):
     now = utc_now()
     if current_user.is_admin:
         exams = Exam.query.filter_by(published=True, session_id=session.id).all()
+    elif current_user.study_level == "Professional":
+        exams = Exam.query.filter(
+            Exam.published == True,
+            Exam.study_level.in_(["Beginner", "Professional"]),
+            Exam.session_id == session.id
+        ).all()
     else:
-        exams = Exam.query.filter_by(published=True, study_level=current_user.study_level, session_id=session.id).all()
+        exams = Exam.query.filter_by(published=True, study_level="Beginner", session_id=session.id).all()
     upcoming = [e for e in exams if e.start_time and to_naive(e.start_time) > now]
     available = [
         e
@@ -2561,7 +2586,8 @@ def exam_take(exam_id: int):
     if not exam or not exam.published:
         flash("Exam not available.", "error")
         return redirect(get_exam_redirect_url(exam))
-    if exam.study_level != current_user.study_level:
+    # Professional students can access both Beginner and Professional exams
+    if current_user.study_level != "Professional" and exam.study_level == "Professional":
         flash("You do not have access to this exam.", "error")
         return redirect(get_exam_redirect_url(exam))
     if exam.course_type == "python" and not current_user.enrolled_python:
@@ -3520,7 +3546,13 @@ def admin_student_transcript(user_id: int):
         r_sessions = Session.query.filter_by(published=True, course_type="r").order_by(Session.display_order).all()
         r_sessions = r_sessions[:r_sessions_needed]
         
-    exams = Exam.query.filter_by(published=True, study_level=study_level).all()
+    if study_level == "Professional":
+        exams = Exam.query.filter(
+            Exam.published == True,
+            Exam.study_level.in_(["Beginner", "Professional"])
+        ).all()
+    else:
+        exams = Exam.query.filter_by(published=True, study_level="Beginner").all()
     exam_attempts = ExamAttemptRecord.query.filter_by(user_id=user.id).all()
     
     return render_template(
