@@ -3727,36 +3727,22 @@ def check_and_install_packages_async():
 def initialize():
     check_and_install_packages_async()
     with app.app_context():
+        # Fast path: Check if database is already fully set up and seeded
+        try:
+            version_setting = PlatformSetting.query.filter_by(key="curriculum_version").first()
+            if version_setting and version_setting.value == "11":
+                # Database matches expected structure and version, skip everything else
+                return
+        except Exception:
+            # Table or database is not initialized yet. Proceed with full setup.
+            pass
+
         # Unconditionally run create_all and migrate_schema to ensure schema is up-to-date
         db.create_all()
         try:
             migrate_schema()
         except Exception as e:
             print(f"Database migration skipped/failed during startup: {e}")
-
-        from sqlalchemy import inspect
-        try:
-            inspector = inspect(db.engine)
-            if "sessions" in inspector.get_table_names():
-                r_db_count = Session.query.filter_by(course_type="r").count()
-                existing_r_slugs = {s.slug for s in Session.query.filter_by(course_type="r").all()}
-                expected_r_slugs = {item["slug"] for item in R_SESSIONS}
-                python_notes_count = Session.query.filter(Session.course_type == "python", Session.notes_file_path != None).count()
-                
-                global_files_count = 0
-                if "user_sandbox_files" in inspector.get_table_names():
-                    global_files_count = UserSandboxFile.query.filter_by(is_global=True).count()
-                
-                version_setting = PlatformSetting.query.filter_by(key="curriculum_version").first()
-                if (r_db_count == len(R_SESSIONS) and 
-                    existing_r_slugs == expected_r_slugs and 
-                    python_notes_count >= 18 and 
-                    global_files_count >= 11 and
-                    version_setting and version_setting.value == "11"):
-                    # Database is already seeded and matches expected structure. Skip.
-                    return
-        except Exception as e:
-            print(f"Database check skipped during startup: {e}")
 
         seed_sessions()
         try:
