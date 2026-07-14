@@ -958,226 +958,250 @@ R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
         'resources': '- [CDAM R Portal](https://cdam.chuka.ac.ke/grad/r/)',
         'slug': 'r-session-9-capstone',
         'title': 'Session 9: Capstone Project in R with Agricultural Production Capstone Data'},
-    {   'code_examples': '# Analyze Customer Banking Transactions (ML) Dataset\n'
-                         'data <- list(\n'
-                         '    list(id = 1, amount = 2500, type = "deposit"),\n'
-                         '    list(id = 2, amount = 1200, type = "withdrawal"),\n'
-                         '    list(id = 3, amount = 3000, type = "deposit"),\n'
-                         '    list(id = 4, amount = 800, type = "withdrawal"),\n'
-                         '    list(id = 5, amount = 5000, type = "deposit")\n'
+    {   'code_examples': 'library(dplyr)\n'
+                         'library(tidyr)\n'
+                         'library(data.table)\n'
+                         '# Reshape and summarize using tidyverse and data.table\n'
+                         'df <- data.frame(\n'
+                         '  id = 1:4,\n'
+                         '  group = c("A", "A", "B", "B"),\n'
+                         '  val1 = c(10, 15, 8, 12),\n'
+                         '  val2 = c(20, 25, 18, 22)\n'
                          ')\n'
-                         'print("Customer Banking Transactions Data:")\n'
-                         'print(data)',
-        'content': 'Intermediate to advanced statistical modeling and regression analysis using R.',
-        'description': 'Deep dive into statistical modeling, regression techniques, and predictive analysis using R.',
+                         '# Pivot longer\n'
+                         'df_long <- df %>% pivot_longer(cols = starts_with("val"), names_to = "measure", values_to = '
+                         '"value")\n'
+                         'print("Reshaped Data:")\n'
+                         'print(df_long)\n'
+                         '# data.table equivalent for fast aggregation\n'
+                         'dt <- as.data.table(df)\n'
+                         'result <- dt[, .(mean_val1 = mean(val1)), by = group]\n'
+                         'print("data.table Result:")\n'
+                         'print(result)',
+        'content': 'Advanced data manipulation, reshaping, and fast data processing with dplyr, tidyr, and data.table.',
+        'description': 'Master advanced data wrangling and transformation using dplyr, tidyr, and data.table in R.',
         'difficulty': 'Professional',
         'duration': '60 min',
-        'expected_outcomes': '- Understand advanced regression models\n'
-                             '- Apply statistical modeling to real data\n'
-                             '- Evaluate model performance',
-        'instructions': 'Run the code examples to explore advanced statistical modeling.',
-        'learning_notes': '### Agricultural Crop Production (ML)\n'
-                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
-                          'application, perfect for machine learning modeling.\n'
+        'expected_outcomes': '- Write efficient wrangling pipelines in R\n'
+                             '- Use pivot_longer and pivot_wider to reshape data\n'
+                             '- Apply data.table syntax for high-performance operations',
+        'learning_notes': '### Data Wrangling in R\n'
+                          'Data wrangling involves cleaning, reshaping, and transforming raw data into a format '
+                          'suitable for analysis.\n'
                           '\n'
-                          '### Customer Banking Transactions (ML)\n'
-                          'This dataset contains customer transaction records, perfect for fraud detection and '
-                          'customer behavior analysis using machine learning.\n'
-                          '### Advanced Statistical Modeling\n'
-                          'Learn how to build and evaluate advanced statistical models in R.',
-        'notes_file_path': None,
-        'objectives': '- Implement multiple linear regression\n'
-                      '- Perform logistic regression\n'
-                      '- Evaluate model assumptions',
+                          '### dplyr & tidyr\n'
+                          '- pivot_longer() and pivot_wider() from tidyr reshape datasets between wide and long '
+                          'formats.\n'
+                          '- dplyr handles group-wise transformations, filtering, and joins.\n'
+                          '\n'
+                          '### data.table\n'
+                          'data.table is an R package that provides a high-performance version of data.frames. It is '
+                          'extremely fast and memory-efficient for large datasets.',
+        'notes_file_path': 'https://019f5f1f-e71d-6a8b-f340-0cf1306ef23c.share.connect.posit.cloud/',
+        'objectives': '- Use dplyr and tidyr for complex data cleaning and reshaping\n'
+                      '- Perform fast data operations using the data.table package\n'
+                      '- Clean and transform datasets for downstream analysis',
         'quiz': [],
-        'resources': '- https://cran.r-project.org/web/packages/stats/index.html',
+        'resources': '- [Tidyverse homepage](https://www.tidyverse.org/)\n'
+                     '- [data.table documentation](https://rdatatable.gitlab.io/data.table/)',
         'slug': 'r-session-10',
-        'title': 'Session 10: Advanced Statistical Modeling in R with Agricultural Crop Production Data'},
-    {   'code_examples': '# Analyze Retail Sales (ML) Dataset\n'
-                         'data <- data.frame(\n'
-                         "  Month = c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'),\n"
-                         '  Sales = c(5000, 6200, 5800, 7500, 8000, 7200),\n'
-                         '  AdSpend = c(500, 650, 600, 800, 850, 750),\n'
-                         '  FootTraffic = c(1200, 1500, 1400, 1800, 1900, 1700)\n'
+        'title': 'Session 10: Data Wrangling with dplyr, tidyr & data.table'},
+    {   'code_examples': 'library(ggplot2)\n'
+                         '# Advanced ggplot2 customization\n'
+                         'df <- data.frame(\n'
+                         '  category = factor(c("A", "B", "C", "D")),\n'
+                         '  value = c(23, 45, 12, 38)\n'
                          ')\n'
-                         'print("Retail Sales Data:")\n'
-                         'print(data)',
-        'content': 'Master advanced functional programming concepts using tidyverse tools, especially purrr.',
-        'description': 'Advanced data transformation, nesting, and functional programming with purrr.',
+                         'p <- ggplot(df, aes(x = category, y = value, fill = category)) +\n'
+                         '  geom_col(show.legend = FALSE) +\n'
+                         '  theme_minimal(base_size = 14) +\n'
+                         '  scale_fill_brewer(palette = "Set2") +\n'
+                         '  labs(title = "Custom Styled Column Chart", x = "Category", y = "Value")\n'
+                         'print(p)',
+        'content': 'Advanced ggplot2 customization, themes, scales, multi-panel plotting, and interactive '
+                   'visualizations.',
+        'description': 'Create publication-quality plots and custom visualizations using advanced ggplot2 features, '
+                       'plotly, and patchworks.',
         'difficulty': 'Professional',
         'duration': '60 min',
-        'expected_outcomes': '- Use purrr for functional programming\n'
-                             '- Manipulate nested data frames\n'
-                             '- Write efficient R code',
-        'instructions': 'Run the code examples to learn functional programming with purrr.',
-        'learning_notes': '### Customer Banking Transactions (ML)\n'
-                          'This dataset contains customer transaction records, perfect for fraud detection and '
-                          'customer behavior analysis using machine learning.\n'
+        'expected_outcomes': '- Create highly customized, clean data visualizations\n'
+                             '- Compose multi-panel figures\n'
+                             '- Generate interactive web-based charts',
+        'learning_notes': '### Advanced Data Visualization in R\n'
+                          'Advanced data visualization involves creating customized and interactive plots that '
+                          'communicate complex data insights effectively.\n'
                           '\n'
-                          '### Retail Sales (ML)\n'
-                          'This dataset contains monthly sales, ad spend, and foot traffic data, perfect for sales '
-                          'prediction and marketing optimization using machine learning.\n'
-                          '### Functional Programming with purrr\n'
-                          'purrr provides tools for working with functions and vectors in R.',
-        'notes_file_path': None,
-        'objectives': '- Use map() functions\n- Work with list-columns\n- Apply functional programming patterns',
+                          '### ggplot2 Themes and Customization\n'
+                          '- Use theme() to customize background, grid lines, text size, and colors.\n'
+                          '- Customize color and fill scales using scale_fill_brewer() or scale_color_viridis_d().\n'
+                          '\n'
+                          '### Plot Layouts\n'
+                          'Combine multiple plots in a single figure using packages like patchwork or cowplot.',
+        'notes_file_path': 'https://019f5f33-6dd3-0544-d5dd-7558d1a45bf1.share.connect.posit.cloud/',
+        'objectives': '- Customize ggplot2 themes and scales for publication-grade charts\n'
+                      '- Arrange multiple plots in a grid layout\n'
+                      '- Build interactive graphics for the web',
         'quiz': [],
-        'resources': '- https://purrr.tidyverse.org/',
+        'resources': '- [ggplot2 Elegant Graphics for Data Analysis](https://ggplot2-book.org/)\n'
+                     '- [R Graph Gallery](https://r-graph-gallery.com/)',
         'slug': 'r-session-11',
-        'title': 'Session 11: Functional Programming in R with Customer Banking Transactions Data'},
-    {   'code_examples': '# Analyze Agricultural Crop Production (ML) Dataset\n'
-                         'data <- data.frame(\n'
-                         "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
-                         '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
-                         '  Rainfall_mm = c(800, 750, 1200, 600, 850, 780),\n'
-                         '  Fertilizer_kg_ha = c(150, 180, 200, 100, 160, 190)\n'
-                         ')\n'
-                         'print("Agricultural Crop Production Data:")\n'
-                         'print(data)',
-        'content': 'Implement classification models and inspect performance metrics in R.',
-        'description': 'Supervised machine learning algorithms, classification models, and model evaluation.',
+        'title': 'Session 11: Advanced Data Visualization in R'},
+    {   'code_examples': '# Split data and evaluate a simple baseline model\n'
+                         'set.seed(42)\n'
+                         'data(mtcars)\n'
+                         'train_idx <- sample(1:nrow(mtcars), 0.7 * nrow(mtcars))\n'
+                         'train_data <- mtcars[train_idx, ]\n'
+                         'test_data <- mtcars[-train_idx, ]\n'
+                         'print(paste("Train size:", nrow(train_data), "Test size:", nrow(test_data)))',
+        'content': 'Introduction to machine learning terminology, train/test splitting, preprocessing, and model '
+                   'development in R.',
+        'description': 'Learn the core concepts of statistical computing, optimization, and the machine learning '
+                       'workflow in R.',
         'difficulty': 'Professional',
-        'duration': '75 min',
-        'expected_outcomes': '- Build classification models\n- Evaluate model performance\n- Use cross-validation',
-        'instructions': 'Run the code examples to build classification models.',
-        'learning_notes': '### Retail Sales (ML)\n'
-                          'This dataset contains monthly sales, ad spend, and foot traffic data, perfect for sales '
-                          'prediction and marketing optimization using machine learning.\n'
+        'duration': '60 min',
+        'expected_outcomes': '- Partition data into training and test sets\n'
+                             '- Scale and normalize data features\n'
+                             '- Evaluate model predictions using basic metrics',
+        'learning_notes': '### Machine Learning Workflow\n'
+                          'Machine learning is a subset of AI that enables systems to learn from data. The standard ML '
+                          'workflow includes:\n'
+                          '1. Data Preprocessing & Cleaning\n'
+                          '2. Feature Selection & Engineering\n'
+                          '3. Train/Test Splitting\n'
+                          '4. Model Training & Tuning\n'
+                          '5. Model Evaluation\n'
                           '\n'
-                          '### Agricultural Crop Production (ML)\n'
-                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
-                          'application, perfect for machine learning modeling.\n'
-                          '### Supervised Machine Learning\n'
-                          'Learn how to build and evaluate supervised learning models in R.',
-        'notes_file_path': None,
-        'objectives': '- Use caret or tidymodels\n- Build decision trees\n- Evaluate model accuracy',
+                          '### Preprocessing in R\n'
+                          'Use scale() to normalize numeric columns so they have a mean of 0 and standard deviation of '
+                          '1.',
+        'notes_file_path': 'https://019f5f3c-d9a9-9e03-83cf-2daad22a5978.share.connect.posit.cloud/',
+        'objectives': '- Understand the machine learning workflow (splitting, training, testing)\n'
+                      '- Perform data preprocessing and scaling in R\n'
+                      '- Implement a baseline predictive model',
         'quiz': [],
-        'resources': '- https://www.tidymodels.org/',
+        'resources': '- [Introduction to Modern Statistics](https://openintro-ims.netlify.app/)\n'
+                     '- [Hands-On Machine Learning with R](https://bradleyboehmke.github.io/HOML/)',
         'slug': 'r-session-12',
-        'title': 'Session 12: Supervised Machine Learning in R with Retail Sales Data'},
-    {   'code_examples': '# Analyze Customer Banking Transactions (ML) Dataset\n'
-                         'data <- list(\n'
-                         '    list(id = 1, amount = 2500, type = "deposit"),\n'
-                         '    list(id = 2, amount = 1200, type = "withdrawal"),\n'
-                         '    list(id = 3, amount = 3000, type = "deposit"),\n'
-                         '    list(id = 4, amount = 800, type = "withdrawal"),\n'
-                         '    list(id = 5, amount = 5000, type = "deposit")\n'
-                         ')\n'
-                         'print("Customer Banking Transactions Data:")\n'
-                         'print(data)',
-        'content': 'Discover patterns in unlabeled datasets using clustering and PCA reduction.',
-        'description': 'Unsupervised learning, clustering algorithms (K-means), and dimension reduction (PCA).',
+        'title': 'Session 12: Statistical Computing & Introduction to Machine Learning'},
+    {   'code_examples': '# Logistic regression classification on mtcars (predicting high vs low mpg)\n'
+                         'df <- mtcars\n'
+                         'df$high_mpg <- as.factor(ifelse(df$mpg > 20, 1, 0))\n'
+                         'model <- glm(high_mpg ~ wt + hp, data = df, family = binomial)\n'
+                         'summary(model)',
+        'content': 'Supervised classification techniques including logistic regression, decision trees, and random '
+                   'forests in R.',
+        'description': 'Train, evaluate, and tune classification models in R using caret and tidymodels.',
         'difficulty': 'Professional',
         'duration': '75 min',
-        'expected_outcomes': '- Perform K-means clustering\n- Apply PCA\n- Visualize unsupervised learning results',
-        'instructions': 'Run the code examples to try clustering and PCA.',
-        'learning_notes': '### Agricultural Crop Production (ML)\n'
-                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
-                          'application, perfect for machine learning modeling.\n'
+        'expected_outcomes': '- Fit classification models in R\n'
+                             '- Build and interpret a confusion matrix\n'
+                             '- Measure classifier performance',
+        'learning_notes': '### Supervised Classification\n'
+                          'Classification is a type of supervised learning where the target variable is categorical '
+                          '(e.g. Pass/Fail, Yes/No).\n'
                           '\n'
-                          '### Customer Banking Transactions (ML)\n'
-                          'This dataset contains customer transaction records, perfect for fraud detection and '
-                          'customer behavior analysis using machine learning.\n'
-                          '### Unsupervised Machine Learning\n'
-                          'Unsupervised learning finds patterns in unlabeled data.',
-        'notes_file_path': None,
-        'objectives': '- Use kmeans()\n- Perform PCA with prcomp()\n- Visualize clusters',
+                          '### Logistic Regression\n'
+                          'Used when predicting a binary outcome. It models the log-odds of the probability of class '
+                          '1.\n'
+                          '\n'
+                          '### Decision Trees & Random Forests\n'
+                          'Decision trees split data recursively based on feature thresholds. Random Forests combine '
+                          'multiple trees for better generalizability.',
+        'notes_file_path': 'https://019f5f3a-de8f-352f-c0c4-f987772281b3.share.connect.posit.cloud/',
+        'objectives': '- Train classification models (logistic regression, decision trees)\n'
+                      '- Compute classification performance metrics (accuracy, precision, recall, AUC-ROC)\n'
+                      '- Handle class imbalance and evaluate model robustness',
         'quiz': [],
-        'resources': '- https://www.statmethods.net/advstats/cluster.html',
+        'resources': '- [Tidymodels documentation](https://www.tidymodels.org/)\n'
+                     '- [Caret package manual](https://topepo.github.io/caret/)',
         'slug': 'r-session-13',
-        'title': 'Session 13: Unsupervised Machine Learning in R with Agricultural Crop Production Data'},
-    {   'code_examples': '# Analyze Retail Sales (ML) Dataset\n'
-                         'data <- data.frame(\n'
-                         "  Month = c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'),\n"
-                         '  Sales = c(5000, 6200, 5800, 7500, 8000, 7200),\n'
-                         '  AdSpend = c(500, 650, 600, 800, 850, 750),\n'
-                         '  FootTraffic = c(1200, 1500, 1400, 1800, 1900, 1700)\n'
-                         ')\n'
-                         'print("Retail Sales Data:")\n'
-                         'print(data)',
-        'content': 'Train basic deep learning networks and optimize parameters in R.',
-        'description': 'Deep learning foundations, neural networks, and advanced tensor operations in R.',
+        'title': 'Session 13: Supervised Machine Learning | Classification'},
+    {   'code_examples': '# Multiple linear regression in R\n'
+                         'model <- lm(mpg ~ wt + hp + cyl, data = mtcars)\n'
+                         'summary(model)',
+        'content': 'Supervised regression models including multiple linear regression, ridge, lasso, and decision tree '
+                   'regressors.',
+        'description': 'Train, tune, and evaluate regression models in R to predict continuous variables.',
         'difficulty': 'Professional',
-        'duration': '90 min',
-        'expected_outcomes': '- Understand neural network basics\n'
-                             '- Build a simple neural network\n'
-                             '- Train and evaluate models',
-        'instructions': 'Run the code examples to explore deep learning in R.',
-        'learning_notes': '### Customer Banking Transactions (ML)\n'
-                          'This dataset contains customer transaction records, perfect for fraud detection and '
-                          'customer behavior analysis using machine learning.\n'
+        'duration': '75 min',
+        'expected_outcomes': '- Train regression models to predict continuous variables\n'
+                             '- Extract and interpret regression coefficients\n'
+                             '- Compute error metrics on test datasets',
+        'learning_notes': '### Supervised Regression\n'
+                          'Regression is used to predict continuous outcomes (e.g., house prices, sales, yields).\n'
                           '\n'
-                          '### Retail Sales (ML)\n'
-                          'This dataset contains monthly sales, ad spend, and foot traffic data, perfect for sales '
-                          'prediction and marketing optimization using machine learning.\n'
-                          '### Deep Learning in R\n'
-                          'Use packages like keras or torch for deep learning in R.',
-        'notes_file_path': None,
-        'objectives': '- Install and configure keras\n- Build a simple NN\n- Train and evaluate',
+                          '### Regularization\n'
+                          '- **Lasso Regression (L1)**: Adds a penalty equivalent to the absolute values of the '
+                          'coefficients, pushing some to zero (feature selection).\n'
+                          '- **Ridge Regression (L2)**: Adds a penalty equivalent to the square of the coefficients, '
+                          'shrinking them towards zero.\n'
+                          '\n'
+                          '### Evaluation Metrics\n'
+                          '- Root Mean Squared Error (RMSE): Average magnitude of error.\n'
+                          '- R-squared: Proportion of variance explained by model.',
+        'notes_file_path': 'https://019f5f53-62bf-c5b5-e834-ed3252d834f3.share.connect.posit.cloud/',
+        'objectives': '- Fit multiple linear regression models\n'
+                      '- Understand regularization techniques (Ridge/Lasso) in R\n'
+                      '- Evaluate regression models using RMSE, MAE, and R-squared',
         'quiz': [],
-        'resources': '- https://keras.rstudio.com/',
+        'resources': '- [An Introduction to Statistical Learning](https://www.statlearning.com/)\n'
+                     '- [Tidymodels for Regression](https://www.tidymodels.org/start/models/)',
         'slug': 'r-session-14',
-        'title': 'Session 14: Deep Learning Fundamentals in R with Customer Banking Transactions Data'},
-    {   'code_examples': '# Analyze Agricultural Crop Production (ML) Dataset\n'
-                         'data <- data.frame(\n'
-                         "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
-                         '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
-                         '  Rainfall_mm = c(800, 750, 1200, 600, 850, 780),\n'
-                         '  Fertilizer_kg_ha = c(150, 180, 200, 100, 160, 190)\n'
-                         ')\n'
-                         'print("Agricultural Crop Production Data:")\n'
-                         'print(data)',
-        'content': 'Extract topics and perform sentiment analysis on textual corpora in R.',
-        'description': 'Natural language processing (NLP), text mining, and sentiment analysis with tidytext.',
+        'title': 'Session 14: Supervised Machine Learning | Regression'},
+    {   'code_examples': '# K-means clustering on mtcars numeric columns\n'
+                         'numeric_data <- scale(mtcars[, c("mpg", "disp", "hp", "wt")])\n'
+                         'set.seed(42)\n'
+                         'clusters <- kmeans(numeric_data, centers = 3)\n'
+                         'print(clusters$centers)',
+        'content': 'Unsupervised learning techniques including K-means clustering, hierarchical clustering, and '
+                   'Principal Component Analysis (PCA) in R.',
+        'description': 'Discover hidden structures in unlabeled datasets using clustering and dimensionality reduction '
+                       'in R.',
         'difficulty': 'Professional',
-        'duration': '90 min',
-        'expected_outcomes': '- Perform text mining\n- Conduct sentiment analysis\n- Extract topics',
-        'instructions': 'Run the code examples to try NLP in R.',
-        'learning_notes': '### Retail Sales (ML)\n'
-                          'This dataset contains monthly sales, ad spend, and foot traffic data, perfect for sales '
-                          'prediction and marketing optimization using machine learning.\n'
+        'duration': '75 min',
+        'expected_outcomes': '- Cluster unlabeled datasets in R\n'
+                             '- Determine optimal cluster counts (elbow method)\n'
+                             '- Interpret PCA loadings and score plots',
+        'learning_notes': '### Unsupervised Learning\n'
+                          'Unsupervised learning works with unlabeled datasets. Its goals include clustering and '
+                          'dimension reduction.\n'
                           '\n'
-                          '### Agricultural Crop Production (ML)\n'
-                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
-                          'application, perfect for machine learning modeling.\n'
-                          '### Natural Language Processing with tidytext\n'
-                          'tidytext makes text mining easy in R using tidy data principles.',
-        'notes_file_path': None,
-        'objectives': '- Use tidytext\n- Perform sentiment analysis\n- Create term frequency matrices',
+                          '### Clustering\n'
+                          '- **K-Means**: Groups observations based on their distance to a central centroid.\n'
+                          '- **Hierarchical Clustering**: Builds a tree of clusters (dendrogram) based on pairwise '
+                          'distances.\n'
+                          '\n'
+                          '### Dimension Reduction (PCA)\n'
+                          'PCA converts a set of correlated variables into a set of values of linearly uncorrelated '
+                          'variables called principal components.',
+        'notes_file_path': 'https://019f5f57-7e38-8f53-3e0b-b31b94057808.share.connect.posit.cloud/',
+        'objectives': '- Implement K-means and hierarchical clustering algorithms in R\n'
+                      '- Perform dimensionality reduction using Principal Component Analysis (PCA)\n'
+                      '- Visualize clusters and PCA projections',
         'quiz': [],
-        'resources': '- https://www.tidytextmining.com/',
+        'resources': '- [Unsupervised Learning on CRAN](https://cran.r-project.org/web/views/Cluster.html)\n'
+                     '- [PCA in R Tutorial](https://www.r-bloggers.com/2021/05/principal-component-analysis-pca-in-r/)',
         'slug': 'r-session-15',
-        'title': 'Session 15: Natural Language Processing in R with Retail Sales Data'},
-    {   'code_examples': '# Analyze Customer Banking Transactions (ML) Dataset\n'
-                         'data <- list(\n'
-                         '    list(id = 1, amount = 2500, type = "deposit"),\n'
-                         '    list(id = 2, amount = 1200, type = "withdrawal"),\n'
-                         '    list(id = 3, amount = 3000, type = "deposit"),\n'
-                         '    list(id = 4, amount = 800, type = "withdrawal"),\n'
-                         '    list(id = 5, amount = 5000, type = "deposit")\n'
-                         ')\n'
-                         'print("Customer Banking Transactions Data:")\n'
-                         'print(data)',
-        'content': 'Combine ML/AI capabilities into a final R capstone project.',
-        'description': 'Capstone project integration, final model deployments, and system reporting.',
+        'title': 'Session 15: Unsupervised Machine Learning | Clustering & Dimension Reduction'},
+    {   'code_examples': '# Capstone end-to-end simulation\nprint("CDAM R Capstone Project Pipeline Initialized")',
+        'content': 'Project planning, implementation, model deployment, final reporting, and presentation in R.',
+        'description': 'Apply your machine learning and statistical computing skills to solve a comprehensive '
+                       'real-world problem in R.',
         'difficulty': 'Professional',
         'duration': '120 min',
-        'expected_outcomes': '- Complete a full data science project\n'
-                             '- Integrate multiple techniques\n'
-                             '- Present findings professionally',
-        'instructions': 'Use the code examples as a starting point for your capstone.',
-        'learning_notes': '### Agricultural Crop Production (ML)\n'
-                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
-                          'application, perfect for machine learning modeling.\n'
-                          '\n'
-                          '### Customer Banking Transactions (ML)\n'
-                          'This dataset contains customer transaction records, perfect for fraud detection and '
-                          'customer behavior analysis using machine learning.\n'
-                          '### Capstone Project\n'
-                          "Combine everything you've learned into a final project.",
-        'notes_file_path': None,
-        'objectives': '- Design a project\n- Implement the analysis\n- Write a report',
+        'expected_outcomes': '- Complete a full R data science project\n'
+                             '- Deploy a predictive model or build an interactive dashboard\n'
+                             '- Write a reproducible project report',
+        'learning_notes': '### R Capstone Project\n'
+                          'The capstone is an integration of all key R capabilities. It represents the final step in '
+                          'the Professional R Track, allowing you to showcase an end-to-end statistical modeling or '
+                          'machine learning solution.',
+        'notes_file_path': 'https://019f5f78-17b4-f53f-98ee-ab41aa5595c0.share.connect.posit.cloud/',
+        'objectives': '- Design and execute a complete data science workflow in R\n'
+                      '- Integrate multiple data manipulation, visualization, and ML techniques\n'
+                      '- Present analytical findings professionally',
         'quiz': [],
-        'resources': '- https://r4ds.had.co.nz/',
+        'resources': '- [CDAM R Graduation Requirements](https://cdam.chuka.ac.ke/grad/r/)\n'
+                     '- [R Markdown Guide](https://bookdown.org/yihui/rmarkdown/)',
         'slug': 'r-session-16',
-        'title': 'Session 16: R Capstone Project with Agricultural Crop Production Data'}]
+        'title': 'Session 16: Capstone Projects in R'}]

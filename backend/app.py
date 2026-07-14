@@ -500,12 +500,12 @@ def seed_sessions() -> None:
     force_update = False
     version_setting = PlatformSetting.query.filter_by(key="curriculum_version").first()
     if not version_setting:
-        version_setting = PlatformSetting(key="curriculum_version", value="8")
+        version_setting = PlatformSetting(key="curriculum_version", value="9")
         db.session.add(version_setting)
         db.session.commit()
         force_update = True
-    elif version_setting.value != "8":
-        version_setting.value = "8"
+    elif version_setting.value != "9":
+        version_setting.value = "9"
         db.session.commit()
         force_update = True
 
@@ -3729,7 +3729,7 @@ def initialize():
                     existing_r_slugs == expected_r_slugs and 
                     python_notes_count >= 18 and 
                     global_files_count >= 11 and
-                    version_setting and version_setting.value == "8"):
+                    version_setting and version_setting.value == "9"):
                     # Database is already seeded and matches expected structure. Skip.
                     return
         except Exception as e:
