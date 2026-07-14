@@ -630,578 +630,625 @@ SESSIONS = [   {   'code_examples': '# Declare variables and print types\n'
         'slug': 'session-18-reporting-reproducibility',
         'title': 'Session 18: Capstone Project in Python with Customer Banking Transactions Data'}]
 
-R_SESSIONS = [   {   'code_examples': '# Declare variables in R\n'
-                         'name <- "CDAM Student"\n'
-                         'age <- 20\n'
-                         'gpa <- 3.8\n'
-                         'print(paste("Student:", name, "Age:", age, "GPA:", gpa))\n'
-                         'print(class(name))\n'
-                         'print(class(age))',
-        'content': 'This session introduces learners to the R programming language and its role in data science. '
-                   'Participants become familiar with the R environment, RStudio interface, basic syntax, data types, '
-                   'variables, operators, and fundamental programming concepts used in statistical computing and data '
-                   'analysis.',
-        'description': 'Learn the fundamentals of R programming, RStudio IDE, and the core concepts of data science.',
-        'difficulty': 'Beginner',
-        'duration': '45 min',
-        'expected_outcomes': '- Navigate the RStudio environment confidently.\n'
-                             '- Write and execute basic R programs.\n'
-                             '- Use R data types and structures effectively.\n'
-                             '- Apply fundamental programming concepts to solve simple analytical problems.',
-        'instructions': 'Run the code editor cell to calculate variable values and print their class.',
-        'learning_notes': '### R & RStudio Overview\n'
-                          'R is a programming language specifically built for statistical computing and graphics. '
-                          'RStudio is the standard IDE for R.\n'
-                          '\n'
-                          '### Assignment Operator\n'
-                          'In R, we typically use `<-` instead of `=` for assignment:\n'
-                          '`x <- 10`\n'
-                          '\n'
-                          '### Core Data Types\n'
-                          '- `numeric`: Decimals or integers (e.g., 3.14, 42)\n'
-                          '- `character`: Text strings wrapped in quotes\n'
-                          '- `logical`: TRUE or FALSE values (can be abbreviated as T or F)',
-        'notes_file_path': 'https://019f40c2-09d4-fb31-50b0-e79ca532e49e.share.connect.posit.cloud/',
-        'objectives': '- Understand the fundamentals of the R programming language.\n'
-                      '- Install and navigate the R and RStudio environments.\n'
-                      '- Learn basic R syntax and programming concepts.\n'
-                      '- Identify and use different data types and data structures in R.\n'
-                      '- Write and execute simple R scripts.',
-        'quiz': [],
-        'resources': '- [R Manuals](https://cran.r-project.org/manuals.html)\n'
-                     '- [RStudio Desktop](https://posit.co/download/rstudio-desktop/)',
-        'slug': 'r-session-1-intro-to-r',
-        'title': 'Session 1: Introduction to R for Data Science'},
-    {   'code_examples': '# Create a sample data frame with NA values\n'
-                         'df <- data.frame(\n'
-                         '  Name = c("Alice", "Bob", "Carol", NA),\n'
-                         '  Age = c(25, NA, 30, 22)\n'
-                         ')\n'
-                         'print("Original Data Frame:")\n'
-                         'print(df)\n'
-                         'df_clean <- na.omit(df)\n'
-                         'print("Cleaned Data Frame:")\n'
-                         'print(df_clean)',
-        'content': 'This session focuses on importing datasets from various sources, cleaning and preparing data for '
-                   'analysis, and performing exploratory data analysis to understand data characteristics and identify '
-                   'patterns.',
-        'description': 'Master data importation, cleaning techniques, and exploratory data analysis to prepare '
-                       'datasets for analysis.',
-        'difficulty': 'Beginner',
-        'duration': '50 min',
-        'expected_outcomes': '- Successfully import and prepare datasets for analysis.\n'
-                             '- Clean datasets using appropriate techniques.\n'
-                             '- Perform exploratory data analysis effectively.\n'
-                             '- Identify trends, patterns, and potential data quality issues.',
-        'instructions': 'Execute the R code to see how rows containing NA values are filtered from a data frame.',
-        'learning_notes': '### Exploratory Data Analysis in R\n'
-                          'We begin by inspecting data structures using `str()` and calculating summary stats using '
-                          '`summary()`.\n'
-                          '\n'
-                          '### Missing Data (NA)\n'
-                          'In R, missing values are represented by `NA`. We use `is.na(x)` to find them, and '
-                          '`na.omit()` to drop rows containing any NAs.',
-        'notes_file_path': 'https://019f40cd-56e7-ef68-cdd0-fbffbf783050.share.connect.posit.cloud/',
-        'objectives': '- Import datasets into R from different file formats.\n'
-                      '- Handle missing values and duplicate records.\n'
-                      '- Clean and transform datasets.\n'
-                      '- Generate descriptive statistics.\n'
-                      '- Explore datasets using summary tables and visualizations.',
-        'quiz': [],
-        'resources': '- [R Data Import/Export Guide](https://cran.r-project.org/doc/manuals/r-release/R-data.html)',
-        'slug': 'r-session-2-data-import-eda',
-        'title': 'Session 2: Data Importation, Cleaning and Exploratory Data Analysis (EDA)'},
-    {   'code_examples': 'library(dplyr)\n'
-                         '# Create sales data\n'
-                         'df <- data.frame(\n'
-                         '  Region = c("East", "West", "East", "West"),\n'
-                         '  Revenue = c(100, 150, 200, 300)\n'
-                         ')\n'
-                         '# Filter and summarize\n'
-                         'east_only <- df %>% filter(Region == "East")\n'
-                         'print("East Region only:")\n'
-                         'print(east_only)\n'
-                         'grouped <- df %>% group_by(Region) %>% summarize(Total = sum(Revenue))\n'
-                         'print("Grouped Revenue:")\n'
-                         'print(grouped)',
-        'content': 'Participants learn how to manipulate and transform data efficiently using the **dplyr** package, '
-                   'one of the core tools within the tidyverse ecosystem.',
-        'description': 'Learn powerful data manipulation techniques using dplyr to transform and organize your data '
-                       'efficiently.',
-        'difficulty': 'Beginner',
-        'duration': '60 min',
-        'expected_outcomes': '- Manipulate datasets efficiently using dplyr.\n'
-                             '- Perform data transformation and aggregation.\n'
-                             '- Combine datasets from different sources.\n'
-                             '- Prepare datasets for statistical analysis and visualization.',
-        'instructions': 'Run the dplyr script to filter sales data and aggregate revenue statistics.',
-        'learning_notes': '### dplyr Manipulation\n'
-                          'The `dplyr` package is the core tool of the Tidyverse for data manipulation:\n'
-                          '- `filter()`: Keep rows matching criteria.\n'
-                          '- `select()`: Pick columns by name.\n'
-                          '- `mutate()`: Create or transform columns.\n'
-                          '- `summarize()`: Aggregate values.\n'
-                          '\n'
-                          '### Pipe Operator\n'
-                          'The pipe operator `%>%` passes the result of one function as the first argument of the '
-                          'next.',
-        'notes_file_path': 'https://019f40d2-7d76-1343-15a2-638e763635bf.share.connect.posit.cloud/',
-        'objectives': '- Select and filter observations.\n'
-                      '- Arrange and sort datasets.\n'
-                      '- Create and modify variables.\n'
-                      '- Group and summarize data.\n'
-                      '- Join multiple datasets.',
-        'quiz': [],
-        'resources': '- [dplyr Cheatsheet](https://github.com/rstudio/cheatsheets/blob/main/data-transformation.pdf)',
-        'slug': 'r-session-3-dplyr-manipulation',
-        'title': 'Session 3: Data Manipulation with dplyr'},
-    {   'code_examples': 'library(ggplot2)\n'
-                         '# Prepare data\n'
-                         'df <- data.frame(\n'
-                         '  Hours = c(1, 2, 3, 4),\n'
-                         '  Score = c(10, 20, 25, 30)\n'
-                         ')\n'
-                         '# Construct line chart\n'
-                         'p <- ggplot(df, aes(x=Hours, y=Score)) +\n'
-                         '  geom_line(color="red") +\n'
-                         '  geom_point(color="blue", size=3) +\n'
-                         '  theme_minimal() +\n'
-                         '  labs(title="Performance Chart", x="Hours", y="Score")\n'
-                         'print("Plot structured successfully!")',
-        'content': 'This session introduces learners to creating professional and informative visualizations using the '
-                   '**ggplot2** package.',
-        'description': 'Create professional, publication-quality graphics using ggplot2 and the Grammar of Graphics.',
-        'difficulty': 'Beginner',
-        'duration': '60 min',
-        'expected_outcomes': '- Produce high-quality visualizations.\n'
-                             '- Customize graphs for effective communication.\n'
-                             '- Present data insights clearly.\n'
-                             '- Interpret trends and relationships from visualizations.',
-        'instructions': 'Execute the ggplot code to set up a sample line chart.',
-        'learning_notes': '### ggplot2 & Grammar of Graphics\n'
-                          'ggplot2 is built on the Grammar of Graphics, combining data, aesthetic mappings (`aes`), '
-                          'and geometric layers (`geom_`):\n'
-                          '- `geom_point()`: Scatter plots.\n'
-                          '- `geom_line()`: Line charts.\n'
-                          '- `geom_bar()`: Bar charts.',
-        'notes_file_path': 'https://019f40d7-71c6-36e8-2d30-e50a254eb4f9.share.connect.posit.cloud/',
-        'objectives': '- Understand the Grammar of Graphics.\n'
-                      '- Create common statistical plots.\n'
-                      '- Customize charts with themes, labels, and colors.\n'
-                      '- Select appropriate visualization techniques.\n'
-                      '- Interpret graphical outputs.',
-        'quiz': [],
-        'resources': '- [ggplot2 Elegant Graphics for Data Analysis](https://ggplot2-book.org/)',
-        'slug': 'r-session-4-ggplot2-visualization',
-        'title': 'Session 4: Data Visualization in R with ggplot2'},
-    {   'code_examples': '# Student scores sample\n'
-                         'scores <- c(78, 85, 92, 88, 79, 81, 95, 87)\n'
-                         '# Run one-sample t-test\n'
-                         'test_result <- t.test(scores, mu=80)\n'
-                         'print(test_result)\n'
-                         'print(paste("P-value:", test_result$p.value))',
-        'content': 'This session introduces statistical hypothesis testing using R to make data-driven decisions based '
-                   'on sample data.',
-        'description': 'Learn statistical hypothesis testing methods including t-tests, chi-square tests, and '
-                       'correlation analysis.',
-        'difficulty': 'Beginner',
-        'duration': '60 min',
-        'expected_outcomes': '- Conduct hypothesis testing using R.\n'
-                             '- Interpret statistical test results accurately.\n'
-                             '- Make evidence-based decisions.\n'
-                             '- Report findings in a professional manner.',
-        'instructions': 'Execute the R script to run a t-test and compute significance.',
-        'learning_notes': '### t-tests in R\n'
-                          'We compare group means to population norms or control treatments:\n'
-                          '- `t.test(x, mu=val)`: One-sample t-test.\n'
-                          '- `t.test(x, y)`: Independent two-sample t-test.\n'
-                          'If the p-value is smaller than alpha (usually 0.05), we reject the null hypothesis.',
-        'notes_file_path': 'https://019f40da-5e17-a6e6-580a-2b22194e2728.share.connect.posit.cloud/',
-        'objectives': '- Understand null and alternative hypotheses.\n'
-                      '- Perform common hypothesis tests in R.\n'
-                      '- Interpret p-values and confidence intervals.\n'
-                      '- Draw statistical conclusions from data.',
-        'quiz': [],
-        'resources': '- [Quick-R t-tests](https://www.statmethods.net/stats/ttests.html)',
-        'slug': 'r-session-5-hypothesis-testing',
-        'title': 'Session 5: Hypothesis Testing in R'},
-    {   'code_examples': '# Correlation and Regression\n'
-                         'hours <- c(2, 4, 6, 8, 10)\n'
-                         'scores <- c(55, 65, 75, 80, 95)\n'
-                         'corr <- cor(hours, scores)\n'
-                         'print(paste("Correlation:", corr))\n'
-                         'model <- lm(scores ~ hours)\n'
-                         'print(summary(model))',
-        'content': 'Learners explore statistical techniques for measuring relationships between variables and building '
-                   'predictive regression models in R.',
-        'description': 'Master correlation analysis and regression modeling to understand and predict relationships '
-                       'between variables.',
-        'difficulty': 'Beginner',
-        'duration': '75 min',
-        'expected_outcomes': '- Measure relationships between variables.\n'
-                             '- Build and interpret regression models.\n'
-                             '- Evaluate predictive accuracy.\n'
-                             '- Apply regression analysis to real-world datasets.',
-        'instructions': 'Run the regression model code to find intercept and slope parameters.',
-        'learning_notes': '### Correlation & Regression\n'
-                          '- `cor(x, y)`: Returns the Pearson correlation coefficient.\n'
-                          '- `lm(formula, data)`: Fits a linear model. The formula is written as `y ~ x`.\n'
-                          'Extract model statistics using `summary(model)`.',
-        'notes_file_path': 'https://019f40dc-ff38-1995-58a7-a986fc1eb9aa.share.connect.posit.cloud/',
-        'objectives': '- Calculate correlation coefficients.\n'
-                      '- Perform simple linear regression.\n'
-                      '- Interpret regression coefficients.\n'
-                      '- Evaluate regression model performance.',
-        'quiz': [],
-        'resources': '- [Linear Models in '
-                     'R](https://www.r-bloggers.com/2016/01/fitting-a-least-squares-regression-line-in-r/)',
-        'slug': 'r-session-6-correlation-regression',
-        'title': 'Session 6: Correlation and Regression Analysis'},
-    {   'code_examples': '# Group data frame\n'
-                         'df <- data.frame(\n'
-                         '  Method = factor(c(rep("A", 4), rep("B", 4), rep("C", 4))),\n'
-                         '  Score = c(85, 88, 90, 82, 72, 75, 80, 78, 91, 95, 88, 92)\n'
-                         ')\n'
-                         '# Perform ANOVA\n'
-                         'fit <- aov(Score ~ Method, data=df)\n'
-                         'print(summary(fit))',
-        'content': 'This session covers statistical methods for comparing multiple groups and analyzing datasets that '
-                   'do not meet the assumptions required for parametric tests.',
-        'description': 'Extend your statistical testing toolkit with Analysis of Variance (ANOVA) and non-parametric '
-                       'alternatives.',
-        'difficulty': 'Beginner',
-        'duration': '75 min',
-        'expected_outcomes': '- Compare group means effectively.\n'
-                             '- Apply appropriate non-parametric tests.\n'
-                             '- Interpret statistical significance correctly.\n'
-                             '- Select suitable statistical techniques for different data types.',
-        'instructions': 'Execute the ANOVA and Tukey test scripts to find significant cohort variations.',
-        'learning_notes': '### ANOVA in R\n'
-                          'Use `aov(Score ~ Method, data=df)` to perform Analysis of Variance. Follow up significant '
-                          'ANOVA results with `TukeyHSD()` to find specific group differences.\n'
-                          'If normality assumptions are violated, use `kruskal.test()`.',
-        'notes_file_path': 'https://019f40e0-0802-97af-4580-c6dee929895a.share.connect.posit.cloud/',
-        'objectives': '- Understand the principles of ANOVA.\n'
-                      '- Perform one-way ANOVA in R.\n'
-                      '- Conduct non-parametric statistical tests.\n'
-                      '- Interpret statistical outputs.',
-        'quiz': [],
-        'resources': '- [ANOVA in R Tutorial](https://www.datanovia.com/en/lessons/anova-in-r/)',
-        'slug': 'r-session-7-anova-tests',
-        'title': 'Session 7: Analysis of Variance and Non-Parametric Tests'},
-    {   'code_examples': '# Simulated quarterly sales data over 2 years\n'
-                         'sales <- c(100, 120, 110, 150, 105, 125, 115, 160)\n'
-                         '# Create ts object starting in 2023\n'
-                         'ts_sales <- ts(sales, start=c(2023, 1), frequency=4)\n'
-                         'print(ts_sales)\n'
-                         '# Decompose\n'
-                         'fit <- decompose(ts_sales, type="additive")\n'
-                         'print("Decomposition completed successfully.")',
-        'content': 'Participants learn to use **GwalkR**, an interactive visualization package that enables intuitive '
-                   'exploration and dashboard creation with minimal coding.',
-        'description': 'Master time series analysis techniques for forecasting and trend analysis.',
-        'difficulty': 'Beginner',
-        'duration': '75 min',
-        'expected_outcomes': '- Create interactive visualizations.\n'
-                             '- Explore large datasets efficiently.\n'
-                             '- Develop simple analytical dashboards.\n'
-                             '- Communicate findings through interactive visual reports.',
-        'instructions': 'Run the time-series setup to construct a simulated quarterly time series object.',
-        'learning_notes': '### Time Series in R\n'
-                          '- `ts(data, start, frequency)`: Declares a time series object.\n'
-                          '- `decompose()`: Breaks a series into trend, seasonal, and random components.\n'
-                          'Plot components instantly with `plot(decompose(ts_object))`.',
-        'notes_file_path': 'https://019f4142-087e-cf54-f225-1f6c1d12382b.share.connect.posit.cloud/',
-        'objectives': '- Install and configure GwalkR.\n'
-                      '- Explore datasets interactively.\n'
-                      '- Generate interactive charts and dashboards.\n'
-                      '- Interpret visual insights obtained from GwalkR.',
-        'quiz': [],
-        'resources': '- [Time Series Analysis with R](https://otexts.com/fpp2/)',
-        'slug': 'r-session-8-time-series',
-        'title': 'Session 8: Data Visualization with GwalkR in R'},
-    {   'code_examples': '# Analyze Agricultural Production Capstone Dataset\n'
-                         'data <- data.frame(\n'
-                         "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
-                         '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
-                         '  Rainfall_mm = c(800, 750, 1200, 600, 850, 780),\n'
-                         '  Fertilizer_kg_ha = c(150, 180, 200, 100, 160, 190)\n'
-                         ')\n'
-                         'print("Agricultural Production Capstone Data:")\n'
-                         'print(data)',
-        'content': 'The final session provides participants with an opportunity to integrate the concepts and '
-                   'techniques learned throughout the course by completing a comprehensive data science project using '
-                   'R.',
-        'description': 'Apply all your R data science skills to real-world capstone projects. using real-world '
-                       'Agricultural Production Capstone data.',
-        'difficulty': 'Beginner',
-        'duration': '90 min',
-        'expected_outcomes': '- Successfully complete an end-to-end data science project using R.\n'
-                             '- Demonstrate proficiency in R for data analysis and statistical computing.\n'
-                             '- Produce professional-quality visualizations, reports, and presentations.\n'
-                             '- Showcase readiness to apply R data science skills in academic, research, and industry '
-                             'environments.',
-        'instructions': 'Execute the R code to run the capstone performance pipeline.',
-        'learning_notes': '### Capstone Integration\n'
-                          "Bring together everything you've learned: data frame instantiation, dplyr aggregation "
-                          'verbs, stats, plotting, and reporting.\n'
-                          '\n'
-                          '### Agricultural Production Capstone\n'
-                          'This dataset contains crop yield data with factors like rainfall and fertilizer '
-                          'application, perfect for statistical modeling.',
-        'notes_file_path': 'https://019f413a-2978-f27d-2314-c298cdb340e7.share.connect.posit.cloud/',
-        'objectives': '- Design and implement a complete data analysis workflow.\n'
-                      '- Apply data cleaning, manipulation, visualization, and statistical analysis techniques.\n'
-                      '- Interpret and communicate analytical findings.\n'
-                      '- Present a professional project report and presentation.',
-        'quiz': [],
-        'resources': '- [CDAM R Portal](https://cdam.chuka.ac.ke/grad/r/)',
-        'slug': 'r-session-9-capstone',
-        'title': 'Session 9: Capstone Project in R with Agricultural Production Capstone Data'},
-    {   'code_examples': 'library(dplyr)\n'
-                         'library(tidyr)\n'
-                         'library(data.table)\n'
-                         '# Reshape and summarize using tidyverse and data.table\n'
-                         'df <- data.frame(\n'
-                         '  id = 1:4,\n'
-                         '  group = c("A", "A", "B", "B"),\n'
-                         '  val1 = c(10, 15, 8, 12),\n'
-                         '  val2 = c(20, 25, 18, 22)\n'
-                         ')\n'
-                         '# Pivot longer\n'
-                         'df_long <- df %>% pivot_longer(cols = starts_with("val"), names_to = "measure", values_to = '
-                         '"value")\n'
-                         'print("Reshaped Data:")\n'
-                         'print(df_long)\n'
-                         '# data.table equivalent for fast aggregation\n'
-                         'dt <- as.data.table(df)\n'
-                         'result <- dt[, .(mean_val1 = mean(val1)), by = group]\n'
-                         'print("data.table Result:")\n'
-                         'print(result)',
-        'content': 'Advanced data manipulation, reshaping, and fast data processing with dplyr, tidyr, and data.table.',
-        'description': 'Master advanced data wrangling and transformation using dplyr, tidyr, and data.table in R.',
-        'difficulty': 'Professional',
-        'duration': '60 min',
-        'expected_outcomes': '- Write efficient wrangling pipelines in R\n'
-                             '- Use pivot_longer and pivot_wider to reshape data\n'
-                             '- Apply data.table syntax for high-performance operations',
-        'learning_notes': '### Data Wrangling in R\n'
-                          'Data wrangling involves cleaning, reshaping, and transforming raw data into a format '
-                          'suitable for analysis.\n'
-                          '\n'
-                          '### dplyr & tidyr\n'
-                          '- pivot_longer() and pivot_wider() from tidyr reshape datasets between wide and long '
-                          'formats.\n'
-                          '- dplyr handles group-wise transformations, filtering, and joins.\n'
-                          '\n'
-                          '### data.table\n'
-                          'data.table is an R package that provides a high-performance version of data.frames. It is '
-                          'extremely fast and memory-efficient for large datasets.',
-        'notes_file_path': 'https://019f5f1f-e71d-6a8b-f340-0cf1306ef23c.share.connect.posit.cloud/',
-        'objectives': '- Use dplyr and tidyr for complex data cleaning and reshaping\n'
-                      '- Perform fast data operations using the data.table package\n'
-                      '- Clean and transform datasets for downstream analysis',
-        'quiz': [],
-        'resources': '- [Tidyverse homepage](https://www.tidyverse.org/)\n'
-                     '- [data.table documentation](https://rdatatable.gitlab.io/data.table/)',
-        'slug': 'r-session-10',
-        'title': 'Session 10: Data Wrangling with dplyr, tidyr & data.table'},
-    {   'code_examples': 'library(ggplot2)\n'
-                         '# Advanced ggplot2 customization\n'
-                         'df <- data.frame(\n'
-                         '  category = factor(c("A", "B", "C", "D")),\n'
-                         '  value = c(23, 45, 12, 38)\n'
-                         ')\n'
-                         'p <- ggplot(df, aes(x = category, y = value, fill = category)) +\n'
-                         '  geom_col(show.legend = FALSE) +\n'
-                         '  theme_minimal(base_size = 14) +\n'
-                         '  scale_fill_brewer(palette = "Set2") +\n'
-                         '  labs(title = "Custom Styled Column Chart", x = "Category", y = "Value")\n'
-                         'print(p)',
-        'content': 'Advanced ggplot2 customization, themes, scales, multi-panel plotting, and interactive '
-                   'visualizations.',
-        'description': 'Create publication-quality plots and custom visualizations using advanced ggplot2 features, '
-                       'plotly, and patchworks.',
-        'difficulty': 'Professional',
-        'duration': '60 min',
-        'expected_outcomes': '- Create highly customized, clean data visualizations\n'
-                             '- Compose multi-panel figures\n'
-                             '- Generate interactive web-based charts',
-        'learning_notes': '### Advanced Data Visualization in R\n'
-                          'Advanced data visualization involves creating customized and interactive plots that '
-                          'communicate complex data insights effectively.\n'
-                          '\n'
-                          '### ggplot2 Themes and Customization\n'
-                          '- Use theme() to customize background, grid lines, text size, and colors.\n'
-                          '- Customize color and fill scales using scale_fill_brewer() or scale_color_viridis_d().\n'
-                          '\n'
-                          '### Plot Layouts\n'
-                          'Combine multiple plots in a single figure using packages like patchwork or cowplot.',
-        'notes_file_path': 'https://019f5f33-6dd3-0544-d5dd-7558d1a45bf1.share.connect.posit.cloud/',
-        'objectives': '- Customize ggplot2 themes and scales for publication-grade charts\n'
-                      '- Arrange multiple plots in a grid layout\n'
-                      '- Build interactive graphics for the web',
-        'quiz': [],
-        'resources': '- [ggplot2 Elegant Graphics for Data Analysis](https://ggplot2-book.org/)\n'
-                     '- [R Graph Gallery](https://r-graph-gallery.com/)',
-        'slug': 'r-session-11',
-        'title': 'Session 11: Advanced Data Visualization in R'},
-    {   'code_examples': '# Split data and evaluate a simple baseline model\n'
-                         'set.seed(42)\n'
-                         'data(mtcars)\n'
-                         'train_idx <- sample(1:nrow(mtcars), 0.7 * nrow(mtcars))\n'
-                         'train_data <- mtcars[train_idx, ]\n'
-                         'test_data <- mtcars[-train_idx, ]\n'
-                         'print(paste("Train size:", nrow(train_data), "Test size:", nrow(test_data)))',
-        'content': 'Introduction to machine learning terminology, train/test splitting, preprocessing, and model '
-                   'development in R.',
-        'description': 'Learn the core concepts of statistical computing, optimization, and the machine learning '
-                       'workflow in R.',
-        'difficulty': 'Professional',
-        'duration': '60 min',
-        'expected_outcomes': '- Partition data into training and test sets\n'
-                             '- Scale and normalize data features\n'
-                             '- Evaluate model predictions using basic metrics',
-        'learning_notes': '### Machine Learning Workflow\n'
-                          'Machine learning is a subset of AI that enables systems to learn from data. The standard ML '
-                          'workflow includes:\n'
-                          '1. Data Preprocessing & Cleaning\n'
-                          '2. Feature Selection & Engineering\n'
-                          '3. Train/Test Splitting\n'
-                          '4. Model Training & Tuning\n'
-                          '5. Model Evaluation\n'
-                          '\n'
-                          '### Preprocessing in R\n'
-                          'Use scale() to normalize numeric columns so they have a mean of 0 and standard deviation of '
-                          '1.',
-        'notes_file_path': 'https://019f5f3c-d9a9-9e03-83cf-2daad22a5978.share.connect.posit.cloud/',
-        'objectives': '- Understand the machine learning workflow (splitting, training, testing)\n'
-                      '- Perform data preprocessing and scaling in R\n'
-                      '- Implement a baseline predictive model',
-        'quiz': [],
-        'resources': '- [Introduction to Modern Statistics](https://openintro-ims.netlify.app/)\n'
-                     '- [Hands-On Machine Learning with R](https://bradleyboehmke.github.io/HOML/)',
-        'slug': 'r-session-12',
-        'title': 'Session 12: Statistical Computing & Introduction to Machine Learning'},
-    {   'code_examples': '# Logistic regression classification on mtcars (predicting high vs low mpg)\n'
-                         'df <- mtcars\n'
-                         'df$high_mpg <- as.factor(ifelse(df$mpg > 20, 1, 0))\n'
-                         'model <- glm(high_mpg ~ wt + hp, data = df, family = binomial)\n'
-                         'summary(model)',
-        'content': 'Supervised classification techniques including logistic regression, decision trees, and random '
-                   'forests in R.',
-        'description': 'Train, evaluate, and tune classification models in R using caret and tidymodels.',
-        'difficulty': 'Professional',
-        'duration': '75 min',
-        'expected_outcomes': '- Fit classification models in R\n'
-                             '- Build and interpret a confusion matrix\n'
-                             '- Measure classifier performance',
-        'learning_notes': '### Supervised Classification\n'
-                          'Classification is a type of supervised learning where the target variable is categorical '
-                          '(e.g. Pass/Fail, Yes/No).\n'
-                          '\n'
-                          '### Logistic Regression\n'
-                          'Used when predicting a binary outcome. It models the log-odds of the probability of class '
-                          '1.\n'
-                          '\n'
-                          '### Decision Trees & Random Forests\n'
-                          'Decision trees split data recursively based on feature thresholds. Random Forests combine '
-                          'multiple trees for better generalizability.',
-        'notes_file_path': 'https://019f5f3a-de8f-352f-c0c4-f987772281b3.share.connect.posit.cloud/',
-        'objectives': '- Train classification models (logistic regression, decision trees)\n'
-                      '- Compute classification performance metrics (accuracy, precision, recall, AUC-ROC)\n'
-                      '- Handle class imbalance and evaluate model robustness',
-        'quiz': [],
-        'resources': '- [Tidymodels documentation](https://www.tidymodels.org/)\n'
-                     '- [Caret package manual](https://topepo.github.io/caret/)',
-        'slug': 'r-session-13',
-        'title': 'Session 13: Supervised Machine Learning | Classification'},
-    {   'code_examples': '# Multiple linear regression in R\n'
-                         'model <- lm(mpg ~ wt + hp + cyl, data = mtcars)\n'
-                         'summary(model)',
-        'content': 'Supervised regression models including multiple linear regression, ridge, lasso, and decision tree '
-                   'regressors.',
-        'description': 'Train, tune, and evaluate regression models in R to predict continuous variables.',
-        'difficulty': 'Professional',
-        'duration': '75 min',
-        'expected_outcomes': '- Train regression models to predict continuous variables\n'
-                             '- Extract and interpret regression coefficients\n'
-                             '- Compute error metrics on test datasets',
-        'learning_notes': '### Supervised Regression\n'
-                          'Regression is used to predict continuous outcomes (e.g., house prices, sales, yields).\n'
-                          '\n'
-                          '### Regularization\n'
-                          '- **Lasso Regression (L1)**: Adds a penalty equivalent to the absolute values of the '
-                          'coefficients, pushing some to zero (feature selection).\n'
-                          '- **Ridge Regression (L2)**: Adds a penalty equivalent to the square of the coefficients, '
-                          'shrinking them towards zero.\n'
-                          '\n'
-                          '### Evaluation Metrics\n'
-                          '- Root Mean Squared Error (RMSE): Average magnitude of error.\n'
-                          '- R-squared: Proportion of variance explained by model.',
-        'notes_file_path': 'https://019f5f53-62bf-c5b5-e834-ed3252d834f3.share.connect.posit.cloud/',
-        'objectives': '- Fit multiple linear regression models\n'
-                      '- Understand regularization techniques (Ridge/Lasso) in R\n'
-                      '- Evaluate regression models using RMSE, MAE, and R-squared',
-        'quiz': [],
-        'resources': '- [An Introduction to Statistical Learning](https://www.statlearning.com/)\n'
-                     '- [Tidymodels for Regression](https://www.tidymodels.org/start/models/)',
-        'slug': 'r-session-14',
-        'title': 'Session 14: Supervised Machine Learning | Regression'},
-    {   'code_examples': '# K-means clustering on mtcars numeric columns\n'
-                         'numeric_data <- scale(mtcars[, c("mpg", "disp", "hp", "wt")])\n'
-                         'set.seed(42)\n'
-                         'clusters <- kmeans(numeric_data, centers = 3)\n'
-                         'print(clusters$centers)',
-        'content': 'Unsupervised learning techniques including K-means clustering, hierarchical clustering, and '
-                   'Principal Component Analysis (PCA) in R.',
-        'description': 'Discover hidden structures in unlabeled datasets using clustering and dimensionality reduction '
-                       'in R.',
-        'difficulty': 'Professional',
-        'duration': '75 min',
-        'expected_outcomes': '- Cluster unlabeled datasets in R\n'
-                             '- Determine optimal cluster counts (elbow method)\n'
-                             '- Interpret PCA loadings and score plots',
-        'learning_notes': '### Unsupervised Learning\n'
-                          'Unsupervised learning works with unlabeled datasets. Its goals include clustering and '
-                          'dimension reduction.\n'
-                          '\n'
-                          '### Clustering\n'
-                          '- **K-Means**: Groups observations based on their distance to a central centroid.\n'
-                          '- **Hierarchical Clustering**: Builds a tree of clusters (dendrogram) based on pairwise '
-                          'distances.\n'
-                          '\n'
-                          '### Dimension Reduction (PCA)\n'
-                          'PCA converts a set of correlated variables into a set of values of linearly uncorrelated '
-                          'variables called principal components.',
-        'notes_file_path': 'https://019f5f57-7e38-8f53-3e0b-b31b94057808.share.connect.posit.cloud/',
-        'objectives': '- Implement K-means and hierarchical clustering algorithms in R\n'
-                      '- Perform dimensionality reduction using Principal Component Analysis (PCA)\n'
-                      '- Visualize clusters and PCA projections',
-        'quiz': [],
-        'resources': '- [Unsupervised Learning on CRAN](https://cran.r-project.org/web/views/Cluster.html)\n'
-                     '- [PCA in R Tutorial](https://www.r-bloggers.com/2021/05/principal-component-analysis-pca-in-r/)',
-        'slug': 'r-session-15',
-        'title': 'Session 15: Unsupervised Machine Learning | Clustering & Dimension Reduction'},
-    {   'code_examples': '# Capstone end-to-end simulation\nprint("CDAM R Capstone Project Pipeline Initialized")',
-        'content': 'Project planning, implementation, model deployment, final reporting, and presentation in R.',
-        'description': 'Apply your machine learning and statistical computing skills to solve a comprehensive '
-                       'real-world problem in R.',
-        'difficulty': 'Professional',
-        'duration': '120 min',
-        'expected_outcomes': '- Complete a full R data science project\n'
-                             '- Deploy a predictive model or build an interactive dashboard\n'
-                             '- Write a reproducible project report',
-        'learning_notes': '### R Capstone Project\n'
-                          'The capstone is an integration of all key R capabilities. It represents the final step in '
-                          'the Professional R Track, allowing you to showcase an end-to-end statistical modeling or '
-                          'machine learning solution.',
-        'notes_file_path': 'https://019f5f78-17b4-f53f-98ee-ab41aa5595c0.share.connect.posit.cloud/',
-        'objectives': '- Design and execute a complete data science workflow in R\n'
-                      '- Integrate multiple data manipulation, visualization, and ML techniques\n'
-                      '- Present analytical findings professionally',
-        'quiz': [],
-        'resources': '- [CDAM R Graduation Requirements](https://cdam.chuka.ac.ke/grad/r/)\n'
-                     '- [R Markdown Guide](https://bookdown.org/yihui/rmarkdown/)',
-        'slug': 'r-session-16',
-        'title': 'Session 16: Capstone Projects in R'}]
+R_SESSIONS = [{'code_examples': '# Declare variables in R\n'
+                   'name <- "CDAM Student"\n'
+                   'age <- 20\n'
+                   'gpa <- 3.8\n'
+                   'print(paste("Student:", name, "Age:", age, "GPA:", gpa))\n'
+                   'print(class(name))\n'
+                   'print(class(age))',
+  'content': 'This session introduces learners to the R programming language and its role in data science. '
+             'Participants become familiar with the R environment, RStudio interface, basic syntax, data types, '
+             'variables, operators, and fundamental programming concepts used in statistical computing and data '
+             'analysis.',
+  'description': 'Learn the fundamentals of R programming, RStudio IDE, and the core concepts of data science.',
+  'difficulty': 'Beginner',
+  'duration': '45 min',
+  'expected_outcomes': '- Navigate the RStudio environment confidently.\n'
+                       '- Write and execute basic R programs.\n'
+                       '- Use R data types and structures effectively.\n'
+                       '- Apply fundamental programming concepts to solve simple analytical problems.',
+  'instructions': 'Run the code editor cell to calculate variable values and print their class.',
+  'learning_notes': '### R & RStudio Overview\n'
+                    'R is a programming language specifically built for statistical computing and graphics. RStudio is '
+                    'the standard IDE for R.\n'
+                    '\n'
+                    '### Assignment Operator\n'
+                    'In R, we typically use `<-` instead of `=` for assignment:\n'
+                    '`x <- 10`\n'
+                    '\n'
+                    '### Core Data Types\n'
+                    '- `numeric`: Decimals or integers (e.g., 3.14, 42)\n'
+                    '- `character`: Text strings wrapped in quotes\n'
+                    '- `logical`: TRUE or FALSE values (can be abbreviated as T or F)',
+  'notes_file_path': 'https://019f40c2-09d4-fb31-50b0-e79ca532e49e.share.connect.posit.cloud/',
+  'objectives': '- Understand the fundamentals of the R programming language.\n'
+                '- Install and navigate the R and RStudio environments.\n'
+                '- Learn basic R syntax and programming concepts.\n'
+                '- Identify and use different data types and data structures in R.\n'
+                '- Write and execute simple R scripts.',
+  'quiz': [],
+  'resources': '- [R Manuals](https://cran.r-project.org/manuals.html)\n'
+               '- [RStudio Desktop](https://posit.co/download/rstudio-desktop/)',
+  'slug': 'r-session-1-intro-to-r',
+  'title': 'Session 1: Introduction to R for Data Science'},
+ {'code_examples': '# Create a sample data frame with NA values\n'
+                   'df <- data.frame(\n'
+                   '  Name = c("Alice", "Bob", "Carol", NA),\n'
+                   '  Age = c(25, NA, 30, 22)\n'
+                   ')\n'
+                   'print("Original Data Frame:")\n'
+                   'print(df)\n'
+                   'df_clean <- na.omit(df)\n'
+                   'print("Cleaned Data Frame:")\n'
+                   'print(df_clean)',
+  'content': 'This session focuses on importing datasets from various sources, cleaning and preparing data for '
+             'analysis, and performing exploratory data analysis to understand data characteristics and identify '
+             'patterns.',
+  'description': 'Master data importation, cleaning techniques, and exploratory data analysis to prepare datasets for '
+                 'analysis.',
+  'difficulty': 'Beginner',
+  'duration': '50 min',
+  'expected_outcomes': '- Successfully import and prepare datasets for analysis.\n'
+                       '- Clean datasets using appropriate techniques.\n'
+                       '- Perform exploratory data analysis effectively.\n'
+                       '- Identify trends, patterns, and potential data quality issues.',
+  'instructions': 'Execute the R code to see how rows containing NA values are filtered from a data frame.',
+  'learning_notes': '### Exploratory Data Analysis in R\n'
+                    'We begin by inspecting data structures using `str()` and calculating summary stats using '
+                    '`summary()`.\n'
+                    '\n'
+                    '### Missing Data (NA)\n'
+                    'In R, missing values are represented by `NA`. We use `is.na(x)` to find them, and `na.omit()` to '
+                    'drop rows containing any NAs.',
+  'notes_file_path': 'https://019f40cd-56e7-ef68-cdd0-fbffbf783050.share.connect.posit.cloud/',
+  'objectives': '- Import datasets into R from different file formats.\n'
+                '- Handle missing values and duplicate records.\n'
+                '- Clean and transform datasets.\n'
+                '- Generate descriptive statistics.\n'
+                '- Explore datasets using summary tables and visualizations.',
+  'quiz': [],
+  'resources': '- [R Data Import/Export Guide](https://cran.r-project.org/doc/manuals/r-release/R-data.html)',
+  'slug': 'r-session-2-data-import-eda',
+  'title': 'Session 2: Data Importation, Cleaning and Exploratory Data Analysis (EDA)'},
+ {'code_examples': 'library(dplyr)\n'
+                   '# Create sales data\n'
+                   'df <- data.frame(\n'
+                   '  Region = c("East", "West", "East", "West"),\n'
+                   '  Revenue = c(100, 150, 200, 300)\n'
+                   ')\n'
+                   '# Filter and summarize\n'
+                   'east_only <- df %>% filter(Region == "East")\n'
+                   'print("East Region only:")\n'
+                   'print(east_only)\n'
+                   'grouped <- df %>% group_by(Region) %>% summarize(Total = sum(Revenue))\n'
+                   'print("Grouped Revenue:")\n'
+                   'print(grouped)',
+  'content': 'Participants learn how to manipulate and transform data efficiently using the **dplyr** package, one of '
+             'the core tools within the tidyverse ecosystem.',
+  'description': 'Learn powerful data manipulation techniques using dplyr to transform and organize your data '
+                 'efficiently.',
+  'difficulty': 'Beginner',
+  'duration': '60 min',
+  'expected_outcomes': '- Manipulate datasets efficiently using dplyr.\n'
+                       '- Perform data transformation and aggregation.\n'
+                       '- Combine datasets from different sources.\n'
+                       '- Prepare datasets for statistical analysis and visualization.',
+  'instructions': 'Run the dplyr script to filter sales data and aggregate revenue statistics.',
+  'learning_notes': '### dplyr Manipulation\n'
+                    'The `dplyr` package is the core tool of the Tidyverse for data manipulation:\n'
+                    '- `filter()`: Keep rows matching criteria.\n'
+                    '- `select()`: Pick columns by name.\n'
+                    '- `mutate()`: Create or transform columns.\n'
+                    '- `summarize()`: Aggregate values.\n'
+                    '\n'
+                    '### Pipe Operator\n'
+                    'The pipe operator `%>%` passes the result of one function as the first argument of the next.',
+  'notes_file_path': 'https://019f40d2-7d76-1343-15a2-638e763635bf.share.connect.posit.cloud/',
+  'objectives': '- Select and filter observations.\n'
+                '- Arrange and sort datasets.\n'
+                '- Create and modify variables.\n'
+                '- Group and summarize data.\n'
+                '- Join multiple datasets.',
+  'quiz': [],
+  'resources': '- [dplyr Cheatsheet](https://github.com/rstudio/cheatsheets/blob/main/data-transformation.pdf)',
+  'slug': 'r-session-3-dplyr-manipulation',
+  'title': 'Session 3: Data Manipulation with dplyr'},
+ {'code_examples': 'library(ggplot2)\n'
+                   '# Prepare data\n'
+                   'df <- data.frame(\n'
+                   '  Hours = c(1, 2, 3, 4),\n'
+                   '  Score = c(10, 20, 25, 30)\n'
+                   ')\n'
+                   '# Construct line chart\n'
+                   'p <- ggplot(df, aes(x=Hours, y=Score)) +\n'
+                   '  geom_line(color="red") +\n'
+                   '  geom_point(color="blue", size=3) +\n'
+                   '  theme_minimal() +\n'
+                   '  labs(title="Performance Chart", x="Hours", y="Score")\n'
+                   'print("Plot structured successfully!")',
+  'content': 'This session introduces learners to creating professional and informative visualizations using the '
+             '**ggplot2** package.',
+  'description': 'Create professional, publication-quality graphics using ggplot2 and the Grammar of Graphics.',
+  'difficulty': 'Beginner',
+  'duration': '60 min',
+  'expected_outcomes': '- Produce high-quality visualizations.\n'
+                       '- Customize graphs for effective communication.\n'
+                       '- Present data insights clearly.\n'
+                       '- Interpret trends and relationships from visualizations.',
+  'instructions': 'Execute the ggplot code to set up a sample line chart.',
+  'learning_notes': '### ggplot2 & Grammar of Graphics\n'
+                    'ggplot2 is built on the Grammar of Graphics, combining data, aesthetic mappings (`aes`), and '
+                    'geometric layers (`geom_`):\n'
+                    '- `geom_point()`: Scatter plots.\n'
+                    '- `geom_line()`: Line charts.\n'
+                    '- `geom_bar()`: Bar charts.',
+  'notes_file_path': 'https://019f40d7-71c6-36e8-2d30-e50a254eb4f9.share.connect.posit.cloud/',
+  'objectives': '- Understand the Grammar of Graphics.\n'
+                '- Create common statistical plots.\n'
+                '- Customize charts with themes, labels, and colors.\n'
+                '- Select appropriate visualization techniques.\n'
+                '- Interpret graphical outputs.',
+  'quiz': [],
+  'resources': '- [ggplot2 Elegant Graphics for Data Analysis](https://ggplot2-book.org/)',
+  'slug': 'r-session-4-ggplot2-visualization',
+  'title': 'Session 4: Data Visualization in R with ggplot2'},
+ {'code_examples': '# Student scores sample\n'
+                   'scores <- c(78, 85, 92, 88, 79, 81, 95, 87)\n'
+                   '# Run one-sample t-test\n'
+                   'test_result <- t.test(scores, mu=80)\n'
+                   'print(test_result)\n'
+                   'print(paste("P-value:", test_result$p.value))',
+  'content': 'This session introduces statistical hypothesis testing using R to make data-driven decisions based on '
+             'sample data.',
+  'description': 'Learn statistical hypothesis testing methods including t-tests, chi-square tests, and correlation '
+                 'analysis.',
+  'difficulty': 'Beginner',
+  'duration': '60 min',
+  'expected_outcomes': '- Conduct hypothesis testing using R.\n'
+                       '- Interpret statistical test results accurately.\n'
+                       '- Make evidence-based decisions.\n'
+                       '- Report findings in a professional manner.',
+  'instructions': 'Execute the R script to run a t-test and compute significance.',
+  'learning_notes': '### t-tests in R\n'
+                    'We compare group means to population norms or control treatments:\n'
+                    '- `t.test(x, mu=val)`: One-sample t-test.\n'
+                    '- `t.test(x, y)`: Independent two-sample t-test.\n'
+                    'If the p-value is smaller than alpha (usually 0.05), we reject the null hypothesis.',
+  'notes_file_path': 'https://019f40da-5e17-a6e6-580a-2b22194e2728.share.connect.posit.cloud/',
+  'objectives': '- Understand null and alternative hypotheses.\n'
+                '- Perform common hypothesis tests in R.\n'
+                '- Interpret p-values and confidence intervals.\n'
+                '- Draw statistical conclusions from data.',
+  'quiz': [],
+  'resources': '- [Quick-R t-tests](https://www.statmethods.net/stats/ttests.html)',
+  'slug': 'r-session-5-hypothesis-testing',
+  'title': 'Session 5: Hypothesis Testing in R'},
+ {'code_examples': '# Correlation and Regression\n'
+                   'hours <- c(2, 4, 6, 8, 10)\n'
+                   'scores <- c(55, 65, 75, 80, 95)\n'
+                   'corr <- cor(hours, scores)\n'
+                   'print(paste("Correlation:", corr))\n'
+                   'model <- lm(scores ~ hours)\n'
+                   'print(summary(model))',
+  'content': 'Learners explore statistical techniques for measuring relationships between variables and building '
+             'predictive regression models in R.',
+  'description': 'Master correlation analysis and regression modeling to understand and predict relationships between '
+                 'variables.',
+  'difficulty': 'Beginner',
+  'duration': '75 min',
+  'expected_outcomes': '- Measure relationships between variables.\n'
+                       '- Build and interpret regression models.\n'
+                       '- Evaluate predictive accuracy.\n'
+                       '- Apply regression analysis to real-world datasets.',
+  'instructions': 'Run the regression model code to find intercept and slope parameters.',
+  'learning_notes': '### Correlation & Regression\n'
+                    '- `cor(x, y)`: Returns the Pearson correlation coefficient.\n'
+                    '- `lm(formula, data)`: Fits a linear model. The formula is written as `y ~ x`.\n'
+                    'Extract model statistics using `summary(model)`.',
+  'notes_file_path': 'https://019f40dc-ff38-1995-58a7-a986fc1eb9aa.share.connect.posit.cloud/',
+  'objectives': '- Calculate correlation coefficients.\n'
+                '- Perform simple linear regression.\n'
+                '- Interpret regression coefficients.\n'
+                '- Evaluate regression model performance.',
+  'quiz': [],
+  'resources': '- [Linear Models in '
+               'R](https://www.r-bloggers.com/2016/01/fitting-a-least-squares-regression-line-in-r/)',
+  'slug': 'r-session-6-correlation-regression',
+  'title': 'Session 6: Correlation and Regression Analysis'},
+ {'code_examples': '# Group data frame\n'
+                   'df <- data.frame(\n'
+                   '  Method = factor(c(rep("A", 4), rep("B", 4), rep("C", 4))),\n'
+                   '  Score = c(85, 88, 90, 82, 72, 75, 80, 78, 91, 95, 88, 92)\n'
+                   ')\n'
+                   '# Perform ANOVA\n'
+                   'fit <- aov(Score ~ Method, data=df)\n'
+                   'print(summary(fit))',
+  'content': 'This session covers statistical methods for comparing multiple groups and analyzing datasets that do not '
+             'meet the assumptions required for parametric tests.',
+  'description': 'Extend your statistical testing toolkit with Analysis of Variance (ANOVA) and non-parametric '
+                 'alternatives.',
+  'difficulty': 'Beginner',
+  'duration': '75 min',
+  'expected_outcomes': '- Compare group means effectively.\n'
+                       '- Apply appropriate non-parametric tests.\n'
+                       '- Interpret statistical significance correctly.\n'
+                       '- Select suitable statistical techniques for different data types.',
+  'instructions': 'Execute the ANOVA and Tukey test scripts to find significant cohort variations.',
+  'learning_notes': '### ANOVA in R\n'
+                    'Use `aov(Score ~ Method, data=df)` to perform Analysis of Variance. Follow up significant ANOVA '
+                    'results with `TukeyHSD()` to find specific group differences.\n'
+                    'If normality assumptions are violated, use `kruskal.test()`.',
+  'notes_file_path': 'https://019f40e0-0802-97af-4580-c6dee929895a.share.connect.posit.cloud/',
+  'objectives': '- Understand the principles of ANOVA.\n'
+                '- Perform one-way ANOVA in R.\n'
+                '- Conduct non-parametric statistical tests.\n'
+                '- Interpret statistical outputs.',
+  'quiz': [],
+  'resources': '- [ANOVA in R Tutorial](https://www.datanovia.com/en/lessons/anova-in-r/)',
+  'slug': 'r-session-7-anova-tests',
+  'title': 'Session 7: Analysis of Variance and Non-Parametric Tests'},
+ {'code_examples': '# Simulated quarterly sales data over 2 years\n'
+                   'sales <- c(100, 120, 110, 150, 105, 125, 115, 160)\n'
+                   '# Create ts object starting in 2023\n'
+                   'ts_sales <- ts(sales, start=c(2023, 1), frequency=4)\n'
+                   'print(ts_sales)\n'
+                   '# Decompose\n'
+                   'fit <- decompose(ts_sales, type="additive")\n'
+                   'print("Decomposition completed successfully.")',
+  'content': 'Participants learn to use **GwalkR**, an interactive visualization package that enables intuitive '
+             'exploration and dashboard creation with minimal coding.',
+  'description': 'Master time series analysis techniques for forecasting and trend analysis.',
+  'difficulty': 'Beginner',
+  'duration': '75 min',
+  'expected_outcomes': '- Create interactive visualizations.\n'
+                       '- Explore large datasets efficiently.\n'
+                       '- Develop simple analytical dashboards.\n'
+                       '- Communicate findings through interactive visual reports.',
+  'instructions': 'Run the time-series setup to construct a simulated quarterly time series object.',
+  'learning_notes': '### Time Series in R\n'
+                    '- `ts(data, start, frequency)`: Declares a time series object.\n'
+                    '- `decompose()`: Breaks a series into trend, seasonal, and random components.\n'
+                    'Plot components instantly with `plot(decompose(ts_object))`.',
+  'notes_file_path': 'https://019f4142-087e-cf54-f225-1f6c1d12382b.share.connect.posit.cloud/',
+  'objectives': '- Install and configure GwalkR.\n'
+                '- Explore datasets interactively.\n'
+                '- Generate interactive charts and dashboards.\n'
+                '- Interpret visual insights obtained from GwalkR.',
+  'quiz': [],
+  'resources': '- [Time Series Analysis with R](https://otexts.com/fpp2/)',
+  'slug': 'r-session-8-time-series',
+  'title': 'Session 8: Data Visualization with GwalkR in R'},
+ {'code_examples': '# Analyze Agricultural Production Capstone Dataset\n'
+                   'data <- data.frame(\n'
+                   "  Crop = c('Maize', 'Wheat', 'Rice', 'Beans', 'Maize', 'Wheat'),\n"
+                   '  Yield_kg_ha = c(2500, 3200, 4500, 1800, 2700, 3400),\n'
+                   '  Rainfall_mm = c(800, 750, 1200, 600, 850, 780),\n'
+                   '  Fertilizer_kg_ha = c(150, 180, 200, 100, 160, 190)\n'
+                   ')\n'
+                   'print("Agricultural Production Capstone Data:")\n'
+                   'print(data)',
+  'content': 'The final session provides participants with an opportunity to integrate the concepts and techniques '
+             'learned throughout the course by completing a comprehensive data science project using R.',
+  'description': 'Apply all your R data science skills to real-world capstone projects. using real-world Agricultural '
+                 'Production Capstone data.',
+  'difficulty': 'Beginner',
+  'duration': '90 min',
+  'expected_outcomes': '- Successfully complete an end-to-end data science project using R.\n'
+                       '- Demonstrate proficiency in R for data analysis and statistical computing.\n'
+                       '- Produce professional-quality visualizations, reports, and presentations.\n'
+                       '- Showcase readiness to apply R data science skills in academic, research, and industry '
+                       'environments.',
+  'instructions': 'Execute the R code to run the capstone performance pipeline.',
+  'learning_notes': '### Capstone Integration\n'
+                    "Bring together everything you've learned: data frame instantiation, dplyr aggregation verbs, "
+                    'stats, plotting, and reporting.\n'
+                    '\n'
+                    '### Agricultural Production Capstone\n'
+                    'This dataset contains crop yield data with factors like rainfall and fertilizer application, '
+                    'perfect for statistical modeling.',
+  'notes_file_path': 'https://019f413a-2978-f27d-2314-c298cdb340e7.share.connect.posit.cloud/',
+  'objectives': '- Design and implement a complete data analysis workflow.\n'
+                '- Apply data cleaning, manipulation, visualization, and statistical analysis techniques.\n'
+                '- Interpret and communicate analytical findings.\n'
+                '- Present a professional project report and presentation.',
+  'quiz': [],
+  'resources': '- [CDAM R Portal](https://cdam.chuka.ac.ke/grad/r/)',
+  'slug': 'r-session-9-capstone',
+  'title': 'Session 9: Capstone Project in R with Agricultural Production Capstone Data'},
+ {'code_examples': 'library(dplyr)\n'
+                   'library(tidyr)\n'
+                   'library(data.table)\n'
+                   '# Reshape and summarize using tidyverse and data.table\n'
+                   'df <- data.frame(\n'
+                   '  id = 1:4,\n'
+                   '  group = c("A", "A", "B", "B"),\n'
+                   '  val1 = c(10, 15, 8, 12),\n'
+                   '  val2 = c(20, 25, 18, 22)\n'
+                   ')\n'
+                   '# Pivot longer\n'
+                   'df_long <- df %>% pivot_longer(cols = starts_with("val"), names_to = "measure", values_to = '
+                   '"value")\n'
+                   'print("Reshaped Data:")\n'
+                   'print(df_long)\n'
+                   '# data.table equivalent for fast aggregation\n'
+                   'dt <- as.data.table(df)\n'
+                   'result <- dt[, .(mean_val1 = mean(val1)), by = group]\n'
+                   'print("data.table Result:")\n'
+                   'print(result)',
+  'content': 'This session focuses on efficient data wrangling techniques in R using three of the most powerful '
+             'packages: **dplyr**, **tidyr**, and **data.table**. Learners will explore how to clean, transform, '
+             'reshape, merge, summarize, and manipulate datasets to prepare them for statistical analysis and machine '
+             'learning. Emphasis is placed on writing efficient, readable, and scalable data manipulation workflows.',
+  'description': 'Master advanced data wrangling and transformation using dplyr, tidyr, and data.table in R.',
+  'difficulty': 'Professional',
+  'duration': '60 min',
+  'expected_outcomes': '* Clean messy datasets efficiently.\n'
+                       '* Transform raw data into analysis-ready formats.\n'
+                       '* Apply dplyr verbs such as `filter()`, `select()`, `mutate()`, `summarise()`, and '
+                       '`group_by()`.\n'
+                       '* Reshape data using `pivot_longer()` and `pivot_wider()`.\n'
+                       '* Perform fast data processing with **data.table**.\n'
+                       '* Build reproducible data wrangling workflows for real-world datasets.',
+  'learning_notes': '### Data Wrangling in R\n'
+                    'Data wrangling involves cleaning, reshaping, and transforming raw data into a format suitable for '
+                    'analysis.\n'
+                    '\n'
+                    '### dplyr & tidyr\n'
+                    '- pivot_longer() and pivot_wider() from tidyr reshape datasets between wide and long formats.\n'
+                    '- dplyr handles group-wise transformations, filtering, and joins.\n'
+                    '\n'
+                    '### data.table\n'
+                    'data.table is an R package that provides a high-performance version of data.frames. It is '
+                    'extremely fast and memory-efficient for large datasets.',
+  'notes_file_path': 'https://019f5f1f-e71d-6a8b-f340-0cf1306ef23c.share.connect.posit.cloud/',
+  'objectives': '* Understand the principles of data wrangling.\n'
+                '* Manipulate datasets using the **dplyr** package.\n'
+                '* Reshape datasets using **tidyr**.\n'
+                '* Perform high-performance data manipulation using **data.table**.\n'
+                '* Merge, join, filter, group, and summarize datasets.\n'
+                '* Handle missing values and duplicate records efficiently.\n'
+                '* Prepare clean datasets for visualization and machine learning.',
+  'quiz': [],
+  'resources': '- [Tidyverse homepage](https://www.tidyverse.org/)\n'
+               '- [data.table documentation](https://rdatatable.gitlab.io/data.table/)',
+  'slug': 'r-session-10',
+  'title': 'Session 10: Data Wrangling with dplyr, tidyr & data.table'},
+ {'code_examples': 'library(ggplot2)\n'
+                   '# Advanced ggplot2 customization\n'
+                   'df <- data.frame(\n'
+                   '  category = factor(c("A", "B", "C", "D")),\n'
+                   '  value = c(23, 45, 12, 38)\n'
+                   ')\n'
+                   'p <- ggplot(df, aes(x = category, y = value, fill = category)) +\n'
+                   '  geom_col(show.legend = FALSE) +\n'
+                   '  theme_minimal(base_size = 14) +\n'
+                   '  scale_fill_brewer(palette = "Set2") +\n'
+                   '  labs(title = "Custom Styled Column Chart", x = "Category", y = "Value")\n'
+                   'print(p)',
+  'content': 'This session introduces advanced data visualization techniques using **ggplot2**, enabling learners to '
+             'create professional, publication-quality visualizations. Students will learn how to customize plots, '
+             'apply themes, visualize multivariate data, and communicate insights effectively through compelling '
+             'graphics.',
+  'description': 'Create publication-quality plots and custom visualizations using advanced ggplot2 features, plotly, '
+                 'and patchworks.',
+  'difficulty': 'Professional',
+  'duration': '60 min',
+  'expected_outcomes': '* Design professional-quality charts and graphs.\n'
+                       '* Customize colors, labels, legends, and themes.\n'
+                       '* Create boxplots, violin plots, heatmaps, histograms, scatterplots, and faceted '
+                       'visualizations.\n'
+                       '* Present analytical findings effectively.\n'
+                       '* Develop dashboards and reports with meaningful visualizations.',
+  'learning_notes': '### Advanced Data Visualization in R\n'
+                    'Advanced data visualization involves creating customized and interactive plots that communicate '
+                    'complex data insights effectively.\n'
+                    '\n'
+                    '### ggplot2 Themes and Customization\n'
+                    '- Use theme() to customize background, grid lines, text size, and colors.\n'
+                    '- Customize color and fill scales using scale_fill_brewer() or scale_color_viridis_d().\n'
+                    '\n'
+                    '### Plot Layouts\n'
+                    'Combine multiple plots in a single figure using packages like patchwork or cowplot.',
+  'notes_file_path': 'https://019f5f33-6dd3-0544-d5dd-7558d1a45bf1.share.connect.posit.cloud/',
+  'objectives': '* Build advanced visualizations using **ggplot2**.\n'
+                '* Customize plot aesthetics and themes.\n'
+                '* Create statistical graphics for data exploration.\n'
+                '* Visualize relationships among multiple variables.\n'
+                '* Produce interactive and presentation-ready charts.\n'
+                '* Select appropriate visualizations for different data types.',
+  'quiz': [],
+  'resources': '- [ggplot2 Elegant Graphics for Data Analysis](https://ggplot2-book.org/)\n'
+               '- [R Graph Gallery](https://r-graph-gallery.com/)',
+  'slug': 'r-session-11',
+  'title': 'Session 11: Advanced Data Visualization in R'},
+ {'code_examples': '# Split data and evaluate a simple baseline model\n'
+                   'set.seed(42)\n'
+                   'data(mtcars)\n'
+                   'train_idx <- sample(1:nrow(mtcars), 0.7 * nrow(mtcars))\n'
+                   'train_data <- mtcars[train_idx, ]\n'
+                   'test_data <- mtcars[-train_idx, ]\n'
+                   'print(paste("Train size:", nrow(train_data), "Test size:", nrow(test_data)))',
+  'content': 'This session introduces statistical computing concepts and the fundamentals of machine learning using R. '
+             'Learners explore descriptive and inferential statistics, probability distributions, feature engineering, '
+             'model evaluation, and the overall machine learning workflow.',
+  'description': 'Learn the core concepts of statistical computing, optimization, and the machine learning workflow in '
+                 'R.',
+  'difficulty': 'Professional',
+  'duration': '60 min',
+  'expected_outcomes': '* Perform statistical analysis in R.\n'
+                       '* Prepare datasets for predictive modeling.\n'
+                       '* Understand the machine learning lifecycle.\n'
+                       '* Select suitable algorithms for different problems.\n'
+                       '* Interpret model evaluation metrics.\n'
+                       '* Build a strong foundation for advanced machine learning.',
+  'learning_notes': '### Machine Learning Workflow\n'
+                    'Machine learning is a subset of AI that enables systems to learn from data. The standard ML '
+                    'workflow includes:\n'
+                    '1. Data Preprocessing & Cleaning\n'
+                    '2. Feature Selection & Engineering\n'
+                    '3. Train/Test Splitting\n'
+                    '4. Model Training & Tuning\n'
+                    '5. Model Evaluation\n'
+                    '\n'
+                    '### Preprocessing in R\n'
+                    'Use scale() to normalize numeric columns so they have a mean of 0 and standard deviation of 1.',
+  'notes_file_path': 'https://019f5f3c-d9a9-9e03-83cf-2daad22a5978.share.connect.posit.cloud/',
+  'objectives': '* Apply statistical techniques in R.\n'
+                '* Understand supervised and unsupervised learning concepts.\n'
+                '* Prepare datasets for machine learning.\n'
+                '* Perform feature engineering and data preprocessing.\n'
+                '* Split datasets into training and testing sets.\n'
+                '* Evaluate machine learning models using appropriate metrics.',
+  'quiz': [],
+  'resources': '- [Introduction to Modern Statistics](https://openintro-ims.netlify.app/)\n'
+               '- [Hands-On Machine Learning with R](https://bradleyboehmke.github.io/HOML/)',
+  'slug': 'r-session-12',
+  'title': 'Session 12: Statistical Computing & Introduction to Machine Learning'},
+ {'code_examples': '# Logistic regression classification on mtcars (predicting high vs low mpg)\n'
+                   'df <- mtcars\n'
+                   'df$high_mpg <- as.factor(ifelse(df$mpg > 20, 1, 0))\n'
+                   'model <- glm(high_mpg ~ wt + hp, data = df, family = binomial)\n'
+                   'summary(model)',
+  'content': 'This session introduces classification techniques used in supervised machine learning. Learners will '
+             'build models capable of predicting categorical outcomes using algorithms such as Logistic Regression, '
+             'Decision Trees, Random Forest, Naïve Bayes, K-Nearest Neighbors (KNN), and Support Vector Machines '
+             '(SVM).',
+  'description': 'Train, evaluate, and tune classification models in R using caret and tidymodels.',
+  'difficulty': 'Professional',
+  'duration': '75 min',
+  'expected_outcomes': '* Develop classification models for real-world datasets.\n'
+                       '* Predict categorical outcomes accurately.\n'
+                       '* Evaluate model performance using Accuracy, Precision, Recall, F1-Score, and ROC-AUC.\n'
+                       '* Improve model performance through parameter tuning.\n'
+                       '* Select appropriate classification techniques for different business problems.',
+  'learning_notes': '### Supervised Classification\n'
+                    'Classification is a type of supervised learning where the target variable is categorical (e.g. '
+                    'Pass/Fail, Yes/No).\n'
+                    '\n'
+                    '### Logistic Regression\n'
+                    'Used when predicting a binary outcome. It models the log-odds of the probability of class 1.\n'
+                    '\n'
+                    '### Decision Trees & Random Forests\n'
+                    'Decision trees split data recursively based on feature thresholds. Random Forests combine '
+                    'multiple trees for better generalizability.',
+  'notes_file_path': 'https://019f5f3a-de8f-352f-c0c4-f987772281b3.share.connect.posit.cloud/',
+  'objectives': '* Understand classification problems.\n'
+                '* Build classification models in R.\n'
+                '* Train and test classification algorithms.\n'
+                '* Evaluate classification performance.\n'
+                '* Interpret confusion matrices and classification metrics.\n'
+                '* Compare multiple classification algorithms.',
+  'quiz': [],
+  'resources': '- [Tidymodels documentation](https://www.tidymodels.org/)\n'
+               '- [Caret package manual](https://topepo.github.io/caret/)',
+  'slug': 'r-session-13',
+  'title': 'Session 13: Supervised Machine Learning | Classification'},
+ {'code_examples': '# Multiple linear regression in R\nmodel <- lm(mpg ~ wt + hp + cyl, data = mtcars)\nsummary(model)',
+  'content': 'This session explores regression techniques for predicting continuous numerical outcomes. Learners build '
+             'and evaluate regression models using Linear Regression, Multiple Regression, Polynomial Regression, and '
+             'Regularization techniques to solve predictive analytics problems.',
+  'description': 'Train, tune, and evaluate regression models in R to predict continuous variables.',
+  'difficulty': 'Professional',
+  'duration': '75 min',
+  'expected_outcomes': '* Develop predictive regression models.\n'
+                       '* Analyze relationships between variables.\n'
+                       '* Evaluate models using RMSE, MAE, and R².\n'
+                       '* Interpret regression outputs confidently.\n'
+                       '* Apply regression techniques to business and research datasets.',
+  'learning_notes': '### Supervised Regression\n'
+                    'Regression is used to predict continuous outcomes (e.g., house prices, sales, yields).\n'
+                    '\n'
+                    '### Regularization\n'
+                    '- **Lasso Regression (L1)**: Adds a penalty equivalent to the absolute values of the '
+                    'coefficients, pushing some to zero (feature selection).\n'
+                    '- **Ridge Regression (L2)**: Adds a penalty equivalent to the square of the coefficients, '
+                    'shrinking them towards zero.\n'
+                    '\n'
+                    '### Evaluation Metrics\n'
+                    '- Root Mean Squared Error (RMSE): Average magnitude of error.\n'
+                    '- R-squared: Proportion of variance explained by model.',
+  'notes_file_path': 'https://019f5f53-62bf-c5b5-e834-ed3252d834f3.share.connect.posit.cloud/',
+  'objectives': '* Understand regression analysis concepts.\n'
+                '* Build regression models in R.\n'
+                '* Interpret regression coefficients.\n'
+                '* Evaluate regression performance.\n'
+                '* Detect overfitting and underfitting.\n'
+                '* Improve predictive accuracy.',
+  'quiz': [],
+  'resources': '- [An Introduction to Statistical Learning](https://www.statlearning.com/)\n'
+               '- [Tidymodels for Regression](https://www.tidymodels.org/start/models/)',
+  'slug': 'r-session-14',
+  'title': 'Session 14: Supervised Machine Learning | Regression'},
+ {'code_examples': '# K-means clustering on mtcars numeric columns\n'
+                   'numeric_data <- scale(mtcars[, c("mpg", "disp", "hp", "wt")])\n'
+                   'set.seed(42)\n'
+                   'clusters <- kmeans(numeric_data, centers = 3)\n'
+                   'print(clusters$centers)',
+  'content': 'This session introduces unsupervised learning techniques that identify hidden structures within '
+             'datasets. Learners will perform clustering and dimensionality reduction using algorithms such as '
+             'K-Means, Hierarchical Clustering, Principal Component Analysis (PCA), and t-SNE to discover patterns '
+             'without predefined labels.',
+  'description': 'Discover hidden structures in unlabeled datasets using clustering and dimensionality reduction in R.',
+  'difficulty': 'Professional',
+  'duration': '75 min',
+  'expected_outcomes': '* Segment data into meaningful groups.\n'
+                       '* Apply K-Means and Hierarchical Clustering.\n'
+                       '* Reduce dataset dimensions using PCA.\n'
+                       '* Visualize complex datasets effectively.\n'
+                       '* Extract meaningful insights from unlabeled data.',
+  'learning_notes': '### Unsupervised Learning\n'
+                    'Unsupervised learning works with unlabeled datasets. Its goals include clustering and dimension '
+                    'reduction.\n'
+                    '\n'
+                    '### Clustering\n'
+                    '- **K-Means**: Groups observations based on their distance to a central centroid.\n'
+                    '- **Hierarchical Clustering**: Builds a tree of clusters (dendrogram) based on pairwise '
+                    'distances.\n'
+                    '\n'
+                    '### Dimension Reduction (PCA)\n'
+                    'PCA converts a set of correlated variables into a set of values of linearly uncorrelated '
+                    'variables called principal components.',
+  'notes_file_path': 'https://019f5f57-7e38-8f53-3e0b-b31b94057808.share.connect.posit.cloud/',
+  'objectives': '* Understand unsupervised learning concepts.\n'
+                '* Perform clustering analysis.\n'
+                '* Apply dimensionality reduction techniques.\n'
+                '* Visualize high-dimensional datasets.\n'
+                '* Interpret clusters and hidden patterns.\n'
+                '* Evaluate clustering performance.',
+  'quiz': [],
+  'resources': '- [Unsupervised Learning on CRAN](https://cran.r-project.org/web/views/Cluster.html)\n'
+               '- [PCA in R Tutorial](https://www.r-bloggers.com/2021/05/principal-component-analysis-pca-in-r/)',
+  'slug': 'r-session-15',
+  'title': 'Session 15: Unsupervised Machine Learning | Clustering & Dimension Reduction'},
+ {'code_examples': '# Capstone end-to-end simulation\nprint("CDAM R Capstone Project Pipeline Initialized")',
+  'content': 'The final session provides learners with the opportunity to apply all the knowledge and skills acquired '
+             'throughout the course by completing comprehensive real-world data science projects using R. Students '
+             'will independently plan, implement, analyze, visualize, and present end-to-end analytical solutions '
+             'while demonstrating proficiency in data wrangling, statistical analysis, visualization, and machine '
+             'learning.',
+  'description': 'Apply your machine learning and statistical computing skills to solve a comprehensive real-world '
+                 'problem in R.',
+  'difficulty': 'Professional',
+  'duration': '120 min',
+  'expected_outcomes': '* Develop complete end-to-end data science solutions in R.\n'
+                       '* Apply industry-standard analytical workflows.\n'
+                       '* Build professional portfolios showcasing practical projects.\n'
+                       '* Demonstrate readiness for real-world data analytics roles.\n'
+                       '* Present data-driven insights confidently to technical and non-technical audiences.',
+  'learning_notes': '### R Capstone Project\n'
+                    'The capstone is an integration of all key R capabilities. It represents the final step in the '
+                    'Professional R Track, allowing you to showcase an end-to-end statistical modeling or machine '
+                    'learning solution.',
+  'notes_file_path': 'https://019f5f78-17b4-f53f-98ee-ab41aa5595c0.share.connect.posit.cloud/',
+  'objectives': '* Integrate all concepts learned throughout the course.\n'
+                '* Design and execute complete data science projects.\n'
+                '* Perform data cleaning, analysis, visualization, and modeling.\n'
+                '* Document analytical workflows professionally.\n'
+                '* Communicate analytical findings effectively.\n'
+                '* Present project results using reproducible reports.',
+  'quiz': [],
+  'resources': '- [CDAM R Graduation Requirements](https://cdam.chuka.ac.ke/grad/r/)\n'
+               '- [R Markdown Guide](https://bookdown.org/yihui/rmarkdown/)',
+  'slug': 'r-session-16',
+  'title': 'Session 16: Capstone Projects in R'}]
