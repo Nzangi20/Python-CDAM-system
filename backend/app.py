@@ -1406,7 +1406,10 @@ def session_detail(slug: str):
                 is_viewable = True
             
     now = utc_now()
-    exams = Exam.query.filter_by(published=True, study_level=current_user.study_level, session_id=session.id).all()
+    if current_user.is_admin:
+        exams = Exam.query.filter_by(published=True, session_id=session.id).all()
+    else:
+        exams = Exam.query.filter_by(published=True, study_level=current_user.study_level, session_id=session.id).all()
     upcoming = [e for e in exams if e.start_time and to_naive(e.start_time) > now]
     available = [
         e
