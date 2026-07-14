@@ -865,7 +865,7 @@ def admin_dashboard_context():
     ).order_by(User.created_at.desc()).all()
 
     total_attempts = ExamAttemptRecord.query.count()
-    passed_attempts = ExamAttemptRecord.query.filter_by(status="submitted").join(
+    passed_attempts = ExamAttemptRecord.query.join(
         Exam, Exam.id == ExamAttemptRecord.exam_id
     ).filter(ExamAttemptRecord.score >= Exam.passing_score).count()
     exam_pass_rate = round((passed_attempts / total_attempts * 100), 1) if total_attempts > 0 else 0.0
@@ -2452,6 +2452,20 @@ def complete_session(slug: str):
         if not res or res.score < 60:
             flash("You must take and pass the quiz for this session with at least 60% before marking it as completed.", "error")
             return redirect(url_for("session_detail", slug=slug) + "?tab=quiz-tab")
+
+    session_exams = Exam.query.filter_by(session_id=session.id, published=True).all()
+    if session_exams:
+        passed_exam = False
+        for ex in session_exams:
+            attempt = ExamAttemptRecord.query.filter_by(user_id=current_user.id, exam_id=ex.id).filter(
+                ExamAttemptRecord.score >= ex.passing_score
+            ).first()
+            if attempt:
+                passed_exam = True
+                break
+        if not passed_exam:
+            flash("You must take and pass the assessment for this session before marking it as completed.", "error")
+            return redirect(url_for("session_detail", slug=slug) + "?tab=exams-tab")
             
     progress = UserProgress.query.filter_by(user_id=current_user.id, session_id=session.id).first()
     if not progress:
@@ -2607,12 +2621,12 @@ def exam_take(exam_id: int):
     # Check if student has already passed this exam
     passed_attempt = ExamAttemptRecord.query.filter_by(
         user_id=current_user.id, 
-        exam_id=exam.id,
-        status="submitted"
+        exam_id=exam.id
     ).filter(ExamAttemptRecord.score >= exam.passing_score).first()
     if passed_attempt:
         flash("You have already passed this exam.", "success")
         return redirect(get_exam_redirect_url(exam))
+
 
     prior_attempts = ExamAttemptRecord.query.filter_by(user_id=current_user.id, exam_id=exam.id).count()
     if prior_attempts >= 3:
@@ -2722,6 +2736,17 @@ def exam_take(exam_id: int):
     attempt.status = "flagged" if is_flagged else ("passed" if passed else "submitted")
     attempt.score = score
     db.session.commit()
+
+    if passed and exam.session_id:
+        progress = UserProgress.query.filter_by(user_id=current_user.id, session_id=exam.session_id).first()
+        if not progress:
+            progress = UserProgress(user_id=current_user.id, session_id=exam.session_id)
+        progress.completed = True
+        progress.progress_percentage = 100
+        progress.completed_at = utc_now()
+        db.session.add(progress)
+        db.session.commit()
+
     if attempt.violation_count or integrity_flags["forced_termination"]:
         db.session.add(
             IntegrityLog(
@@ -3601,6 +3626,19 @@ def admin_attempt_action(attempt_id: int):
     else:
         flash("Invalid action.", "error")
     db.session.commit()
+
+    if attempt.status in ["submitted", "passed"]:
+        exam = db.session.get(Exam, attempt.exam_id)
+        if exam and exam.session_id and attempt.score >= exam.passing_score:
+            progress = UserProgress.query.filter_by(user_id=attempt.user_id, session_id=exam.session_id).first()
+            if not progress:
+                progress = UserProgress(user_id=attempt.user_id, session_id=exam.session_id)
+            progress.completed = True
+            progress.progress_percentage = 100
+            progress.completed_at = utc_now()
+            db.session.add(progress)
+            db.session.commit()
+
     return redirect(url_for("admin_integrity"))
 
 

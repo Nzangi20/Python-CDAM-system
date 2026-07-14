@@ -73,10 +73,33 @@
               <td class="ts-col-no">{{ row_counter.value }}</td>
               <td>Session {{ session.display_order }}: {{ session.clean_title }}</td>
               <td class="ts-col-score">
-                {% if quiz_map.get(session.id) is not none %}
-                  {{ quiz_map[session.id].score }}%
+                {% set session_exams = [] %}
+                {% for e in exams if e.session_id == session.id %}
+                  {% set _ = session_exams.append(e) %}
+                {% endfor %}
+                
+                {% if session_exams %}
+                  {% set session_attempts = [] %}
+                  {% for att in exam_attempts %}
+                    {% for e in session_exams %}
+                      {% if att.exam_id == e.id %}
+                        {% set _ = session_attempts.append(att) %}
+                      {% endif %}
+                    {% endfor %}
+                  {% endfor %}
+                  
+                  {% if session_attempts %}
+                    {% set best_exam_attempt = session_attempts | sort(attribute='score', reverse=True) | first %}
+                    {{ best_exam_attempt.score }}%
+                  {% else %}
+                    —
+                  {% endif %}
                 {% else %}
-                  —
+                  {% if quiz_map.get(session.id) is not none %}
+                    {{ quiz_map[session.id].score }}%
+                  {% else %}
+                    —
+                  {% endif %}
                 {% endif %}
               </td>
             </tr>
@@ -92,10 +115,33 @@
               <td class="ts-col-no">{{ row_counter.value }}</td>
               <td>Session {{ session.display_order }}: {{ session.clean_title }}</td>
               <td class="ts-col-score">
-                {% if quiz_map.get(session.id) is not none %}
-                  {{ quiz_map[session.id].score }}%
+                {% set session_exams = [] %}
+                {% for e in exams if e.session_id == session.id %}
+                  {% set _ = session_exams.append(e) %}
+                {% endfor %}
+                
+                {% if session_exams %}
+                  {% set session_attempts = [] %}
+                  {% for att in exam_attempts %}
+                    {% for e in session_exams %}
+                      {% if att.exam_id == e.id %}
+                        {% set _ = session_attempts.append(att) %}
+                      {% endif %}
+                    {% endfor %}
+                  {% endfor %}
+                  
+                  {% if session_attempts %}
+                    {% set best_exam_attempt = session_attempts | sort(attribute='score', reverse=True) | first %}
+                    {{ best_exam_attempt.score }}%
+                  {% else %}
+                    —
+                  {% endif %}
                 {% else %}
-                  —
+                  {% if quiz_map.get(session.id) is not none %}
+                    {{ quiz_map[session.id].score }}%
+                  {% else %}
+                    —
+                  {% endif %}
                 {% endif %}
               </td>
             </tr>
