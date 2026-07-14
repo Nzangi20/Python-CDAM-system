@@ -292,6 +292,8 @@ class Exam(db.Model):
     published = db.Column(db.Boolean, default=False)
     study_level = db.Column(db.String(30), default="Beginner", nullable=False)
     course_type = db.Column(db.String(30), default="python", nullable=False)
+    session_id = db.Column(db.Integer, db.ForeignKey("sessions.id"), nullable=True, index=True)
+    session = db.relationship("Session", backref=db.backref("exams", lazy=True), foreign_keys=[session_id])
     created_at = db.Column(db.DateTime, default=utc_now)
 
 
@@ -1142,7 +1144,7 @@ def resources():
 def exams_dashboard():
     now = utc_now()
     active_track = get_active_track()
-    exams = Exam.query.filter_by(published=True, study_level=current_user.study_level, course_type=active_track).all()
+    exams = Exam.query.filter_by(published=True, study_level=current_user.study_level, course_type=active_track, session_id=None).all()
     upcoming = [e for e in exams if e.start_time and to_naive(e.start_time) > now]
     available = [
         e
@@ -1404,7 +1406,7 @@ def session_detail(slug: str):
                 is_viewable = True
             
     now = utc_now()
-    exams = Exam.query.filter_by(published=True, study_level=current_user.study_level).all()
+    exams = Exam.query.filter_by(published=True, study_level=current_user.study_level, session_id=session.id).all()
     upcoming = [e for e in exams if e.start_time and to_naive(e.start_time) > now]
     available = [
         e
@@ -2540,6 +2542,14 @@ def like_comment(comment_id: int):
     return redirect(url_for("session_detail", slug=db.session.get(Session, comment.session_id).slug))
 
 
+def get_exam_redirect_url(exam):
+    if exam and exam.session_id:
+        session = db.session.get(Session, exam.session_id)
+        if session:
+            return url_for("session_detail", slug=session.slug)
+    return url_for("exams_dashboard")
+
+
 @app.route("/exams/<int:exam_id>/take", methods=["GET", "POST"])
 @login_required
 @student_required
@@ -2547,23 +2557,23 @@ def exam_take(exam_id: int):
     exam = db.session.get(Exam, exam_id)
     if not exam or not exam.published:
         flash("Exam not available.", "error")
-        return redirect(url_for("exams_dashboard"))
+        return redirect(get_exam_redirect_url(exam))
     if exam.study_level != current_user.study_level:
         flash("You do not have access to this exam.", "error")
-        return redirect(url_for("exams_dashboard"))
+        return redirect(get_exam_redirect_url(exam))
     if exam.course_type == "python" and not current_user.enrolled_python:
         flash("You do not have access to this exam.", "error")
-        return redirect(url_for("exams_dashboard"))
+        return redirect(get_exam_redirect_url(exam))
     if exam.course_type == "r" and not current_user.enrolled_r:
         flash("You do not have access to this exam.", "error")
-        return redirect(url_for("exams_dashboard"))
+        return redirect(get_exam_redirect_url(exam))
     now = utc_now()
     if exam.start_time and to_naive(exam.start_time) > now:
         flash("Exam has not started yet.", "error")
-        return redirect(url_for("exams_dashboard"))
+        return redirect(get_exam_redirect_url(exam))
     if exam.end_time and to_naive(exam.end_time) < now:
         flash("Exam window has closed.", "error")
-        return redirect(url_for("exams_dashboard"))
+        return redirect(get_exam_redirect_url(exam))
 
     # Check if student has already passed this exam
     passed_attempt = ExamAttemptRecord.query.filter_by(
@@ -2573,12 +2583,12 @@ def exam_take(exam_id: int):
     ).filter(ExamAttemptRecord.score >= exam.passing_score).first()
     if passed_attempt:
         flash("You have already passed this exam.", "success")
-        return redirect(url_for("exams_dashboard"))
+        return redirect(get_exam_redirect_url(exam))
 
     prior_attempts = ExamAttemptRecord.query.filter_by(user_id=current_user.id, exam_id=exam.id).count()
     if prior_attempts >= 3:
         flash("Attempt limit reached. You are only allowed 2 other trials after failing.", "error")
-        return redirect(url_for("exams_dashboard"))
+        return redirect(get_exam_redirect_url(exam))
 
     question_rows = Question.query.filter_by(exam_id=exam.id).all()
     exam_questions = [
@@ -2594,7 +2604,7 @@ def exam_take(exam_id: int):
     ]
     if not exam_questions:
         flash("Exam questions are not configured.", "error")
-        return redirect(url_for("exams_dashboard"))
+        return redirect(get_exam_redirect_url(exam))
 
     attempt = ExamAttemptRecord.query.filter_by(user_id=current_user.id, exam_id=exam.id, status="in_progress").order_by(
         ExamAttemptRecord.created_at.desc()
@@ -2631,7 +2641,7 @@ def exam_take(exam_id: int):
     # POST submit
     if not attempt:
         flash("No active exam attempt found.", "error")
-        return redirect(url_for("exams_dashboard"))
+        return redirect(get_exam_redirect_url(exam))
 
     elapsed = (utc_now() - to_naive(attempt.created_at)).total_seconds() / 60
     if elapsed > exam.duration + 1:
@@ -2639,7 +2649,7 @@ def exam_take(exam_id: int):
         attempt.submitted_at = utc_now()
         attempt.status = "terminated"
         db.session.commit()
-        return redirect(url_for("exams_dashboard"))
+        return redirect(get_exam_redirect_url(exam))
 
     integrity_flags = {
         "tab_switches": int(request.form.get("tab_switches", "0") or 0),
@@ -2696,7 +2706,7 @@ def exam_take(exam_id: int):
         db.session.commit()
     log_activity("student.exam.submit", f"exam={exam.id}:{score}:flagged={is_flagged}")
     flash("Exam submitted successfully.", "success")
-    return redirect(url_for("exams_dashboard"))
+    return redirect(get_exam_redirect_url(exam))
 
 
 @app.post("/exams/attempt/<int:attempt_id>/violation")
@@ -2826,6 +2836,9 @@ def admin_exams():
             except Exception:
                 pass
         
+        session_id_raw = request.form.get("session_id")
+        session_id = int(session_id_raw) if (session_id_raw and session_id_raw != "none") else None
+
         exam = Exam(
             title=request.form.get("title", "").strip(),
             description=request.form.get("description", "").strip(),
@@ -2840,6 +2853,7 @@ def admin_exams():
             published=True,
             study_level=request.form.get("study_level", "Beginner").strip(),
             course_type=request.form.get("course_type", "python").strip(),
+            session_id=session_id,
             start_time=start_time,
             end_time=end_time,
         )
@@ -2866,7 +2880,8 @@ def admin_exams():
         flash("Exam created.", "success")
         return redirect(url_for("admin_exams"))
     exams = Exam.query.order_by(Exam.created_at.desc()).all()
-    return render_template("admin_exams.html", exams=exams)
+    sessions = Session.query.order_by(Session.course_type, Session.display_order).all()
+    return render_template("admin_exams.html", exams=exams, sessions=sessions)
 
 
 @app.route("/admin/session/new", methods=["GET", "POST"])
@@ -3267,6 +3282,9 @@ def admin_exam_edit(exam_id: int):
         flash("Exam not found.", "error")
         return redirect(url_for("admin_exams"))
     if request.method == "POST":
+        session_id_raw = request.form.get("session_id")
+        session_id = int(session_id_raw) if (session_id_raw and session_id_raw != "none") else None
+
         exam.title = request.form.get("title", "").strip()
         exam.description = request.form.get("description", "").strip()
         exam.duration = int(request.form.get("duration", "30") or 30)
@@ -3280,6 +3298,7 @@ def admin_exam_edit(exam_id: int):
         exam.published = request.form.get("published") == "on"
         exam.study_level = request.form.get("study_level", "Beginner").strip()
         exam.course_type = request.form.get("course_type", "python").strip()
+        exam.session_id = session_id
         start_time_raw = request.form.get("start_time", "").strip()
         end_time_raw = request.form.get("end_time", "").strip()
         
@@ -3354,7 +3373,8 @@ def admin_exam_edit(exam_id: int):
          "marks": q.marks}
         for q in questions
     ]
-    return render_template("admin_exam_edit.html", exam=exam, questions_json=json.dumps(questions_data, indent=2))
+    sessions = Session.query.order_by(Session.course_type, Session.display_order).all()
+    return render_template("admin_exam_edit.html", exam=exam, questions_json=json.dumps(questions_data, indent=2), sessions=sessions)
 
 
 @app.post("/admin/exams/<int:exam_id>/delete")
@@ -3616,6 +3636,9 @@ def migrate_schema() -> None:
         if "course_type" not in columns:
             with db.engine.begin() as conn:
                 conn.execute(text("ALTER TABLE exams ADD COLUMN course_type VARCHAR(30) DEFAULT 'python'"))
+        if "session_id" not in columns:
+            with db.engine.begin() as conn:
+                conn.execute(text("ALTER TABLE exams ADD COLUMN session_id INTEGER"))
     if "activity_logs" in inspector.get_table_names():
         columns = {col["name"] for col in inspector.get_columns("activity_logs")}
         if "role" not in columns:

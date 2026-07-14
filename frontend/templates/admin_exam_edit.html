@@ -50,9 +50,18 @@
         </div>
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
           <label>Course Track</label>
-          <select name="course_type" required>
+          <select name="course_type" id="course_type_select" required>
             <option value="python" {% if exam.course_type == "python" %}selected{% endif %}>Python Programming</option>
             <option value="r" {% if exam.course_type == "r" %}selected{% endif %}>R Programming</option>
+          </select>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <label>Associated Session</label>
+          <select name="session_id" id="session_id_select">
+            <option value="none">None (General Assessment)</option>
+            {% for s in sessions %}
+              <option value="{{ s.id }}" data-track="{{ s.course_type }}" {% if exam.session_id == s.id %}selected{% endif %}>Session {{ s.display_order }}: {{ s.clean_title }}</option>
+            {% endfor %}
           </select>
         </div>
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
@@ -389,6 +398,35 @@
           aiGenerateBtn.innerHTML = originalText;
         }
       });
+    }
+    // Dynamic Session Dropdown Filtering
+    const courseTypeSelect = document.getElementById("course_type_select") || document.getElementsByName("course_type")[0];
+    const sessionIdSelect = document.getElementById("session_id_select") || document.getElementsByName("session_id")[0];
+    
+    if (courseTypeSelect && sessionIdSelect) {
+      const allSessionOptions = Array.from(sessionIdSelect.options);
+      
+      function filterSessions() {
+        const selectedTrack = courseTypeSelect.value;
+        const currentSelectedValue = sessionIdSelect.value;
+        sessionIdSelect.innerHTML = "";
+        
+        allSessionOptions.forEach(opt => {
+          if (opt.value === "none" || opt.getAttribute("data-track") === selectedTrack) {
+            sessionIdSelect.appendChild(opt);
+          }
+        });
+        
+        // Restore selected value if it's still available, otherwise default to none
+        if (Array.from(sessionIdSelect.options).some(opt => opt.value === currentSelectedValue)) {
+          sessionIdSelect.value = currentSelectedValue;
+        } else {
+          sessionIdSelect.value = "none";
+        }
+      }
+      
+      courseTypeSelect.addEventListener("change", filterSessions);
+      filterSessions();
     }
   })();
 </script>
