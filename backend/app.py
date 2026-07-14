@@ -1144,20 +1144,12 @@ def resources():
 def exams_dashboard():
     now = utc_now()
     active_track = get_active_track()
-    if current_user.study_level == "Professional":
-        exams = Exam.query.filter(
-            Exam.published == True,
-            Exam.study_level.in_(["Beginner", "Professional"]),
-            Exam.course_type == active_track,
-            Exam.session_id == None
-        ).all()
-    else:
-        exams = Exam.query.filter_by(
-            published=True,
-            study_level="Beginner",
-            course_type=active_track,
-            session_id=None
-        ).all()
+    exams = Exam.query.filter_by(
+        published=True,
+        study_level=current_user.study_level,
+        course_type=active_track,
+        session_id=None
+    ).all()
     upcoming = [e for e in exams if e.start_time and to_naive(e.start_time) > now]
     available = [
         e

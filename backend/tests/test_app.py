@@ -541,7 +541,7 @@ def test_transcript_and_trials_limit(client):
     # 2. Check transcript is accessible with 0% progress
     resp_tr = client.get("/transcript")
     assert resp_tr.status_code == 200
-    assert b"Official Academic Transcript" in resp_tr.data
+    assert b"TRANSCRIPT" in resp_tr.data
     assert b"IN PROGRESS" in resp_tr.data
     
     # 3. Seed student progress to 100%
@@ -559,9 +559,9 @@ def test_transcript_and_trials_limit(client):
         
     resp_tr_unlocked = client.get("/transcript")
     assert resp_tr_unlocked.status_code == 200
-    assert b"Official Academic Transcript" in resp_tr_unlocked.data
+    assert b"TRANSCRIPT" in resp_tr_unlocked.data
     assert b"EB3/99999/26" in resp_tr_unlocked.data
-    assert b"COMPLETED" in resp_tr_unlocked.data
+    assert b"PASS" in resp_tr_unlocked.data
     
     # 4. Check trials limit logic (at most 3 attempts, blocked after passing)
     with app.app_context():
@@ -598,6 +598,12 @@ def test_transcript_and_trials_limit(client):
     # Attempt 4: Should be blocked by prior attempts >= 3 limit
     resp_att4 = client.get(f"/exams/{exam_id}/take")
     assert resp_att4.status_code == 302
+
+    # Check that the transcript shows the highest score of the failed attempts (55%)
+    resp_tr_failed = client.get("/transcript")
+    assert resp_tr_failed.status_code == 200
+    assert b"Assessment Session" in resp_tr_failed.data
+    assert b"55%" in resp_tr_failed.data
     
     # Check that if they passed, they are also blocked from retaking
     with app.app_context():
@@ -610,6 +616,12 @@ def test_transcript_and_trials_limit(client):
         
     resp_att_passed = client.get(f"/exams/{exam_id}/take")
     assert resp_att_passed.status_code == 302
+
+    # Check that the transcript shows the highest score of the passed attempt (85%)
+    resp_tr_passed = client.get("/transcript")
+    assert resp_tr_passed.status_code == 200
+    assert b"Assessment Session" in resp_tr_passed.data
+    assert b"85%" in resp_tr_passed.data
 
 
 def test_ai_platform_toggle(client):
@@ -1248,7 +1260,7 @@ def test_transcript_active_track_display(client):
     
     resp_py = client.get("/transcript")
     assert resp_py.status_code == 200
-    assert b"Python for Data Science Masterclass" in resp_py.data
+    assert b"Master Python for Data Science" in resp_py.data
     assert b"R for Data Science" not in resp_py.data
 
     # Log out
@@ -1263,8 +1275,8 @@ def test_transcript_active_track_display(client):
     
     resp_r = client.get("/transcript")
     assert resp_r.status_code == 200
-    assert b"R for Data Science (Statistical Computing" in resp_r.data
-    assert b"Python for Data Science Masterclass" not in resp_r.data
+    assert b"Master R for Data Science" in resp_r.data
+    assert b"Master Python for Data Science" not in resp_r.data
 
 
 def test_transcript_sessions_grouping(client):
@@ -1287,8 +1299,8 @@ def test_transcript_sessions_grouping(client):
     # The page should show the title for both courses
     assert b"Master Python and R for Data Science" in resp.data
     # It should contain headings for both tracks
-    assert b"Python for Data Science Track" in resp.data
-    assert b"R for Data Science Track" in resp.data
+    assert b"Master Python for Data Science" in resp.data
+    assert b"Master R for Data Science" in resp.data
     
     # It should list the first python session and first R session
     assert b"Introduction to Python" in resp.data or b"Session 1" in resp.data
