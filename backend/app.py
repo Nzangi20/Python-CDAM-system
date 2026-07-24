@@ -77,11 +77,11 @@ app = Flask(
 )
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "change-this-in-production")
 
-# Detect if running on Vercel and default to a SQLite temp DB if DATABASE_URL is missing
+# Detect if running on Vercel or default to local SQLite database if DATABASE_URL is missing
 if os.environ.get("VERCEL"):
     db_default = "sqlite:///" + str(Path("/tmp") / "cdam.db")
 else:
-    db_default = "mysql+pymysql://root:@localhost:3306/cdam_lms"
+    db_default = "sqlite:///" + str(BASE_DIR / "cdam.db")
 
 db_url = os.environ.get("DATABASE_URL", db_default).strip()
 if db_url.startswith("mysql://"):
@@ -91,15 +91,23 @@ elif db_url.startswith("postgres://"):
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# Automatically apply secure SSL settings when deploying to cloud providers
-if "aivencloud.com" in db_url or "supabase" in db_url:
+# Establish connection pool options for high-concurrency MySQL/PostgreSQL setups (skip for SQLite)
+if "pytest" not in sys.modules and not db_url.startswith("sqlite"):
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "connect_args": {
+        "pool_size": int(os.environ.get("DB_POOL_SIZE", "15")),
+        "max_overflow": int(os.environ.get("DB_MAX_OVERFLOW", "10")),
+        "pool_recycle": int(os.environ.get("DB_POOL_RECYCLE", "1800")),
+        "pool_pre_ping": True,
+        "pool_timeout": int(os.environ.get("DB_POOL_TIMEOUT", "30")),
+    }
+
+    # Automatically apply secure SSL settings when deploying to cloud providers
+    if "aivencloud.com" in db_url or "supabase" in db_url:
+        app.config["SQLALCHEMY_ENGINE_OPTIONS"]["connect_args"] = {
             "ssl": {
                 "ssl_mode": "REQUIRED"
             }
         }
-    }
 app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024
 
 db = SQLAlchemy(app)
@@ -430,11 +438,17 @@ def student_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
         if not current_user.is_authenticated:
+            if request.path.startswith("/api/"):
+                return jsonify({"error": "Authentication required", "reply": "Please log in to continue."}), 401
             return redirect(url_for("login"))
         if current_user.is_admin:
+            if request.path.startswith("/api/"):
+                return view(*args, **kwargs)
             flash("Admins should use the admin dashboard.", "error")
             return redirect(url_for("admin_panel"))
         if current_user.is_suspended:
+            if request.path.startswith("/api/"):
+                return jsonify({"error": "Account suspended", "reply": "Your account has been suspended."}), 403
             logout_user()
             flash("Your account has been suspended. Contact support.", "error")
             return redirect(url_for("login"))
@@ -1489,21 +1503,32 @@ def download_notes(session_id: int):
             flash("Access to this note/revision material is restricted for your experience level.", "error")
         return redirect(request.referrer or url_for("student_dashboard"))
     
+    # Check if download parameter requested for python materials
+    if session.course_type == "python" and (request.args.get("download") == "true" or request.args.get("dl") == "1"):
+        flash("Downloading Python materials is restricted to protect academic content.", "error")
+        return redirect(url_for("view_notes", session_id=session_id))
+
+    response = None
     # Try serving from disk if the file is available
     if session.notes_file_path:
         filename = session.notes_file_path.split("/")[-1]
         filepath = UPLOADS_DIR / filename
         if filepath.exists() and filepath.is_file():
-            return send_from_directory(UPLOADS_DIR, filename, as_attachment=False)
+            response = send_from_directory(UPLOADS_DIR, filename, as_attachment=False, mimetype="application/pdf")
             
     # Fallback to database BLOB in memory
-    if session.notes_file_data:
-        return send_file(
+    if not response and session.notes_file_data:
+        response = send_file(
             BytesIO(session.notes_file_data),
             mimetype="application/pdf",
             as_attachment=False,
             download_name=session.notes_file_name or "notes.pdf"
         )
+
+    if response:
+        response.headers["Content-Disposition"] = "inline; filename=\"notes.pdf\""
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        return response
         
     flash("Notes file not found.", "error")
     return redirect(request.referrer or url_for("student_dashboard"))
@@ -1696,31 +1721,35 @@ def clean_stderr(stderr_str):
 def run_code():
     if not current_user.is_authenticated:
         return jsonify({"output": "", "error": "Authentication required. Please login again."}), 401
-    import subprocess
-    import sys
-    import os
+    
     payload = request.get_json(silent=True) or {}
     code = payload.get("code", "")
-    if not code.strip():
-        return jsonify({"output": "", "error": "No code provided."})
-    
-    # Establish user-specific sandbox workspace directory
-    import tempfile
-    workspace_dir = os.path.join(tempfile.gettempdir(), "sandbox_workspace", f"user_{current_user.id}")
-    os.makedirs(workspace_dir, exist_ok=True)
-    
-    # Dynamically restore missing sandbox files
-    try:
-        ensure_sandbox_files(workspace_dir, current_user)
-    except Exception as e:
-        try:
-            db.session.rollback()
-        except Exception:
-            pass
-        print(f"Error checking sandbox files: {e}")
-    
     active_track = payload.get("track", get_active_track())
-    temp_script_path = None
+    
+    if active_track == "r":
+        msg = (
+            "[Desktop Workspace Active]\n\n"
+            "To run R code, please open RStudio from your desktop.\n"
+            "1. Open RStudio.\n"
+            "2. Download your session script (.R) or copy your code.\n"
+            "3. Run your analysis in the RStudio console."
+        )
+    else:
+        msg = (
+            "[Desktop Workspace Active]\n\n"
+            "To run Python code, please open Jupyter Notebook from your desktop.\n"
+            "1. Open Command Prompt / Terminal and run 'jupyter notebook' (or open Anaconda Navigator).\n"
+            "2. Copy your session code into Jupyter Notebook (downloading Python materials is restricted).\n"
+            "3. Execute cells in Jupyter Notebook on your computer."
+        )
+    
+    return jsonify({
+        "output": msg,
+        "error": None,
+        "exit_code": 0,
+        "desktop_prompt": True,
+        "track": active_track
+    })
     if active_track == "r":
         temp_script_path = os.path.join(workspace_dir, f"script_{current_user.id}.R")
         # Prepend setup code to auto-load workspace CSV datasets (no slow package loading!)
@@ -1812,7 +1841,7 @@ except ImportError:
             cmd,
             capture_output=True,
             text=True,
-            timeout=30.0,
+            timeout=sandbox_timeout,
             cwd=workspace_dir,
             env=env
         )
@@ -1834,7 +1863,7 @@ except ImportError:
                 pass
         return jsonify({
             "output": "",
-            "error": "Execution timed out (30 seconds limit)."
+            "error": f"Execution timed out ({sandbox_timeout} seconds limit)."
         })
     except FileNotFoundError as e:
         if temp_script_path and os.path.exists(temp_script_path):
@@ -1875,7 +1904,7 @@ except ImportError:
                     [sys.executable, "-W", "ignore", "-c", full_python_code],
                     capture_output=True,
                     text=True,
-                    timeout=15.0,
+                    timeout=sandbox_timeout,
                     cwd=workspace_dir,
                     env=env
                 )
@@ -2076,18 +2105,19 @@ def _ai_check_access():
     if setting and setting.value == "false":
         return jsonify({"reply": "AI assistance has been disabled by the administrator."}), None
 
-    # Check if student has an active exam in progress
-    active_exam = ExamAttemptRecord.query.filter_by(
-        user_id=current_user.id, status="in_progress"
-    ).first()
-    if active_exam:
-        return jsonify({"reply": "⚠️ AI assistance is unavailable during assessments. Complete your exam first."}), None
+    # Admins bypass exam restrictions and rate limits
+    if not getattr(current_user, "is_admin", False):
+        active_exam = ExamAttemptRecord.query.filter_by(
+            user_id=current_user.id, status="in_progress"
+        ).first()
+        if active_exam:
+            return jsonify({"reply": "⚠️ AI assistance is unavailable during assessments. Complete your exam first."}), None
 
-    # Rate limit check
+        ai = get_ai_service()
+        if not ai.check_rate_limit(current_user.id):
+            return jsonify({"reply": "You've reached the AI request limit (10/minute). Please wait a moment before trying again."}), None
+
     ai = get_ai_service()
-    if not ai.check_rate_limit(current_user.id):
-        return jsonify({"reply": "You've reached the AI request limit (10/minute). Please wait a moment before trying again."}), None
-
     return None, ai
 
 

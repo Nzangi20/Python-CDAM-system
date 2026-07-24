@@ -294,36 +294,17 @@ def test_api_run_code(client):
     # Logged in user required
     register_and_login(client, reg_number="EB3/22222/26")
     
-    # Run hello world
+    # Run code endpoint returns desktop notebook prompt
     resp = client.post(
         "/api/run-code",
-        json={"code": "print('Hello from Sandbox!')"}
+        json={"code": "print('Hello from Desktop!')"}
     )
     assert resp.status_code == 200
     res_data = json.loads(resp.data)
-    assert "Hello from Sandbox!" in res_data["output"]
-    assert res_data["error"] == ""
+    assert res_data.get("desktop_prompt") is True
+    assert "Jupyter Notebook" in res_data["output"]
     assert res_data["exit_code"] == 0
-    
-    # Verify sandbox can import key libraries
-    resp_imports = client.post(
-        "/api/run-code",
-        json={"code": "import numpy as np\nimport pandas as pd\nprint('All libraries loaded!')"}
-    )
-    assert resp_imports.status_code == 200
-    res_data_imports = json.loads(resp_imports.data)
-    assert "All libraries loaded!" in res_data_imports["output"]
-    assert res_data_imports["error"] == ""
-    assert res_data_imports["exit_code"] == 0
 
-    # Run timeout infinite loop
-    resp_timeout = client.post(
-        "/api/run-code",
-        json={"code": "import time\nwhile True: time.sleep(0.1)"}
-    )
-    assert resp_timeout.status_code == 200
-    res_data_timeout = json.loads(resp_timeout.data)
-    assert "timed out" in res_data_timeout["error"].lower()
 
 
 def test_exam_level_filtering(client):
@@ -1095,17 +1076,14 @@ def test_r_sandbox_code_execution(client):
     # Let's post to run-code
     run_resp = client.post(
         "/api/run-code",
-        json={"code": 'cat("Hello from R sandboxed environment!\n")'}
+        json={"code": 'cat("Hello from R!\n")'}
     )
     assert run_resp.status_code == 200
     data = json.loads(run_resp.data)
     assert "output" in data
-    assert "error" in data
-    
-    if "not installed" in data["error"] or "could not be found" in data["error"]:
-        assert True
-    else:
-        assert "Hello from R" in data["output"]
+    assert data.get("desktop_prompt") is True
+    assert "RStudio" in data["output"]
+
 
 
 def test_admin_track_awareness(client):

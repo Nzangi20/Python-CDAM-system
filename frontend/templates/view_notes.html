@@ -11,12 +11,58 @@
     <div style="width: 120px;"></div> <!-- Spacer -->
   </div>
 
-  <div class="card" style="padding: 0.5rem; background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius); position: relative; overflow: hidden; height: 85vh;">
-    <iframe id="pdfIframe" src="{{ url_for('download_notes', session_id=session.id) }}#toolbar=0&navpanes=0" style="width: 100%; height: 100%; border: none;" allow="autoplay"></iframe>
+  <div class="card" id="pdfViewerContainer" style="padding: 1.5rem; background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius); overflow-y: auto; height: 85vh;">
+    <!-- Default fallback viewer with disabled toolbar (#toolbar=0) -->
+    <div id="pdfFallbackWrapper" style="width: 100%; height: 100%;">
+      <object data="{{ url_for('download_notes', session_id=session.id) }}#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" style="width: 100%; height: 100%;">
+        <iframe id="pdfIframe" src="{{ url_for('download_notes', session_id=session.id) }}#toolbar=0&navpanes=0&scrollbar=0" style="width: 100%; height: 100%; border: none;"></iframe>
+      </object>
+    </div>
   </div>
 </div>
 
+<!-- Load PDF.js for canvas rendering (removes browser native PDF toolbar/download tab) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
+  // PDF.js Canvas Renderer
+  (function() {
+    const pdfUrl = "{{ url_for('download_notes', session_id=session.id) }}";
+    const container = document.getElementById('pdfViewerContainer');
+    const fallbackWrapper = document.getElementById('pdfFallbackWrapper');
+
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      
+      pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
+        // Clear fallback object once PDF.js loads successfully
+        fallbackWrapper.style.display = 'none';
+
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          pdf.getPage(pageNum).then(function(page) {
+            const scale = 1.35;
+            const viewport = page.getViewport({ scale: scale });
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            canvas.style.display = 'block';
+            canvas.style.margin = '0 auto 1.5rem auto';
+            canvas.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.2)';
+            canvas.style.borderRadius = '8px';
+            canvas.style.maxWidth = '100%';
+            canvas.style.background = '#ffffff';
+
+            container.appendChild(canvas);
+            page.render({ canvasContext: context, viewport: viewport });
+          });
+        }
+      }).catch(function(err) {
+        console.log("PDF.js initialization notice: Using native view-only frame (#toolbar=0).", err);
+      });
+    }
+  })();
+
   // Disable right-click on the entire document
   document.addEventListener('contextmenu', function(e) {
     e.preventDefault();

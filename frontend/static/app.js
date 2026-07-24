@@ -170,46 +170,30 @@ function initCodeBlocks() {
   const codePanel = document.getElementById("code");
   const courseType = codePanel ? codePanel.dataset.courseType : "python";
 
-  if (btnRun && codeEditor && output && outputText) {
+  if (btnRun && codeEditor) {
     const originalCode = codeEditor.value;
 
-    btnRun.addEventListener("click", async () => {
-      const code = codeEditor.value;
-      output.hidden = false;
-      outputText.textContent = ">>> Executing script inside sandbox, please wait...\n";
-      
-      try {
-        btnRun.disabled = true;
-        btnRun.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Running...';
-        
-        const response = await fetch("/api/run-code", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code, track: courseType })
-        });
-        const data = await response.json();
-        
-        if (data.error) {
-          outputText.textContent = (data.output ? data.output + "\n" : "") + "--- ERROR ---\n" + data.error;
-          showToast("Code completed with error.", "error");
-        } else {
-          const hint = courseType === "python" 
-            ? ">>> Execution finished (no standard output to show).\n\nHint: Use the print() function to display results, values, or dataframe contents in the console.\nExample: print(df.head())"
-            : ">>> Execution finished (no standard output to show).\n\nHint: Use the print() or cat() function to display results, values, or dataframe contents in the console.\nExample: print(head(df))";
-          outputText.textContent = data.output || hint;
-          showToast("Execution completed successfully.", "success");
-        }
-      } catch (err) {
-        outputText.textContent = ">>> Error: Failed to contact the backend code sandbox. " + err;
-        showToast("Backend connection failed.", "error");
-      } finally {
-        btnRun.disabled = false;
-        btnRun.innerHTML = '<i class="fa-solid fa-play"></i> Run Code';
+    btnRun.addEventListener("click", () => {
+      openDesktopPromptModal(courseType);
+      if (output && outputText) {
+        output.hidden = false;
+        const appName = courseType === "python" ? "Jupyter Notebook" : "RStudio";
+        const launchCmd = courseType === "python" ? "jupyter notebook" : "Open RStudio from Desktop";
+        outputText.textContent = `>>> Desktop Workspace Prompt Opened for ${appName}\n` +
+          `--------------------------------------------------\n` +
+          `1. Open your desktop terminal/command prompt or Start menu.\n` +
+          `2. Run: ${launchCmd}\n` +
+          `3. Download your code (.ipynb / .py / .R) using the buttons above or copy directly.\n` +
+          `4. Execute and inspect your output in your local ${appName} environment.`;
       }
     });
 
     if (btnDownloadNotebook) {
       btnDownloadNotebook.addEventListener("click", () => {
+        if (courseType === "python") {
+          showToast("Downloading Python materials is restricted to protect academic content.", "error");
+          return;
+        }
         const code = codeEditor.value;
         const out = outputText.textContent || "";
         
@@ -261,17 +245,21 @@ function initCodeBlocks() {
 
     if (btnDownloadScript) {
       btnDownloadScript.addEventListener("click", () => {
+        if (courseType === "python") {
+          showToast("Downloading Python materials is restricted to protect academic content.", "error");
+          return;
+        }
         const code = codeEditor.value;
         const blob = new Blob([code], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = courseType === "python" ? "sandbox_code.py" : "sandbox_code.R";
+        a.download = "sandbox_code.R";
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        showToast(courseType === "python" ? "Python script (.py) downloaded." : "R script (.R) downloaded.", "success");
+        showToast("R script (.R) downloaded.", "success");
       });
     }
 
@@ -772,11 +760,11 @@ function formatAIMarkdown(text) {
             <button class="btn ghost ai-code-copy-btn" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; color: var(--text-muted); cursor: pointer;" title="Copy code">
               <i class="fa-regular fa-copy"></i> Copy
             </button>
-            <button class="btn ghost ai-code-export-btn" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; color: var(--purple-brand); cursor: pointer;" title="Load into simulator editor">
-              <i class="fa-solid fa-file-import"></i> Export to Editor
+            <button class="btn ghost ai-code-export-btn" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; color: var(--purple-brand); cursor: pointer;" title="Load into Session Code Editor">
+              <i class="fa-solid fa-file-import"></i> Send to Workspace
             </button>
-            <button class="btn ghost ai-code-run-btn" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; color: var(--green-500); cursor: pointer;" title="Run in Sandbox simulator">
-              <i class="fa-solid fa-play"></i> Run Code
+            <button class="btn ghost ai-code-run-btn" onclick="openDesktopPromptModal('${block.lang === 'r' ? 'r' : 'python'}')" style="padding: 0.15rem 0.4rem; font-size: 0.7rem; color: var(--green-500); cursor: pointer;" title="Open in Desktop IDE">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Open IDE
             </button>
           </div>
         </div>
@@ -917,3 +905,39 @@ function initSandboxFiles() {
   // Initial load
   loadFiles();
 }
+
+function openDesktopPromptModal(track) {
+  const modal = document.getElementById("desktopLaunchModal");
+  if (modal) {
+    modal.style.display = "flex";
+    const appName = track === "python" ? "Jupyter Notebook" : "RStudio";
+    showToast(`Opening desktop environment guide for ${appName}`, "info");
+  } else {
+    const appName = track === "python" ? "Jupyter Notebook" : "RStudio";
+    alert(`To code in ${track === "python" ? "Python" : "R"}, please launch ${appName} from your desktop application menu or command prompt.`);
+  }
+}
+
+function closeDesktopPromptModal() {
+  const modal = document.getElementById("desktopLaunchModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+async function copyCodeEditorContent() {
+  const editor = document.getElementById("codeEditor");
+  if (editor) {
+    try {
+      await navigator.clipboard.writeText(editor.value);
+      showToast("Code copied to clipboard!", "success");
+    } catch (err) {
+      showToast("Failed to copy code.", "error");
+    }
+  }
+}
+
+window.openDesktopPromptModal = openDesktopPromptModal;
+window.closeDesktopPromptModal = closeDesktopPromptModal;
+window.copyCodeEditorContent = copyCodeEditorContent;
+
